@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html {{todo:html_attributes}}>
+
+<head>
+    <meta charset="utf-8">
+    <title>{{todo:t text="会员注册"}} - {{todo:site_name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="site-url" content="{{todo:site_url}}">
+    <meta name="site-root" content="{{todo:site_url|default}}">
+    <script>
+        (function () {
+            function join(base, path) { return String(base || '').replace(/\/+$/, '') + '/' + String(path || '').replace(/^\/+/, ''); }
+            var siteUrl = '{{todo:site_url}}';
+            var siteRoot = '{{todo:site_url|default}}';
+            window.TODO = window.TODO || {};
+            window.TODO.SITE_URL = siteUrl;
+            window.TODO.SITE_ROOT = siteRoot;
+            window.TODO.join = window.TODO.join || join;
+            window.TODO.API_BASE = join(siteRoot, '/api');
+            window.TODO_LANG = {{todo:lang_pack_json}};
+        })();
+    </script>
+    <link rel="shortcut icon" href="{{todo:site_favicon}}" type="image/x-icon">
+    <link rel="stylesheet" href="{{todo:public_url}}/static/common/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{todo:public_url}}/static/common/css/iconfont.css">
+    <link rel="stylesheet" href="{{todo:public_url}}/plugins/layer-v3.5.1/theme/default/layer.css">
+    <link rel="stylesheet" href="{{todo:theme_url}}/users/skin/css/login.css">
+    
+    <style>
+        /* 短信/邮箱验证码包裹样式 */
+        .verify-code-wrapper { display: flex; justify-content: space-between; align-items: center; border-radius: 3px; overflow: hidden; background: #fff; }
+        .verify-code-wrapper input { border: none; flex: 1; box-shadow: none; }
+        .verify-code-wrapper input:focus { outline: none; }
+        .verify-code-wrapper .send-code-btn { border: none; background: transparent; color: #333; padding: 0 20px; height: 45px; margin-inline-start: 10px; cursor: pointer; font-size: 14px; border-radius: 8px; border: 1px solid #eceef1; }
+        .verify-code-wrapper .send-code-btn:disabled { color: #999; cursor: not-allowed; }
+    </style>
+</head>
+
+<body class="login-page">
+    {{todo:include file="captcha_modal.html"}}
+
+    <!-- 注册主容器 -->
+    <div class="login-main-container">
+        <div class="login-card">
+            <!-- 左侧：宣传/二维码 -->
+            <div class="login-left" style="width: 40%;">
+                <div class="qr-login-section">
+                    {{todo:if condition="site_logo"}}
+                    <a href="{{todo:home_url}}" class="site-logo">
+                        <img src="{{todo:site_logo}}" alt="{{todo:site_name}}">
+                    </a>
+                    {{/todo:if}}
+                    <h2 class="qr-title">{{todo:site_name}}</h2>
+                </div>
+            </div>
+
+            <!-- 右侧：邮箱注册/短信注册 -->
+            <div class="login-right" style="width: 60%;">
+                <div class="login-tabs">
+                    <button type="button" class="tab-btn active" data-tab="email">{{todo:t text="邮箱注册"}}</button>
+                    {{todo:if_mobile_login_enabled}}
+                    <span class="tab-separator">|</span>
+                    <button type="button" class="tab-btn" data-tab="mobile">{{todo:t text="手机注册"}}</button>
+                    {{/todo:if_mobile_login_enabled}}
+                </div>
+
+                <!-- 邮箱注册表单 -->
+                <form id="accountRegisterForm" class="login-form active" onsubmit="return false;">
+                    {{todo:csrf_field name="register"}}
+                    <input type="hidden" name="register_type" value="email">
+                    
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" class="form-input" placeholder="{{todo:t text='邮箱'}}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="verify-code-wrapper">
+                            <input type="text" id="email_code" name="email_code" class="form-input" placeholder="{{todo:t text='邮箱验证码'}}"
+                                maxlength="6" pattern="\d{6}" required>
+                            <button type="button" id="send-email-btn" class="send-code-btn">{{todo:t text="获取验证码"}}</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="position: relative;">
+                        <div class="password-input-wrapper">
+                            <input type="password" id="password" name="password" class="form-input"
+                                placeholder="{{todo:t text='至少8位，含大小写字母和数字'}}" 
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$" 
+                                autocomplete="new-password" required>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" style="position: absolute; inset-inline-end: 15px; top: 0px; height: 44px; opacity: 0.2; cursor: pointer;" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.2';" onclick="var p = this.previousElementSibling; p.type = p.type === 'password' ? 'text' : 'password';">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path fill="currentColor" d="M2 5.27L3.28 4L20 20.72L18.73 22l-3.08-3.08c-1.15.38-2.37.58-3.65.58c-5 0-9.27-3.11-11-7.5c.69-1.76 1.79-3.31 3.19-4.54zM12 9a3 3 0 0 1 3 3a3 3 0 0 1-.17 1L11 9.17A3 3 0 0 1 12 9m0-4.5c5 0 9.27 3.11 11 7.5a11.8 11.8 0 0 1-4 5.19l-1.42-1.43A9.86 9.86 0 0 0 20.82 12A9.82 9.82 0 0 0 12 6.5c-1.09 0-2.16.18-3.16.5L7.3 5.47c1.44-.62 3.03-.97 4.7-.97M3.18 12A9.82 9.82 0 0 0 12 17.5c.69 0 1.37-.07 2-.21L11.72 15A3.064 3.064 0 0 1 9 12.28L5.6 8.87c-.99.85-1.82 1.91-2.42 3.13" />
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-input"
+                            placeholder="{{todo:t text='确认密码'}}" autocomplete="new-password" required>
+                    </div>
+
+                    <button type="submit" class="login-submit-btn">{{todo:t text="注册"}}</button>
+
+                    <div class="login-footer-links">
+                        <div class="social-login">
+                            {{todo:if_qq_login_enabled}}
+                            <a href="{{todo:qq_login_url}}" class="footer-link" title="QQ {{todo:t text='注册'}}">QQ</a>
+                            {{/todo:if_qq_login_enabled}}
+                        </div>
+                        <div class="other-links">
+                            <a href="{{todo:login_url}}" class="footer-link">{{todo:t text="已有账号？登录"}}</a>
+                        </div>
+                    </div>
+
+                    <div class="agreement-section">
+                        <label class="agreement-checkbox">
+                            <input type="checkbox" name="agreement" value="1" required>
+                            <span class="checkbox-mark"></span>
+                            <span class="agreement-text">
+                                {{todo:t text="已阅读并同意"}}&nbsp;<a href="javascript:void(0);" onclick="openAgreementModal(this.textContent.trim(), 'user-agreement-content');">{{todo:t text="用户服务协议"}}</a>&nbsp;{{todo:t text="和"}}&nbsp;<a href="javascript:void(0);" onclick="openAgreementModal(this.textContent.trim(), 'privacy-policy-content');">{{todo:t text="隐私权政策"}}</a>
+                            </span>
+                        </label>
+                    </div>
+                </form>
+
+                {{todo:if_mobile_login_enabled}}
+                <!-- 手机注册表单 -->
+                <form id="mobileRegisterForm" class="login-form" onsubmit="return false;">
+                    {{todo:csrf_field name="register"}}
+                    <input type="hidden" name="register_type" value="mobile">
+                    
+                    <div class="form-group">
+                        <input type="tel" id="mobile" name="mobile" class="form-input" placeholder="{{todo:t text='手机号'}}"
+                            pattern="^1[3-9]\d{9}$" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="verify-code-wrapper">
+                            <input type="text" id="sms_code" name="sms_code" class="form-input" placeholder="{{todo:t text='短信验证码'}}"
+                                maxlength="6" pattern="\d{6}" required>
+                            <button type="button" id="send-sms-btn" class="send-code-btn">{{todo:t text="获取验证码"}}</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="position: relative;">
+                        <div class="password-input-wrapper">
+                            <input type="password" id="mobile_password" name="password" class="form-input"
+                                placeholder="{{todo:t text='至少8位，含大小写字母和数字'}}" 
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$" 
+                                autocomplete="new-password" required>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" style="position: absolute; inset-inline-end: 15px; top: 0px; height: 44px; opacity: 0.2; cursor: pointer;" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.2';" onclick="var p = this.previousElementSibling; p.type = p.type === 'password' ? 'text' : 'password';">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path fill="currentColor" d="M2 5.27L3.28 4L20 20.72L18.73 22l-3.08-3.08c-1.15.38-2.37.58-3.65.58c-5 0-9.27-3.11-11-7.5c.69-1.76 1.79-3.31 3.19-4.54zM12 9a3 3 0 0 1 3 3a3 3 0 0 1-.17 1L11 9.17A3 3 0 0 1 12 9m0-4.5c5 0 9.27 3.11 11 7.5a11.8 11.8 0 0 1-4 5.19l-1.42-1.43A9.86 9.86 0 0 0 20.82 12A9.82 9.82 0 0 0 12 6.5c-1.09 0-2.16.18-3.16.5L7.3 5.47c1.44-.62 3.03-.97 4.7-.97M3.18 12A9.82 9.82 0 0 0 12 17.5c.69 0 1.37-.07 2-.21L11.72 15A3.064 3.064 0 0 1 9 12.28L5.6 8.87c-.99.85-1.82 1.91-2.42 3.13" />
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="mobile_confirm_password" name="confirm_password" class="form-input"
+                            placeholder="{{todo:t text='确认密码'}}" autocomplete="new-password" required>
+                    </div>
+
+                    <button type="submit" class="login-submit-btn">{{todo:t text="注册"}}</button>
+
+                    <div class="login-footer-links">
+                        <div class="social-login">
+                            {{todo:if_qq_login_enabled}}
+                            <a href="{{todo:qq_login_url}}" class="footer-link" title="QQ {{todo:t text='注册'}}">QQ</a>
+                            {{/todo:if_qq_login_enabled}}
+                        </div>
+                        <div class="other-links">
+                            <a href="{{todo:login_url}}" class="footer-link">{{todo:t text="已有账号？登录"}}</a>
+                        </div>
+                    </div>
+
+                    <div class="agreement-section">
+                        <label class="agreement-checkbox">
+                            <input type="checkbox" name="agreement" value="1" required>
+                            <span class="checkbox-mark"></span>
+                            <span class="agreement-text">
+                                {{todo:t text="已阅读并同意"}}&nbsp;<a href="javascript:void(0);" onclick="openAgreementModal(this.textContent.trim(), 'user-agreement-content');">{{todo:t text="用户服务协议"}}</a>&nbsp;{{todo:t text="和"}}&nbsp;<a href="javascript:void(0);" onclick="openAgreementModal(this.textContent.trim(), 'privacy-policy-content');">{{todo:t text="隐私权政策"}}</a>
+                            </span>
+                        </label>
+                    </div>
+                </form>
+                {{/todo:if_mobile_login_enabled}}
+            </div>
+        </div>
+    </div>
+
+    <script src="{{todo:public_url}}/static/common/js/jquery.min.js"></script>
+    <script src="{{todo:public_url}}/plugins/layer-v3.5.1/layer.js"></script>
+    <!-- 我们在此直接编写注册和滑块验证逻辑，覆盖掉原有的 register.js -->
+    <script>
+        // 标签切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const tab = this.dataset.tab;
+
+                // 更新标签状态
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // 切换表单
+                document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
+                if (tab === 'email') {
+                    document.getElementById('accountRegisterForm').classList.add('active');
+                } else if (tab === 'mobile') {
+                    document.getElementById('mobileRegisterForm').classList.add('active');
+                }
+            });
+        });
+
+        // 倒计时工具
+        function startCountdown(btnId) {
+            var btn = document.getElementById(btnId);
+            var count = 60;
+            btn.disabled = true;
+            var timer = setInterval(function() {
+                count--;
+                btn.innerText = '{{todo:t text="重新发送"}} ' + count + 's';
+                if (count <= 0) {
+                    clearInterval(timer);
+                    btn.innerText = '{{todo:t text="获取验证码"}}';
+                    btn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        // 发送邮箱验证码
+        document.getElementById('send-email-btn').addEventListener('click', function() {
+            var email = document.getElementById('email').value.trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                layer.msg('{{todo:t text="请输入有效的邮箱地址"}}', {icon: 2});
+                return;
+            }
+            Captcha.show(function() {
+                var btn = document.getElementById('send-email-btn');
+                btn.disabled = true;
+                btn.innerText = '{{todo:t text="发送中"}}';
+                
+                // 请求发送邮件API
+                var metaSiteUrl = document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : window.location.origin;
+                var apiBase = (window.TODO && window.TODO.API_BASE) ? window.TODO.API_BASE : ((window.TODO && window.TODO.join) ? window.TODO.join(metaSiteUrl, '/api') : (metaSiteUrl.replace(/\/+$/, '') + '/api'));
+                var sendEmailUrl = (window.TODO && window.TODO.join) ? window.TODO.join(apiBase, '/user/send-email-code.php') : (apiBase + '/user/send-email-code.php');
+                $.ajax({
+                    url: sendEmailUrl,
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        type: 'register',
+                        captcha: 'slider', // 传入滑块占位
+                        _csrf_token: (document.querySelector('input[name="_csrf_token"]') ? document.querySelector('input[name="_csrf_token"]').value : (document.querySelector('input[name="_todononce"]') ? document.querySelector('input[name="_todononce"]').value : ''))
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.success) {
+                            layer.msg('{{todo:t text="验证码已发送到您的邮箱"}}', {icon: 1});
+                            startCountdown('send-email-btn');
+                        } else {
+                            layer.msg(res.message || '{{todo:t text="发送失败"}}', {icon: 2});
+                            btn.disabled = false;
+                            btn.innerText = '{{todo:t text="获取验证码"}}';
+                        }
+                    },
+                    error: function() {
+                        layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+                        btn.disabled = false;
+                        btn.innerText = '{{todo:t text="获取验证码"}}';
+                    }
+                });
+            });
+        });
+
+        // 发送短信验证码
+        var sendSmsBtn = document.getElementById('send-sms-btn');
+        if (sendSmsBtn) {
+            sendSmsBtn.addEventListener('click', function() {
+                var mobile = document.getElementById('mobile').value.trim();
+                if (!mobile || !/^1[3-9]\d{9}$/.test(mobile)) {
+                    layer.msg('{{todo:t text="请输入正确的手机号码"}}', {icon: 2});
+                    return;
+                }
+                Captcha.show(function() {
+                    var btn = document.getElementById('send-sms-btn');
+                    btn.disabled = true;
+                    btn.innerText = '{{todo:t text="发送中"}}';
+                    
+                    // 请求发送短信API
+                    var apiBase = window.TODO && window.TODO.API_BASE ? window.TODO.API_BASE : ((document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : window.location.origin).replace(/\/+$/, '') + '/api');
+                    $.ajax({
+                        url: apiBase + '/sms/send',
+                        type: 'POST',
+                        data: {
+                            mobile: mobile,
+                            type: 'register',
+                            captcha: 'slider', // 传入占位符
+                            _todononce: document.querySelector('#mobileRegisterForm input[name="_todononce"]').value
+                        },
+                        dataType: 'json',
+                        success: function(res) {
+                            if (res.success) {
+                                layer.msg('{{todo:t text="验证码已发送到您的手机"}}', {icon: 1});
+                                startCountdown('send-sms-btn');
+                            } else {
+                                layer.msg(res.message || '{{todo:t text="发送失败"}}', {icon: 2});
+                                btn.disabled = false;
+                                btn.innerText = '{{todo:t text="获取验证码"}}';
+                            }
+                        },
+                        error: function(xhr) {
+                            var msg = (xhr && xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : '{{todo:t text="网络错误"}}';
+                            layer.msg(msg, {icon: 2});
+                            btn.disabled = false;
+                            btn.innerText = '{{todo:t text="获取验证码"}}';
+                        }
+                    });
+                });
+            });
+        }
+
+        // 表单 AJAX 提交处理
+        var accountRegisterForm = document.getElementById('accountRegisterForm');
+        if (accountRegisterForm) {
+            accountRegisterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var form = this;
+                var pwd = form.querySelector('input[name="password"]').value;
+                var pwdConfirm = form.querySelector('input[name="confirm_password"]').value;
+                if (pwd !== pwdConfirm) {
+                    layer.msg('{{todo:t text="两次输入的密码不一致"}}', {icon: 2});
+                    return;
+                }
+                var btn = form.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerText = '{{todo:t text="注册中"}}';
+
+                var metaSiteUrl = document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : window.location.origin;
+                var apiBase = (window.TODO && window.TODO.API_BASE) ? window.TODO.API_BASE : ((window.TODO && window.TODO.join) ? window.TODO.join(metaSiteUrl, '/api') : (metaSiteUrl.replace(/\/+$/, '') + '/api'));
+                var regUrl = (window.TODO && window.TODO.join) ? window.TODO.join(apiBase, '/user/register-handler.php') : (apiBase + '/user/register-handler.php');
+
+                var formData = new FormData(form);
+                formData.append('captcha', 'slider');
+
+                $.ajax({
+                    url: regUrl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.success) {
+                            layer.msg(res.message || '{{todo:t text="注册成功"}}', {icon: 1}, function() {
+                                window.location.href = res.data && res.data.redirect_url ? res.data.redirect_url : '{{todo:user_url}}';
+                            });
+                        } else {
+                            layer.msg(res.message || '{{todo:t text="注册失败"}}', {icon: 2});
+                            btn.disabled = false;
+                            btn.innerText = '{{todo:t text="注册"}}';
+                        }
+                    },
+                    error: function(xhr) {
+                        var msg = '{{todo:t text="网络错误"}}';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        layer.msg(msg, {icon: 2});
+                        btn.disabled = false;
+                        btn.innerText = '{{todo:t text="注册"}}';
+                    }
+                });
+            });
+        }
+
+        var mobileRegisterForm = document.getElementById('mobileRegisterForm');
+        if (mobileRegisterForm) {
+            mobileRegisterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var form = this;
+                var pwd = form.querySelector('input[name="password"]').value;
+                var pwdConfirm = form.querySelector('input[name="confirm_password"]').value;
+                if (pwd !== pwdConfirm) {
+                    layer.msg('{{todo:t text="两次输入的密码不一致"}}', {icon: 2});
+                    return;
+                }
+                var btn = form.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerText = '{{todo:t text="注册中"}}';
+
+                var metaSiteUrl = document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : window.location.origin;
+                var apiBase = (window.TODO && window.TODO.API_BASE) ? window.TODO.API_BASE : ((window.TODO && window.TODO.join) ? window.TODO.join(metaSiteUrl, '/api') : (metaSiteUrl.replace(/\/+$/, '') + '/api'));
+                var regUrl = (window.TODO && window.TODO.join) ? window.TODO.join(apiBase, '/user/register-handler.php') : (apiBase + '/user/register-handler.php');
+
+                var formData = new FormData(form);
+                formData.append('captcha', 'slider');
+
+                $.ajax({
+                    url: regUrl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.success) {
+                            layer.msg(res.message || '{{todo:t text="注册成功"}}', {icon: 1}, function() {
+                                window.location.href = res.data && res.data.redirect_url ? res.data.redirect_url : '{{todo:user_url}}';
+                            });
+                        } else {
+                            layer.msg(res.message || '{{todo:t text="注册失败"}}', {icon: 2});
+                            btn.disabled = false;
+                            btn.innerText = '{{todo:t text="注册"}}';
+                        }
+                    },
+                    error: function(xhr) {
+                        var msg = '{{todo:t text="网络错误"}}';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        layer.msg(msg, {icon: 2});
+                        btn.disabled = false;
+                        btn.innerText = '{{todo:t text="注册"}}';
+                    }
+                });
+            });
+        }
+    </script>
+    <div id="user-agreement-content" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="4"}}</div></div>
+    <div id="privacy-policy-content" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="5"}}</div></div>
+    <script>
+    function openAgreementModal(label, contentId) {
+        var el = document.getElementById(contentId);
+        var html = el ? el.innerHTML : '';
+        if (window.layer) {
+            layer.open({
+                type: 1,
+                title: label,
+                area: ['800px', '80%'],
+                shadeClose: true,
+                scrollbar: false,
+                content: html
+            });
+        }
+    }
+    </script>
+</body>
+</html>

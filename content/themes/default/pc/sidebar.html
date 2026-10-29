@@ -1,0 +1,182 @@
+<!-- TodoCMS 侧边栏模板（SEO优化：采用语义化 div 承载小工具与边栏列表，杜绝挤占正文 H1/H2/H3 权重） -->
+<aside id="secondary" class="sidebar">
+    <style>
+        .sidebar .widget-title { font-size: 16px; font-weight: 600; margin: 0 0 10px 0; color: #333; }
+        .sidebar .recent-post-content .post-item-title,
+        .sidebar .popular-post-content .post-item-title { font-size: 14px; font-weight: 500; margin: 0 0 4px 0; line-height: 1.4; }
+        .sidebar .recent-post-content .post-item-title a,
+        .sidebar .popular-post-content .post-item-title a { color: #333; }
+        .sidebar .recent-post-content .post-item-title a:hover,
+        .sidebar .popular-post-content .post-item-title a:hover { color: #0073aa; }
+    </style>
+    {{todo:if active_sidebar}}
+        {{todo:dynamic_sidebar}}
+    {{todo:else}}
+        <!-- 搜索框 -->
+        <div class="widget widget-search">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="搜索"}}</div>
+            <div class="search-form">
+                <div class="flex gap-3">
+                    <input type="search" id="sidebar-search" name="q" value="{{todo:search_keyword}}" class="search-input" onkeypress="if(event.key === 'Enter') document.getElementById('sidebar-search-btn').click();" required>
+                    <button type="button" id="sidebar-search-btn" class="button-secondary" style="display: flex;" onclick="window.TODO.doSafeSearch(document.getElementById('sidebar-search').value, document.getElementById('sidebar-search'));">
+                        <i class="icon todofont todo-Search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 最新文章 -->
+        <div class="widget widget-recent-posts">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="最新文章"}}</div>
+            <ul class="recent-posts-list">
+                {{todo:articles limit="5" orderby="post_date" order="desc"}}
+                <li class="recent-post-item flex gap-2">
+                    {{todo:if thumbnail}}
+                    <a href="{{todo:url}}" style="width: 50px; flex-shrink: 0;">
+                        {{todo:thumbnail class="lazy-load" loading="lazy"}}
+                    </a>
+                    {{/todo:if}}
+                    <div class="recent-post-content">
+                        <div class="post-item-title"><a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a></div>
+                        <div class="dec flex items-center gap-2">
+                            <span class="date">
+                                {{todo:date format="m-d"}}
+                            </span>
+                            <span class="views">
+                                <i class="icon todofont todo-PreviewOpen"></i>
+                                {{todo:views}}
+                            </span>
+                        </div>
+                    </div>
+                </li>
+                {{/todo:articles}}
+            </ul>
+        </div>
+        
+        <!-- 热门文章 -->
+        <div class="widget widget-popular-posts">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="热门文章"}}</div>
+            <ul class="popular-posts-list">
+                {{todo:articles limit="5" orderby="view_count" order="desc"}}
+                <li class="popular-post-item flex gap-2 items-baseline">
+                    <div class="rank">{{todo:index}}</div>
+                    <div class="popular-post-content">
+                        <div class="post-item-title"><a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a></div>
+                        <div class="dec flex items-center gap-2">
+                            <span class="views">
+                                <i class="icon todofont todo-PreviewOpen"></i>
+                                {{todo:views}}
+                            </span>
+                            {{todo:if comments_enabled && comment_count}}
+                            <span class="comments">
+                                <i class="icon todofont todo-CommentOne"></i>
+                                {{todo:comments_count}}
+                            </span>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                </li>
+                {{/todo:articles}}
+            </ul>
+        </div>
+
+        <!-- 推荐文章 -->
+        <div class="widget widget-popular-posts">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="推荐文章"}}</div>
+            <ul class="popular-posts-list">
+                {{todo:articles limit="5" orderby="rand"}}
+                <li class="popular-post-item flex gap-2 items-baseline">
+                    <div class="rank">{{todo:index}}</div>
+                    <div class="popular-post-content">
+                        <div class="post-item-title"><a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a></div>
+                        <div class="dec flex items-center gap-2">
+                            <span class="views">
+                                <i class="icon todofont todo-PreviewOpen"></i>
+                                {{todo:views}}
+                            </span>
+                            {{todo:if comments_enabled && comment_count}}
+                            <span class="comments">
+                                <i class="icon todofont todo-CommentOne"></i>
+                                {{todo:comments_count}}
+                            </span>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                </li>
+                {{/todo:articles}}
+            </ul>
+        </div>
+        
+        <!-- 标签云 -->
+        <div class="widget widget-tags">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="标签云"}}</div>
+            <div class="tag-cloud flex flex-wrap gap-2">
+                {{todo:tags limit="20" order="articles_count desc"}}
+                <a href="{{todo:url}}" class="tag-cloud-item" title="{{todo:name}} ({{todo:articles_count}} {{todo:t text='篇文章'}})">
+                    {{todo:name}}
+                </a>
+                {{/todo:tags}}
+            </div>
+        </div>
+        
+        <!-- 归档 -->
+        <div class="widget widget-archives">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="文章归档"}}</div>
+            <ul class="archives-list">
+                {{todo:archives|limit=10}}
+                <li class="archive-item">
+                    <a href="{{todo:archives_url}}" class="archive-link inline-flex items-center gap-1">
+                        <span class="archive-date inline-flex items-center gap-1">
+                            <i class="icon todofont todo-FolderClose"></i>
+                            {{todo:year}}/{{todo:month}}
+                        </span>
+                        <span class="archive-count">({{todo:articles_count}})</span>
+                    </a>
+                </li>
+                {{/todo:archives}}
+            </ul>
+        </div>
+        
+        <!-- 友情链接 -->
+        <div class="widget widget-links">
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="友情链接"}}</div>
+            <ul class="links-list">
+                {{todo:links group="设计"}}
+                <li class="link-item">
+                    <a href="{{todo:url}}" target="{{todo:target}}" rel="nofollow" title="{{todo:description}}" class="flex items-center gap-2">
+                        {{todo:if image}}
+                        <div style="width: 50px;text-align: center;">{{todo:img_tag src="image" alt="name" width="30" class="lazy-load" loading="lazy" style="vertical-align: middle;"}}</div>
+                        {{/todo:if}}
+                        <div class="flex-1 flex justify-between items-center">
+                            {{todo:name}}
+                            {{todo:if description}}
+                            <p class="dec m-0">{{todo:description}}</p>
+                            {{/todo:if}}
+                        </div>
+                    </a>
+                </li>
+                {{/todo:links}}
+            </ul>
+            <div class="widget-title" role="heading" aria-level="3">{{todo:t text="合作伙伴"}}</div>
+            <ul class="links-list">
+                {{todo:links group="general"}}
+                <li class="link-item">
+                    <a href="{{todo:url}}" target="{{todo:target}}" rel="nofollow" title="{{todo:description}}" class="flex items-center gap-2">
+                        {{todo:if image}}
+                        <div style="width: 50px;text-align: center;">{{todo:img_tag src="image" alt="name" class="lazy-load" loading="lazy" style="vertical-align: middle;"}}</div>
+                        {{/todo:if}}
+                        <div class="flex-1 flex justify-between items-center">
+                            {{todo:name}}
+                            {{todo:if description}}
+                            <p class="dec m-0">{{todo:description}}</p>
+                            {{/todo:if}}
+                        </div>
+                    </a>
+                </li>
+                {{/todo:links}}
+            </ul>
+        </div>
+        
+    {{/todo:if}}
+</aside>
+

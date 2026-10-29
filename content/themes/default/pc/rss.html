@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+    <title><![CDATA[{{todo:site_title}}]]></title>
+    <link>{{todo:site_url}}</link>
+    <description><![CDATA[{{todo:site_description}}]]></description>
+    <language>zh-CN</language>
+    <generator>TodoCMS</generator>
+    <atom:link href="{{todo:site_url}}rss" rel="self" type="application/rss+xml"/>
+    {{todo:if site_logo}}
+    <image>
+        <url>{{todo:site_logo}}</url>
+        <title><![CDATA[{{todo:site_title}}]]></title>
+        <link>{{todo:site_url}}</link>
+    </image>
+    {{/todo:if}}
+
+    {{todo:loop posts|per_page=20|orderby=post_date|order=DESC}}
+    <item>
+        <title><![CDATA[{{todo:article_title}}]]></title>
+        <link>{{todo:article_url}}</link>
+        <guid isPermaLink="true">{{todo:article_url}}</guid>
+        <pubDate>{{todo:article_created_at format="r"}}</pubDate>
+        <dc:creator><![CDATA[{{todo:article_author_name}}]]></dc:creator>
+        <description><![CDATA[{{todo:article_excerpt length="300"}}]]></description>
+        <content:encoded><![CDATA[{{todo:article_content}}]]></content:encoded>
+        {{todo:if article_featured_image}}
+        <enclosure url="{{todo:article_featured_image}}" length="0" type="image/jpeg"/>
+        {{/todo:if}}
+    </item>
+    {{/todo:loop}}
+
+</channel>
+</rss>

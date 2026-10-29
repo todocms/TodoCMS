@@ -1,0 +1,1261 @@
+{{todo:include file="users/users_header.htm"}}
+
+    <div class="checkout-page">
+        <div class="container">
+            {{todo:if user_logged_in}}
+            {{todo:else}}
+            <!-- 访客下单提示 banner -->
+            <div class="guest-checkout-banner" style="background: #eef6ff; border: 1px solid #cce5ff; border-radius: 6px; padding: 12px 20px; margin: 30px 0 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px 15px;">
+                <div style="font-size: 14px; color: #004085;">
+                    {{todo:t text="您当前正以 <b>访客身份</b> 进行结算"}}
+                </div>
+                <a href="{{todo:login_url}}&redirect_to={{todo:current_url}}" class="btn btn-outline btn-sm" style="border-color: #004085; color: #004085; text-decoration: none; flex-shrink: 0;">{{todo:t text="登录"}}</a>
+            </div>
+            {{/todo:if}}
+            <div class="page-header mt-4">
+                <div>
+                    <h2 class="page-title">{{todo:t text="确认您的订单"}}</h2>
+                    <p class="description m-0">{{todo:t text="请确认以下信息并选择支付方式继续"}}</p>
+                </div>
+            </div>
+
+            <form id="checkout-form" class="checkout-form" data-is-virtual="{{todo:if condition='cart.is_virtual || cart_is_virtual'}}1{{todo:else}}0{{/todo:if}}">
+                <div class="checkout-content">
+                    <div class="checkout-main">
+                        {{todo:unified_notice}}
+                        
+                        {{todo:if user_logged_in}}
+                        {{todo:else}}
+                        <!-- 访客联系信息 -->
+                        <div class="checkout-section" id="guest-info-section">
+                            <h3 class="section-title">
+                                {{todo:t text="客户信息"}}
+                            </h3>
+                            <div class="form-group">
+                                <label>{{todo:t text="邮箱"}} <span class="required" id="guest-email-required" style="color:red; display:none;">*</span></label>
+                                <input type="email" name="guest_email" id="input-guest-email" class="form-control" placeholder="{{todo:t text='请输入用于接收订单更新与收据的电子邮箱'}}">
+                                <p class="description">{{todo:t text="我们将发送订单确认邮件和发货通知到此邮箱"}}</p>
+                            </div>
+                        </div>
+                        {{/todo:if}}
+
+                        <!-- 收货地址与配送方式（虚拟商品直接服务端不渲染） -->
+                        {{todo:if condition="!cart_is_virtual"}}
+                        <!-- 收货地址 -->
+                        <div class="checkout-section" id="address-section">
+                            <h3 class="section-title">
+                                {{todo:t text="收货地址"}}
+                            </h3>
+                                
+                                <!-- 地址展示模式（默认地址已加载时显示） -->
+                                <div id="address-display" style="display:none;">
+                                    <div class="address-card">
+                                        <div class="address-info-display">
+                                            <div class="address-contact">
+                                                <span class="address-name" id="display-name"></span>
+                                                <span class="address-email" id="display-email" style="display:none;"></span>
+                                                <span class="address-phone" id="display-phone"></span>
+                                            </div>
+                                            <div class="address-full" id="display-full"></div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline btn-sm address-edit-btn" id="btn-edit-address">{{todo:t text="修改地址"}}</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 地址编辑模式 -->
+                                <div id="address-edit">
+                                    <input type="hidden" name="address_region_type" id="input-address-region-type" value="cn">
+
+                                    <div class="form-group">
+                                        <label><span class="label-txt-name">{{todo:t text="收件人姓名"}}</span> <span class="required" style="color:red;">*</span></label>
+                                        <input type="text" name="recipient_name" id="input-name" style="width: 45%;" class="form-control" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label><span class="label-txt-phone">{{todo:t text="联系电话"}}</span> <span class="required" style="color:red;">*</span></label>
+                                        <input type="text" name="recipient_phone" id="input-phone" style="width: 45%;" class="form-control" required>
+                                    </div>
+                                    
+                                    <!-- 大陆地址结构 -->
+                                    <div id="fields-cn">
+                                        <div class="form-row flex gap-3 mb-3">
+                                            <div class="form-group flex-1">
+                                                <label>{{todo:t text="省份"}} <span class="required" style="color:red;">*</span></label>
+                                                <select name="province_id" id="input-province" class="form-control">
+                                                    <option value="">{{todo:t text="请选择省份"}}</option>
+                                                </select>
+                                                <input type="hidden" name="province" id="input-province-name">
+                                            </div>
+                                            <div class="form-group flex-1">
+                                                <label>{{todo:t text="城市"}} <span class="required" style="color:red;">*</span></label>
+                                                <select name="city_id" id="input-city" class="form-control">
+                                                    <option value="">{{todo:t text="请选择城市"}}</option>
+                                                </select>
+                                                <input type="hidden" name="city" id="input-city-name">
+                                            </div>
+                                            <div class="form-group flex-1">
+                                                <label>{{todo:t text="区/县"}} <span class="required" style="color:red;">*</span></label>
+                                                <select name="district_id" id="input-district" class="form-control">
+                                                    <option value="">{{todo:t text="请选择区县"}}</option>
+                                                </select>
+                                                <input type="hidden" name="district" id="input-district-name">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>{{todo:t text="详细地址"}} <span class="required" style="color:red;">*</span></label>
+                                            <input type="text" name="detail_address" id="input-address" class="form-control" placeholder="{{todo:t text='街道/门牌号等'}}">
+                                        </div>
+                                    </div>
+
+                                    <!-- 国际地址结构 (Standard International Address Format) -->
+                                    <div id="fields-intl" style="display: none;">
+                                        <div class="form-row flex gap-3 mb-3">
+                                            <div class="form-group flex-1">
+                                                <label>Country / Region <span class="required" style="color:red;">*</span></label>
+                                                <select name="intl_country" id="input-intl-country" class="form-control">
+                                                    {{todo:country_options}}
+                                                </select>
+                                            </div>
+                                            <div class="form-group flex-1">
+                                                <label>State / Province / Region <span class="required" style="color:red;">*</span></label>
+                                                <input type="text" name="intl_state" id="input-intl-state" class="form-control">
+                                            </div>
+                                            <div class="form-group flex-1">
+                                                <label>City <span class="required" style="color:red;">*</span></label>
+                                                <input type="text" name="intl_city" id="input-intl-city" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label>Street Address <span class="required" style="color:red;">*</span></label>
+                                            <input type="text" name="intl_address" id="input-intl-address" class="form-control" placeholder="Street address, P.O. box, company name, c/o">
+                                        </div>
+
+                                        <div class="form-group" style="width: 45%;">
+                                            <label>ZIP / Postal Code <span class="required" style="color:red;">*</span></label>
+                                            <input type="text" name="intl_zipcode" id="input-intl-zipcode" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 预加载默认地址（如果存在） -->
+                                {{todo:user_addresses limit='1'}}
+                                <div id="preload-default-address" style="display:none;">
+                                    <span class="p-name">{{todo:recipient_name}}</span>
+                                    <span class="p-phone">{{todo:recipient_phone}}</span>
+                                    <span class="p-prov">{{todo:province_name}}</span>
+                                    <span class="p-city">{{todo:city_name}}</span>
+                                    <span class="p-dist">{{todo:district_name}}</span>
+                                    <span class="p-addr">{{todo:detailed_address}}</span>
+                                    <span class="p-country">{{todo:intl_country}}</span>
+                                    <span class="p-state">{{todo:intl_state}}</span>
+                                    <span class="p-zip">{{todo:postal_code}}</span>
+                                    <span class="p-email">{{todo:user_email}}</span>
+                                </div>
+                                {{/todo:user_addresses}}
+
+                        </div>
+                        
+                        <!-- 配送方式 -->
+                        <div class="checkout-section" id="shipping-section">
+                            <h3 class="section-title">
+                                {{todo:t text="配送方式"}}
+                            </h3>
+                            
+                            <div class="shipping-methods">
+                                {{todo:shipping_methods}}
+                                    <label class="method-radio">
+                                        <input type="radio" name="shipping_method" value="{{todo:code}}" {{todo:if condition="is_default"}}checked{{/todo:if}} data-fee="{{todo:fee_format}}">
+                                        <div class="method-content justify-content-between">
+                                            <div class="method-info">
+                                                <strong>{{todo:name}}</strong>
+                                                {{todo:if condition="desc"}}
+                                                    <div class="method-description">{{todo:desc}}</div>
+                                                {{/todo:if}}
+                                            </div>
+                                            <div class="method-price">{{todo:if condition="fee > 0"}}{{todo:currency_code}}{{todo:fee_format}}{{todo:else}}{{todo:t text="免费"}}{{/todo:if}}</div>
+                                        </div>
+                                    </label>
+                                {{/todo:shipping_methods}}
+                            </div>
+                        </div>
+                        {{/todo:if}}
+
+                        <!-- 支付方式 -->
+                        <div class="checkout-section">
+                            <h3 class="section-title">
+                                {{todo:t text="支付方式"}}
+                            </h3>
+                            
+                            <div class="payment-methods" data-user-balance="{{todo:user_balance raw=true}}">
+                                {{todo:payment_methods}}
+                                    <div class="payment-method payment-method-{{todo:code}}">
+                                        <label class="method-radio">
+                                            <input type="radio" name="payment_method" value="{{todo:code}}" {{todo:if condition="is_default"}}checked{{/todo:if}}>
+                                            <div class="method-content">
+                                                <div class="method-icon">
+                                                    {{todo:if condition="code == 'balance'"}}
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                                                    {{todo:else}}
+                                                        {{todo:initial}}
+                                                    {{/todo:if}}
+                                                </div>
+                                                <div class="method-info">
+                                                    <strong>{{todo:name}}</strong>
+                                                    {{todo:if condition="code == 'balance'"}}
+                                                        <div class="method-description balance-desc">
+                                                            {{todo:t text="您的余额为"}} {{todo:currency_code}}<span class="user-balance-text">{{todo:user_balance}}</span> <span class="balance-diff-tip"></span>
+                                                        </div>
+                                                        <div class="balance-recharge-btn-wrap" style="margin-top: 10px; display: none;">
+                                                            <a href="{{todo:user_page_url page='wallet'}}" target="_blank" class="btn btn-outline btn-sm" style="background: #fff; border-radius: 4px; padding: 4px 12px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-color: #d9d9d9; color: #333;">
+                                                                <span style="font-size: 15px; font-weight: bold; line-height: 1;">+</span> {{todo:t text="充值余额"}}
+                                                            </a>
+                                                        </div>
+                                                    {{todo:else}}
+                                                        {{todo:if condition="description"}}
+                                                            <div class="method-description">{{todo:description}}</div>
+                                                        {{/todo:if}}
+                                                    {{/todo:if}}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                {{/todo:payment_methods}}
+                            </div>
+                        </div>
+                        
+                        <!-- 订单备注 -->
+                        <div class="checkout-section">
+                            <h3 class="section-title">
+                                {{todo:t text="备注"}}
+                            </h3>
+                            
+                            <textarea name="order_note" rows="3" style="width: 100%;background-color: #f7f7f7;border: navajowhite;border-radius: 5px;padding: 10px 15px;"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- 订单摘要 -->
+                    <div class="checkout-sidebar">
+                        <div class="order-summary">
+                            <h3>{{todo:t text="订单摘要"}}</h3>
+                            
+                            <!-- 商品列表 -->
+                            <div class="order-items">
+                                {{todo:cart_items}}
+                                    <div class="order-item" data-product-type="{{todo:product_type}}" data-category-id="{{todo:category_id}}" data-category-ids="{{todo:category_ids}}" data-item-total="{{todo:total_price_val}}">
+                                        <div class="item-image">
+                                            <img src="{{todo:image}}" alt="{{todo:title}}" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\'no-image\'>📦</div>';">
+                                        </div>
+                                         <div class="item-info">
+                                             <div style="display: flex;align-items: center;gap: 3px 8px;flex-wrap: wrap;margin-bottom: 3px;">
+                                                 <h4 style="margin: 0;">{{todo:title}}</h4>
+                                                 {{todo:if condition="is_wholesale"}}
+                                                     <span class="wholesale-tag" style="background-color: #fff0f0; color: #e53935; border: 1px solid #ffcdd2; font-size: 11px; padding: 1px 6px; border-radius: 3px; font-weight: normal; white-space: nowrap; display: inline-block;">{{todo:discount_label}}</span>
+                                                 {{/todo:if}}
+                                             </div>
+                                             <div class="item-specs">{{todo:specs_text}}</div>
+                                         </div>
+                                        <div style="text-align: right;">
+                                            <div class="item-price">
+                                                {{todo:currency_code}}{{todo:total_price_format}}
+                                            </div>
+                                            <div class="item-quantity text-right">x{{todo:quantity}} {{todo:product_total_unit_text}}</div>
+                                        </div>
+                                    </div>
+                                {{/todo:cart_items}}
+                            </div>
+                            
+                            <!-- 费用明细 -->
+                            <div class="order-totals" 
+                                 data-user-points="{{todo:user_points raw=true}}" 
+                                 data-points-ratio="{{todo:points_ratio}}" 
+                                 data-points-usable-categories="{{todo:points_usable_categories}}">
+                                <div class="total-row">
+                                    <span class="lb-color">{{todo:t text="小计"}}</span>
+                                    <span id="subtotal">{{todo:currency_code}}{{todo:cart.subtotal_format}}</span>
+                                </div>
+                                <div class="total-row">
+                                    <span class="lb-color">{{todo:t text="运费"}}</span>
+                                    <span id="shipping-fee">{{todo:currency_code}}{{todo:cart.shipping_fee_format}}</span>
+                                </div>
+                                <div class="coupon-section" style="padding: 10px 0; display: flex; gap: 10px;">
+                                    <input type="text" id="coupon-code" name="coupon_code" class="form-control" placeholder="{{todo:t text='请输入券码'}}" style="flex: 1;">
+                                    <button type="button" class="btn btn-outline" id="btn-apply-coupon" style="border-radius: 4px;">{{todo:t text="兑换"}}</button>
+                                </div>
+                                <div class="total-row" id="coupon-row" style="display: none;">
+                                    <span class="lb-color">{{todo:t text="券抵扣"}}</span>
+                                    <span id="coupon-discount">-{{todo:currency_code}}0.00</span>
+                                </div>
+                                <input type="hidden" id="input-discount-amount" value="0.00">
+
+                                <!-- 积分抵扣区域 -->
+                                <div class="points-section" id="points-section" style="padding: 8px 0; display: none;">
+                                    <div class="custom-control custom-checkbox" style="display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" class="custom-control-input" id="use-points" name="use_points" value="1">
+                                        <label class="custom-control-label" for="use-points" style="font-size: 14px; cursor: pointer; user-select: none;">
+                                            {{todo:t text="使用积分抵扣"}} (<span id="points-available-text">0 {{todo:t text="积分，可抵"}} {{todo:currency_code}}0.00</span>)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="total-row" id="points-row" style="display: none;">
+                                    <span class="lb-color">{{todo:t text="积分抵扣"}}</span>
+                                    <span id="points-discount">-{{todo:currency_code}}0.00</span>
+                                </div>
+                                <input type="hidden" id="input-points-discount-amount" value="0.00">
+
+                                <div class="total-row total-final">
+                                    <span>{{todo:t text="总计"}}</span>
+                                    <b id="final-total">{{todo:currency_code}}{{todo:cart.total_format}}</b>
+                                </div>
+                            </div>
+                            
+                            <!-- 提交按钮 -->
+                            <div class="checkout-actions">
+                                <div class="agreement-section">
+                                    <label class="agreement-checkbox">
+                                        <input type="checkbox" name="agreement" id="checkout-agreement" value="1">
+                                        <span class="checkbox-mark"></span>
+                                        <span class="agreement-text">
+                                            {{todo:t text="已阅读并同意"}}&nbsp;<a href="javascript:void(0);" onclick="openAgreementModal(this.textContent.trim(), 'sales-terms-content');">{{todo:t text="销售与服务条款"}}</a>&nbsp;{{todo:t text="和"}}&nbsp;<a href="javascript:void(0);" onclick="openAgreementModal(this.textContent.trim(), 'privacy-policy-content');">{{todo:t text="隐私权政策"}}</a>
+                                        </span>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-large btn-block" id="submit-order">
+                                    {{todo:t text="提交订单"}}
+                                </button>
+                            </div>
+                            
+                            <!-- 安全提示 -->
+                            <div class="security-notice">
+                                <small>
+                                    {{todo:t text="您的支付信息将通过SSL加密传输，确保安全"}}
+                                </small>
+                                <!-- 支付帮助 -->
+                                <div class="payment-help mt-3">
+                                    <span>{{todo:t text="支付帮助"}}</span>
+                                    <ul style="margin-top: 10px; gap: 5px;">
+                                        <li><a href="javascript:void(0);" onclick="openFaqModal(this.textContent.trim(), 'payment-faq-1');">{{todo:t text="支付遇到问题?"}}</a></li>
+                                        <li><a href="javascript:void(0);" onclick="openFaqModal(this.textContent.trim(), 'payment-faq-2');">{{todo:t text="如何申请退款?"}}</a></li>
+                                        <li><a href="javascript:void(0);" onclick="openFaqModal(this.textContent.trim(), 'payment-faq-3');">{{todo:t text="联系客服"}}</a></li>
+                                    </ul>
+                                    <div id="payment-faq-1" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="1"}}</div></div>
+                                    <div id="payment-faq-2" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="2"}}</div></div>
+                                    <div id="payment-faq-3" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="3"}}</div></div>
+                                    <div id="sales-terms-content" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="4"}}</div></div>
+                                    <div id="privacy-policy-content" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="5"}}</div></div>
+                                </div>
+                            </div>
+                            <script>
+                            if (typeof window.openFaqModal !== 'function') {
+                                window.openFaqModal = function(label, contentId) {
+                                    var el = document.getElementById(contentId);
+                                    var html = el ? el.innerHTML : '';
+                                    if (window.layer) {
+                                        layer.open({
+                                            type: 1,
+                                            title: label,
+                                            area: ['800px', '80%'],
+                                            shadeClose: true,
+                                            scrollbar: false,
+                                            content: html
+                                        });
+                                    }
+                                };
+                            }
+                            if (typeof window.openAgreementModal !== 'function') {
+                                window.openAgreementModal = function(label, contentId) {
+                                    var el = document.getElementById(contentId);
+                                    var html = el ? el.innerHTML : '';
+                                    if (window.layer) {
+                                        layer.open({
+                                            type: 1,
+                                            title: label,
+                                            area: ['800px', '80%'],
+                                            shadeClose: true,
+                                            scrollbar: false,
+                                            content: html
+                                        });
+                                    }
+                                };
+                            }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 隐藏字段 -->
+                <input type="hidden" name="action" value="create_order">
+                <input type="hidden" name="_todononce" value="{{todo:csrf_token action='create_order'}}">
+                <input type="hidden" name="selected" id="input-selected" value="">
+                <script>
+                (function() {
+                    try {
+                        var params = new URLSearchParams(window.location.search);
+                        var selectedVal = params.get('selected');
+                        if (selectedVal) {
+                            var el = document.getElementById('input-selected');
+                            if (el) el.value = selectedVal;
+                        }
+                    } catch(e) {}
+                })();
+                </script>
+            </form>
+        </div>
+    </div>
+
+    <!-- 地址选择器模态框 -->
+    <div id="address-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>{{todo:t text="选择地址"}}</h4>
+                <button type="button" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 地址选择器内容将通过JavaScript加载 -->
+            </div>
+        </div>
+    </div>
+
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <!-- 引入CSRF管理器 -->
+    <script src="{{todo:theme_url}}/assets/js/csrf-manager.js"></script>
+    <script>window.TODO_SITE_URL = '{{todo:site_url}}';</script>
+
+    <!-- 地区分级联动与校验逻辑 (需在 footer 载入 jQuery 后执行) -->
+    <script>
+    (function() {
+        var REGION_JSON_BASE = "{{todo:public_url}}/static/json";
+        var REGION_CACHE = { provinces: null, cities: null, districts: null };
+
+        function normalizeRegionCode(code, targetLevel) {
+            var s = String(code || '').replace(/[^\d]/g, '');
+            if (!s) return '';
+            if (s.length === 12) return s;
+            if (s.length === 9) return s + '000';
+            if (s.length === 6) return s + '000000';
+            if (s.length === 4) return s + '00000000';
+            if (s.length === 2) return s + '0000000000';
+            if (s.length > 12) return s.slice(0, 12);
+            return s.padEnd(12, '0');
+        }
+
+        function loadRegionJson(level) {
+            var cacheKey = level === 1 ? 'provinces' : (level === 2 ? 'cities' : 'districts');
+            if (REGION_CACHE[cacheKey]) {
+                return $.Deferred().resolve(REGION_CACHE[cacheKey]).promise();
+            }
+            var file = level === 1 ? '01-province.json' : (level === 2 ? '02-city.json' : '03-district.json');
+            return $.getJSON(REGION_JSON_BASE + '/' + encodeURIComponent(file)).then(function(list) {
+                REGION_CACHE[cacheKey] = Array.isArray(list) ? list : [];
+                return REGION_CACHE[cacheKey];
+            });
+        }
+
+        function findRegionCodeByName(level, name) {
+            name = String(name || '').trim();
+            if (!name) return $.Deferred().resolve('').promise();
+            return loadRegionJson(level).then(function(list) {
+                for (var i = 0; i < list.length; i++) {
+                    if (String(list[i].name || '').trim() === name) {
+                        return String(list[i].code || '');
+                    }
+                }
+                return '';
+            });
+        }
+
+        function fillSelectOptions($select, items, placeholder, selectedCode) {
+            var html = '<option value="">' + placeholder + '</option>';
+            for (var i = 0; i < items.length; i++) {
+                var it = items[i];
+                var code = String(it.code || '');
+                var name = String(it.name || '');
+                html += '<option value="' + code + '">' + name + '</option>';
+            }
+            $select.html(html);
+            if (selectedCode) {
+                $select.val(String(selectedCode));
+            }
+        }
+
+        function ensureProvincesLoaded() {
+            return loadRegionJson(1).then(function(provinces) {
+                var list = Array.isArray(provinces) ? provinces.slice() : [];
+                list.sort(function(a, b) {
+                    return String(a.code || '').localeCompare(String(b.code || ''));
+                });
+                fillSelectOptions($('#input-province'), list, '{{todo:t text="请选择省份"}}');
+                return list;
+            });
+        }
+
+        function setProvinceCityDistrictFromData(data) {
+            if (!data) return;
+            ensureProvincesLoaded().then(function() {
+                var cityCandidate = (data.city_id !== undefined && data.city_id !== null && String(data.city_id) !== '') ? data.city_id : (data.city_name || data.city || '');
+                var districtCandidate = (data.district_id !== undefined && data.district_id !== null && String(data.district_id) !== '') ? data.district_id : (data.district_name || data.district || '');
+
+                var rawProvince = (data.province_id !== undefined && data.province_id !== null && String(data.province_id) !== '') ? data.province_id : '';
+                var provinceCode = normalizeRegionCode(rawProvince, 1);
+
+                if (provinceCode && $('#input-province option[value="' + provinceCode + '"]').length) {
+                    $('#input-province').val(provinceCode).trigger('change', [cityCandidate, districtCandidate]);
+                    return;
+                }
+
+                var provinceName = data.province_name || data.province || '';
+                if (provinceName) {
+                    findRegionCodeByName(1, provinceName).then(function(found) {
+                        if (found && $('#input-province option[value="' + found + '"]').length) {
+                            $('#input-province').val(found).trigger('change', [cityCandidate, districtCandidate]);
+                        } else {
+                            $('#input-province').val('').trigger('change');
+                        }
+                    });
+                    return;
+                }
+
+                if (rawProvince && $('#input-province option[value="' + String(rawProvince) + '"]').length) {
+                    $('#input-province').val(String(rawProvince)).trigger('change', [cityCandidate, districtCandidate]);
+                    return;
+                }
+
+                $('#input-province').val('').trigger('change');
+            });
+        }
+        window.setProvinceCityDistrictFromData = setProvinceCityDistrictFromData;
+
+        $(document).ready(function() {
+            ensureProvincesLoaded();
+
+            $('#input-province').on('change', function(e, cityId, districtId) {
+                var $province = $(this);
+                var provinceVal = $province.val();
+                var provinceText = $province.find('option:selected').text();
+                var $city = $('#input-city');
+                var $district = $('#input-district');
+
+                $('#input-province-name').val(provinceVal ? provinceText : '');
+                fillSelectOptions($city, [], '{{todo:t text="请选择城市"}}');
+                fillSelectOptions($district, [], '{{todo:t text="请选择区县"}}');
+                $('#input-city-name').val('');
+                $('#input-district-name').val('');
+
+                if (!provinceVal) return;
+
+                var provinceCode = normalizeRegionCode(provinceVal, 1);
+                loadRegionJson(1).then(function(provinces) {
+                    var hasProvince = false;
+                    for (var i = 0; i < provinces.length; i++) {
+                        if (String(provinces[i].code) === provinceCode) {
+                            hasProvince = true; break;
+                        }
+                    }
+                    if (hasProvince) return provinceCode;
+                    return findRegionCodeByName(1, provinceText);
+                }).then(function(code) {
+                    var finalProvinceCode = String(code || provinceCode || '');
+                    if (!finalProvinceCode) return [];
+                    return loadRegionJson(2).then(function(cities) {
+                        var list = [];
+                        for (var i = 0; i < cities.length; i++) {
+                            if (String(cities[i].parent_code || '') === finalProvinceCode) {
+                                list.push(cities[i]);
+                            }
+                        }
+                        list.sort(function(a, b) {
+                            return String(a.code || '').localeCompare(String(b.code || ''));
+                        });
+                        return list;
+                    });
+                }).then(function(cityList) {
+                    fillSelectOptions($city, cityList || [], '{{todo:t text="请选择城市"}}');
+                    if (cityId) {
+                        var cityCode = normalizeRegionCode(cityId, 2);
+                        if (cityCode && $city.find('option[value="' + cityCode + '"]').length) {
+                            $city.val(cityCode).trigger('change', [districtId]);
+                            return;
+                        }
+                        var cityName = String(cityId || '').trim();
+                        if (cityName) {
+                            for (var i = 0; i < (cityList || []).length; i++) {
+                                if (String(cityList[i].name || '').trim() === cityName) {
+                                    $city.val(String(cityList[i].code || '')).trigger('change', [districtId]);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            $('#input-city').on('change', function(e, districtId) {
+                var $city = $(this);
+                var cityVal = $city.val();
+                var cityText = $city.find('option:selected').text();
+                var $district = $('#input-district');
+
+                $('#input-city-name').val(cityVal ? cityText : '');
+                fillSelectOptions($district, [], '{{todo:t text="请选择区县"}}');
+                $('#input-district-name').val('');
+
+                if (!cityVal) return;
+
+                var cityCode = normalizeRegionCode(cityVal, 2);
+                loadRegionJson(2).then(function(cities) {
+                    var hasCity = false;
+                    for (var i = 0; i < cities.length; i++) {
+                        if (String(cities[i].code) === cityCode) {
+                            hasCity = true; break;
+                        }
+                    }
+                    if (hasCity) return cityCode;
+                    return findRegionCodeByName(2, cityText);
+                }).then(function(code) {
+                    var finalCityCode = String(code || cityCode || '');
+                    if (!finalCityCode) return [];
+                    return loadRegionJson(3).then(function(districts) {
+                        var list = [];
+                        for (var i = 0; i < districts.length; i++) {
+                            if (String(districts[i].parent_code || '') === finalCityCode) {
+                                list.push(districts[i]);
+                            }
+                        }
+                        list.sort(function(a, b) {
+                            return String(a.code || '').localeCompare(String(b.code || ''));
+                        });
+                        return list;
+                    });
+                }).then(function(districtList) {
+                    fillSelectOptions($district, districtList || [], '{{todo:t text="请选择区县"}}');
+                    if (districtId) {
+                        var districtCode = normalizeRegionCode(districtId, 3);
+                        if (districtCode && $district.find('option[value="' + districtCode + '"]').length) {
+                            $district.val(districtCode).trigger('change');
+                            return;
+                        }
+                        var districtName = String(districtId || '').trim();
+                        if (districtName) {
+                            for (var i = 0; i < (districtList || []).length; i++) {
+                                if (String(districtList[i].name || '').trim() === districtName) {
+                                    $district.val(String(districtList[i].code || '')).trigger('change');
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            $('#input-district').on('change', function() {
+                var $district = $(this);
+                var val = $district.val();
+                var txt = $district.find('option:selected').text();
+                $('#input-district-name').val(val ? txt : '');
+            });
+        });
+
+        var cnFields = document.getElementById('fields-cn');
+        var intlFields = document.getElementById('fields-intl');
+        var typeInput = document.getElementById('input-address-region-type');
+        
+        function updateEmailRequiredState() {
+            var type = typeInput ? typeInput.value : 'cn';
+            var intlCountryEl = document.getElementById('input-intl-country');
+            var countryVal = intlCountryEl ? String(intlCountryEl.value || '').trim().toUpperCase() : '';
+            
+            var guestEmailInput = document.getElementById('input-guest-email');
+            var guestEmailReqSpan = document.getElementById('guest-email-required');
+
+            var isCn = (type === 'cn') || (countryVal === 'CN' || countryVal === 'CHINA' || countryVal === '中国');
+
+            if (!isCn) {
+                // 非中国大陆地区（如美/英/日/欧等）：强制要求填写邮箱
+                if (guestEmailInput) guestEmailInput.setAttribute('required', 'required');
+                if (guestEmailReqSpan) guestEmailReqSpan.style.display = 'inline';
+            } else {
+                // 中国大陆地区：邮箱仅作为可选项
+                if (guestEmailInput) guestEmailInput.removeAttribute('required');
+                if (guestEmailReqSpan) guestEmailReqSpan.style.display = 'none';
+            }
+        }
+        window.updateEmailRequiredState = updateEmailRequiredState;
+
+        function setAddressRegionType(type) {
+            if (typeInput) typeInput.value = type;
+
+            if (type === 'intl') {
+                if (cnFields) cnFields.style.display = 'none';
+                if (intlFields) intlFields.style.display = 'block';
+                
+                ['input-province', 'input-city', 'input-district', 'input-address'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.removeAttribute('required');
+                });
+                ['input-intl-country', 'input-intl-state', 'input-intl-city', 'input-intl-address', 'input-intl-zipcode'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.setAttribute('required', 'required');
+                });
+            } else {
+                if (cnFields) cnFields.style.display = 'block';
+                if (intlFields) intlFields.style.display = 'none';
+                
+                ['input-province', 'input-city', 'input-district', 'input-address'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.setAttribute('required', 'required');
+                });
+                ['input-intl-country', 'input-intl-state', 'input-intl-city', 'input-intl-address', 'input-intl-zipcode'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.removeAttribute('required');
+                });
+            }
+            updateEmailRequiredState();
+        }
+        window.setAddressRegionType = setAddressRegionType;
+
+        $(document).ready(function() {
+            $('#input-intl-country').on('change', function() {
+                updateEmailRequiredState();
+            });
+        });
+
+        // 自动根据 URL 中的多语言前缀（如 /en/）或 <html> 的 lang 属性激活对应的地址结构
+        var currentPath = window.location.pathname || '';
+        var htmlLang = (document.documentElement && document.documentElement.lang) ? document.documentElement.lang.toLowerCase() : '';
+        var isIntlByDefault = /^\/([a-z]{2}(?:-[A-Z]{2})?)\//.test(currentPath) && !/^\/zh(?:-CN|-TW|-HK)?\//i.test(currentPath);
+        if (!isIntlByDefault && htmlLang && htmlLang !== 'zh' && htmlLang !== 'zh-cn') {
+            isIntlByDefault = true;
+        }
+
+        setAddressRegionType(isIntlByDefault ? 'intl' : 'cn');
+
+        window._HAS_CHECKED_ADDRESS = true;
+        var preloadEl = document.getElementById('preload-default-address');
+        if (preloadEl) {
+            var defaultAddress = {
+                recipient_name: preloadEl.querySelector('.p-name').textContent,
+                recipient_phone: preloadEl.querySelector('.p-phone').textContent,
+                province: preloadEl.querySelector('.p-prov').textContent,
+                city: preloadEl.querySelector('.p-city').textContent,
+                district: preloadEl.querySelector('.p-dist').textContent,
+                detailed_address: preloadEl.querySelector('.p-addr').textContent,
+                intl_country: preloadEl.querySelector('.p-country') ? preloadEl.querySelector('.p-country').textContent : '',
+                intl_state: preloadEl.querySelector('.p-state') ? preloadEl.querySelector('.p-state').textContent : '',
+                postal_code: preloadEl.querySelector('.p-zip') ? preloadEl.querySelector('.p-zip').textContent : ''
+            };
+            
+            var pVal = String(defaultAddress.province || '').trim();
+            var isIntlAddress = (pVal.indexOf(' | ') !== -1) || (defaultAddress.intl_country && defaultAddress.intl_country.trim() !== '');
+
+            var displayEl = document.getElementById('address-display');
+            var editEl = document.getElementById('address-edit');
+            var nameEl = document.getElementById('display-name');
+            var phoneEl = document.getElementById('display-phone');
+            var fullEl = document.getElementById('display-full');
+            if (nameEl) nameEl.textContent = defaultAddress.recipient_name || '';
+            if (phoneEl) phoneEl.textContent = defaultAddress.recipient_phone || '';
+            var guestEmailInput = document.getElementById('input-guest-email');
+            var userEmail = preloadEl.querySelector('.p-email') ? preloadEl.querySelector('.p-email').textContent : '';
+
+            if (guestEmailInput && userEmail && userEmail.indexOf('@guest.local') === -1) {
+                guestEmailInput.value = userEmail;
+            }
+
+            var emailEl = document.getElementById('display-email');
+            if (emailEl) {
+                if (userEmail && userEmail.indexOf('@guest.local') === -1) {
+                    emailEl.textContent = userEmail;
+                    emailEl.style.display = 'inline';
+                } else {
+                    emailEl.textContent = '';
+                    emailEl.style.display = 'none';
+                }
+            }
+            if (guestEmailInput) {
+                guestEmailInput.addEventListener('input', function() {
+                    var emailEl = document.getElementById('display-email');
+                    var val = this.value.trim();
+                    if (emailEl) {
+                        if (val && val.indexOf('@guest.local') === -1) {
+                            emailEl.textContent = val;
+                            emailEl.style.display = 'inline';
+                        } else {
+                            emailEl.textContent = '';
+                            emailEl.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            var countryVal = defaultAddress.intl_country || '';
+            var stateVal = defaultAddress.intl_state || '';
+            if (pVal.indexOf(' | ') !== -1) {
+                var pParts = pVal.split(' | ');
+                countryVal = pParts[0] || countryVal;
+                stateVal = pParts[1] || stateVal;
+            }
+
+            var parts = [];
+            if (isIntlAddress) {
+                var addrDisp = defaultAddress.detailed_address || '';
+                var cityDisp = defaultAddress.city || '';
+                var zipDisp = defaultAddress.postal_code || '';
+
+                if (addrDisp) parts.push(addrDisp);
+                if (cityDisp) parts.push(cityDisp);
+                
+                var stateZip = stateVal;
+                if (zipDisp) {
+                    stateZip = stateZip ? (stateZip + ' ' + zipDisp) : zipDisp;
+                }
+                if (stateZip) parts.push(stateZip);
+                if (countryVal) parts.push(countryVal);
+                if (fullEl) fullEl.textContent = parts.join(', ');
+            } else {
+                var provDisp = defaultAddress.province || '';
+                if (provDisp) parts.push(provDisp);
+                if (defaultAddress.city) parts.push(defaultAddress.city);
+                if (defaultAddress.district) parts.push(defaultAddress.district);
+                if (defaultAddress.detailed_address) parts.push(defaultAddress.detailed_address);
+                if (fullEl) fullEl.textContent = parts.join(' ');
+            }
+
+            // 填充表单字段
+            var inputName = document.getElementById('input-name');
+            var inputPhone = document.getElementById('input-phone');
+            if (inputName) inputName.value = defaultAddress.recipient_name;
+            if (inputPhone) inputPhone.value = defaultAddress.recipient_phone;
+
+            if (isIntlAddress) {
+                setAddressRegionType('intl');
+                var inputCountry = document.getElementById('input-intl-country');
+                var inputState = document.getElementById('input-intl-state');
+                var inputCity = document.getElementById('input-intl-city');
+                var inputAddr = document.getElementById('input-intl-address');
+                var inputZip = document.getElementById('input-intl-zipcode');
+                function setSelectCountryValue(el, val) {
+                    if (!el || !val) return;
+                    var trimmed = String(val).trim();
+                    if (!trimmed) return;
+                    el.value = trimmed;
+                    if (el.value === trimmed) return;
+                    var upper = trimmed.toUpperCase();
+                    el.value = upper;
+                    if (el.value === upper) return;
+                    for (var i = 0; i < el.options.length; i++) {
+                        var opt = el.options[i];
+                        if (opt.value && (opt.text.toLowerCase().indexOf(trimmed.toLowerCase()) !== -1 || trimmed.toLowerCase().indexOf(opt.text.toLowerCase()) !== -1)) {
+                            el.value = opt.value;
+                            break;
+                        }
+                    }
+                }
+                if (inputCountry) setSelectCountryValue(inputCountry, countryVal);
+                if (inputState) inputState.value = stateVal;
+                if (inputCity) inputCity.value = defaultAddress.city || '';
+                if (inputAddr) inputAddr.value = defaultAddress.detailed_address || '';
+                if (inputZip) inputZip.value = defaultAddress.postal_code || '';
+            } else {
+                setProvinceCityDistrictFromData(defaultAddress);
+                var inputAddr = document.getElementById('input-address');
+                if (inputAddr) inputAddr.value = defaultAddress.detailed_address || '';
+            }
+            
+            // 切换到展示模式并移除编辑框内表单项的 html5 required 校验
+            var isVirt = (typeof window.isVirtualCheckout === 'function') ? window.isVirtualCheckout() : (document.getElementById('checkout-form') && document.getElementById('checkout-form').getAttribute('data-is-virtual') === '1');
+            if (isVirt) {
+                if (displayEl) displayEl.style.display = 'none';
+                if (editEl) editEl.style.display = 'none';
+                if (typeof window.updateVirtualState === 'function') window.updateVirtualState(true);
+            } else {
+                if (displayEl) displayEl.style.display = '';
+                if (editEl) editEl.style.display = 'none';
+            }
+            ['input-name', 'input-phone', 'input-province', 'input-city', 'input-district', 'input-address', 'input-intl-country', 'input-intl-state', 'input-intl-city', 'input-intl-address', 'input-intl-zipcode', 'input-guest-email'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.removeAttribute('required');
+            });
+        }
+        if (document.getElementById('checkout-form') && (document.getElementById('checkout-form').getAttribute('data-is-virtual') === '1' || (typeof window.isVirtualCheckout === 'function' && window.isVirtualCheckout()))) {
+            if (typeof window.updateVirtualState === 'function') window.updateVirtualState(true);
+        }
+    })();
+    </script>
+    
+    <!-- 地址自动加载 -->
+    <script>
+    (function() {
+        // 确保使用当前页面的域名，防止产生跨域导致 session(cookie) 丢失
+        var SITE_URL = window.TODO_SITE_URL || window.location.origin;
+        try {
+            var parsedSiteUrl = new URL(SITE_URL);
+            parsedSiteUrl.protocol = window.location.protocol;
+            parsedSiteUrl.host = window.location.host;
+            SITE_URL = parsedSiteUrl.toString().replace(/\/+$/, '');
+        } catch(e) {
+            SITE_URL = SITE_URL.replace(/\/+$/, '');
+        }
+        var addressHandlerUrl = (window.TODO && window.TODO.INCLUDES_AJAX && window.TODO.join)
+            ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'address-handler.php')
+            : (SITE_URL + '/includes/ajax/address-handler.php');
+        var displayEl = document.getElementById('address-display');
+        var editEl = document.getElementById('address-edit');
+        var btnEdit = document.getElementById('btn-edit-address');
+        
+        // 展示地址
+        function showAddress(address) {
+            if (!address) {
+                // 无地址，保持编辑模式
+                if (displayEl) displayEl.style.display = 'none';
+                if (editEl) editEl.style.display = '';
+                return;
+            }
+
+            var currentPath = window.location.pathname || '';
+            var htmlLang = (document.documentElement && document.documentElement.lang) ? document.documentElement.lang.toLowerCase() : '';
+            var isIntlByDefault = /^\/([a-z]{2}(?:-[A-Z]{2})?)\//.test(currentPath) && !/^\/zh(?:-CN|-TW|-HK)?\//i.test(currentPath);
+            if (!isIntlByDefault && htmlLang && htmlLang !== 'zh' && htmlLang !== 'zh-cn') {
+                isIntlByDefault = true;
+            }
+
+            var isCnAddress = !!(address.province_name || address.province_id || address.city_name || address.city_id || address.district_name || address.district_id);
+            if (isIntlByDefault && isCnAddress) {
+                // 处于国际语言环境，但默认地址是大陆结构，跳过展示卡片，预填姓名/电话并保持国际编辑表单
+                if (displayEl) displayEl.style.display = 'none';
+                if (editEl) editEl.style.display = '';
+                var inputName = document.getElementById('input-name');
+                var inputPhone = document.getElementById('input-phone');
+                if (inputName) inputName.value = address.recipient_name || '';
+                if (inputPhone) inputPhone.value = address.recipient_phone || '';
+                return;
+            }
+            
+            // 填充展示区域
+            var nameEl = document.getElementById('display-name');
+            var phoneEl = document.getElementById('display-phone');
+            var fullEl = document.getElementById('display-full');
+            if (nameEl) nameEl.textContent = address.recipient_name || '';
+            if (phoneEl) phoneEl.textContent = address.recipient_phone || '';
+            
+            var parts = [];
+            if (address.province_name || address.province_id) parts.push(address.province_name || address.province_id);
+            if (address.city_name || address.city_id) parts.push(address.city_name || address.city_id);
+            if (address.district_name || address.district_id) parts.push(address.district_name || address.district_id);
+            if (address.detailed_address) parts.push(address.detailed_address);
+            if (fullEl) fullEl.textContent = parts.join(' ');
+            
+            // 填充表单字段（用于提交）
+            var inputName = document.getElementById('input-name');
+            var inputPhone = document.getElementById('input-phone');
+            var inputAddr = document.getElementById('input-address');
+            if (inputName) inputName.value = address.recipient_name || '';
+            if (inputPhone) inputPhone.value = address.recipient_phone || '';
+            if (typeof setProvinceCityDistrictFromData === 'function') {
+                setProvinceCityDistrictFromData(address);
+            }
+            if (inputAddr) inputAddr.value = address.detailed_address || '';
+            if (typeof window.updateEmailRequiredState === 'function') {
+                window.updateEmailRequiredState();
+            }
+            
+            // 切换到展示模式
+            if (displayEl) displayEl.style.display = '';
+            if (editEl) {
+                editEl.style.display = 'none';
+                ['input-name', 'input-phone', 'input-province', 'input-city', 'input-district', 'input-address', 'input-intl-country', 'input-intl-state', 'input-intl-city', 'input-intl-address', 'input-intl-zipcode', 'input-guest-email'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.removeAttribute('required');
+                });
+            }
+        }
+        
+        // 加载默认地址
+        function loadDefaultAddress() {
+            if (typeof window._HAS_CHECKED_ADDRESS !== 'undefined') {
+                // 已通过模板直出预加载处理，跳过 AJAX 请求
+                return;
+            }
+
+            var isVirt = (typeof window.isVirtualCheckout === 'function') ? window.isVirtualCheckout() : (document.getElementById('checkout-form') && document.getElementById('checkout-form').getAttribute('data-is-virtual') === '1');
+            if (isVirt) {
+                // 虚拟商品免收货地址，直接放弃加载默认地址
+                return;
+            }
+
+            if (!window.todoCSRF || typeof window.todoCSRF.getToken !== 'function') {
+                // CSRF 管理器未就绪则保持编辑模式
+                return;
+            }
+            
+            window.todoCSRF.getToken('address_action').then(function(token) {
+                if (!token) return;
+                
+                var params = new URLSearchParams();
+                params.append('action', 'get_default_address');
+                params.append('_todononce', token);
+                
+                return fetch(addressHandlerUrl + '?' + params.toString(), {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+            }).then(function(resp) {
+                if (!resp) return null;
+                return resp.json();
+            }).then(function(data) {
+                if (data && data.success && data.data && data.data.address) {
+                    showAddress(data.data.address);
+                }
+            }).catch(function(err) {
+                console.warn('Failed to load the default address:', err);
+            });
+        }
+        
+        // 修改地址按钮：切换到编辑模式
+        if (btnEdit) {
+            btnEdit.addEventListener('click', function() {
+                if (displayEl) displayEl.style.display = 'none';
+                if (editEl) editEl.style.display = '';
+                var inputName = document.getElementById('input-name');
+                var inputPhone = document.getElementById('input-phone');
+                if (inputName) inputName.setAttribute('required', 'required');
+                if (inputPhone) inputPhone.setAttribute('required', 'required');
+                var typeInput = document.getElementById('input-address-region-type');
+                var type = (typeInput && typeInput.value) ? typeInput.value : 'cn';
+                if (typeof window.setAddressRegionType === 'function') {
+                    window.setAddressRegionType(type);
+                }
+            });
+        }
+        
+        // 页面加载时自动获取默认地址
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadDefaultAddress);
+        } else {
+            loadDefaultAddress();
+        }
+    })();
+    </script>
+    
+    <script src="{{todo:theme_url}}/users/skin/js/checkout.js"></script>
+    
+    <!-- 直接购买支持脚本 -->
+    <script>
+    // 检测是否为直接购买模式
+    const urlParams = new URLSearchParams(window.location.search);
+    const isBuyNow = urlParams.get('action') === 'buy_now';
+    
+    if (isBuyNow) {
+        // 直接购买模式：从URL参数获取商品信息
+        const productId = urlParams.get('product_id');
+        const quantity = urlParams.get('quantity') || 1;
+        const specs = urlParams.get('specs') || '{}';
+        
+        if (productId) {
+            loadDirectPurchaseProduct(productId, quantity, specs);
+        }
+    }
+    
+    // 加载直接购买的商品信息
+    async function loadDirectPurchaseProduct(productId, quantity, specs) {
+        try {
+            const formData = new FormData();
+            formData.append('action', 'get_product_for_checkout');
+            formData.append('product_id', productId);
+            formData.append('quantity', quantity);
+            formData.append('specs', specs);
+            
+            // 获取CSRF令牌
+            const token = await window.todoCSRF.getToken('get_product_info');
+            formData.append('_todononce', token);
+            
+            let ajaxUrl = '';
+            if (window.TODO && window.TODO.INCLUDES_AJAX && window.TODO.join) {
+                ajaxUrl = window.TODO.join(window.TODO.INCLUDES_AJAX, 'product-info.php');
+            } else {
+                let siteUrl = window.TODO_SITE_URL || '{{todo:site_url}}';
+                try {
+                    let parsed = new URL(siteUrl, window.location.origin);
+                    let basePath = parsed.pathname || '/';
+                    let m = basePath.match(/^(.*)\/(?:[a-z]{2}(?:-[A-Z]{2})?)\/?$/);
+                    if (m) { basePath = m[1] || '/'; }
+                    ajaxUrl = (parsed.origin + basePath).replace(/\/+$/, '') + '/includes/ajax/product-info.php';
+                } catch(e) {
+                    ajaxUrl = siteUrl.replace(/\/+$/, '') + '/includes/ajax/product-info.php';
+                }
+            }
+            
+            const response = await fetch(ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.product) {
+                // 更新页面显示
+                updateCheckoutDisplay(data.product, data.totals);
+                // 更新面包屑导航
+                updateBreadcrumb();
+            } else {
+                alert('{{todo:t text="获取商品信息失败"}}');
+                window.location.href = '{{todo:site_url}}';
+            }
+        } catch (error) {
+            alert('{{todo:t text="网络错误"}}');
+            window.location.href = '{{todo:site_url}}';
+        }
+    }
+    
+    // 格式化基础单位文本（与服务端保持一致，直接使用后端翻译后的单位）
+    function formatTotalUnitText(cartQty, unitQty, unit) {
+        if (!unit) return '';
+        var uQty = parseFloat(unitQty) || 1;
+        var uDisp = (Math.floor(uQty) === uQty) ? uQty.toString() : uQty.toFixed(2).replace(/\.?0+$/, '');
+        return uDisp + unit;
+    }
+    
+    // 更新结算页面显示
+    function updateCheckoutDisplay(product, totals) {
+        // 获取第一个商品项（直接购买模式只有一个商品）
+        const item = product.items && product.items[0] ? product.items[0] : {};
+        
+        // 更新商品列表
+        const orderItems = document.querySelector('.order-items');
+        if (orderItems) {
+            var itemImg = item.image
+                ? '<img src="' + item.image + '" alt="' + (item.title || '') + '">'
+                : '<div class="no-image">📦</div>';
+            var specsHtml = item.specs_text
+                ? '<div class="item-specs">' + item.specs_text + '</div>'
+                : '';
+            var tagLabel = item.discount_label || (item.is_wholesale ? '{{todo:t text="批发价"}}' : '');
+            var tagHtml = (item.is_wholesale || tagLabel)
+                ? '<span class="wholesale-tag" style="background-color: #fff0f0; color: #e53935; border: 1px solid #ffcdd2; font-size: 11px; padding: 1px 6px; border-radius: 3px; font-weight: normal; white-space: nowrap; display: inline-block;">' + tagLabel + '</span>'
+                : '';
+            var itemSubtotalVal = item.total_price_format || (totals && totals.subtotal_format) || '0.00';
+            var displayUnitText = item.unit_text || item.product_unit_text || formatTotalUnitText(item.quantity, item.unit_qty, item.unit);
+            orderItems.innerHTML =
+                '<div class="order-item" data-product-type="' + (item.product_type || 'physical') + '" data-category-id="' + (item.category_id || 0) + '" data-category-ids="' + (item.category_ids || item.category_id || '') + '" data-item-total="' + itemSubtotalVal + '">' +
+                    '<div class="item-image">' + itemImg + '</div>' +
+                    '<div class="item-info">' +
+                        '<div style="display: flex;align-items: center;gap: 3px 8px;flex-wrap: wrap;margin-bottom: 3px;">' +
+                            '<h4 style="margin: 0;">' + (item.title || '{{todo:t text="商品"}}') + '</h4>' +
+                            tagHtml +
+                        '</div>' +
+                        specsHtml +
+                    '</div>' +
+                    '<div style="text-align: right;">' +
+                    '<div class="item-price">' + ((window.TODO && window.TODO.CURRENCY_SYMBOL) || '') + (item.total_price_format || '0.00') + '</div>' +
+                    '<div class="item-quantity text-right">x' + (item.quantity || 1) + ' ' + displayUnitText + '</div>' +
+                    '</div>' +
+                '</div>';
+        }
+        
+        var isVirt = !!(product.is_virtual || (item && item.product_type === 'virtual'));
+        if (typeof window.updateVirtualState === 'function') {
+            window.updateVirtualState(isVirt);
+        }
+        
+        // 更新费用明细
+        const subtotalEl = document.getElementById('subtotal');
+        const shippingFeeEl = document.getElementById('shipping-fee');
+        const finalTotalEl = document.getElementById('final-total');
+        
+        var currSym = (window.TODO && window.TODO.CURRENCY_SYMBOL) || '';
+        if (subtotalEl) subtotalEl.textContent = currSym + (product.subtotal_format || '0.00');
+        if (shippingFeeEl) shippingFeeEl.textContent = currSym + (product.shipping_fee_format || '0.00');
+        if (finalTotalEl) finalTotalEl.textContent = currSym + (product.total_format || '0.00');
+        
+        // 触发 JS 里的运费联动重算
+        setTimeout(function() {
+            const selectedShipping = document.querySelector('input[name="shipping_method"]:checked');
+            if (selectedShipping) {
+                selectedShipping.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }, 50);
+        
+        // 添加隐藏字段用于订单提交
+        const form = document.getElementById('checkout-form');
+        if (form && item) {
+            // 移除可能存在的旧字段
+            const existingFields = form.querySelectorAll('input[name^="buy_now_"]');
+            existingFields.forEach(field => field.remove());
+            
+            // 添加新的隐藏字段
+            const hiddenFields = [
+                { name: 'buy_now_mode', value: '1' },
+                { name: 'buy_now_product_id', value: item.id || '' },
+                { name: 'buy_now_quantity', value: item.quantity || '1' },
+                { name: 'buy_now_specs', value: JSON.stringify(item.specs || {}) }
+            ];
+            
+            hiddenFields.forEach(field => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                input.value = field.value;
+                form.appendChild(input);
+            });
+        }
+    }
+    
+    // 更新面包屑导航
+    function updateBreadcrumb() {
+        const breadcrumb = document.querySelector('.breadcrumb');
+        if (breadcrumb) {
+            breadcrumb.innerHTML =
+                '<a href="{{todo:site_url}}">{{todo:t text="网站首页"}}</a>' +
+                '<span class="separator">/</span>' +
+                '<span class="current">{{todo:t text="结算"}}</span>';
+        }
+    }
+    </script>
+
+    <!-- Google Ads & GA4: E-Commerce begin_checkout Event Tracking -->
+    <script>
+    (function() {
+        window.dataLayer = window.dataLayer || [];
+        var checkoutItems = [];
+        var itemNodes = document.querySelectorAll('.order-items .order-item');
+        if (itemNodes.length > 0) {
+            itemNodes.forEach(function(el) {
+                var titleEl = el.querySelector('.item-info h4');
+                var specEl = el.querySelector('.item-info .item-specs');
+                var priceEl = el.querySelector('.item-price');
+                var qtyEl = el.querySelector('.item-quantity');
+
+                var title = titleEl ? titleEl.textContent.trim() : '';
+                var spec = specEl ? specEl.textContent.trim() : '';
+                var qty = qtyEl ? (parseInt(qtyEl.textContent.replace(/[^0-9]/g, '')) || 1) : 1;
+                var totalStr = priceEl ? priceEl.textContent.replace(/[^0-9.]/g, '') : '0';
+                var total = parseFloat(totalStr) || 0;
+                var unitPrice = qty > 0 ? (total / qty) : total;
+
+                checkoutItems.push({
+                    'item_name': title,
+                    'item_variant': spec,
+                    'price': parseFloat(unitPrice.toFixed(2)),
+                    'quantity': qty
+                });
+            });
+        }
+
+        var totalVal = parseFloat('{{todo:cart.total_format}}'.replace(/[^0-9.]/g, '')) || 0;
+        window.dataLayer.push({
+            'event': 'begin_checkout',
+            'ecommerce': {
+                'currency': '{{todo:currency_iso|default="USD"}}',
+                'value': totalVal,
+                'items': checkoutItems
+            }
+        });
+    })();
+    </script>
+</body>
+</html>

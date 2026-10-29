@@ -1,0 +1,311 @@
+html, body {
+  overflow-x: hidden;
+}
+
+.todo-tag-manual {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  min-height: calc(100vh - 80px);
+}
+
+.mbody .todo-tag-manual {
+  overflow-x: auto;
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
+.todo-tag-manual-sidebar {
+  width: 320px;
+  min-width: 280px;
+  max-width: 380px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff; border-radius: 3px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.todo-tag-manual-search {
+  padding: 12px 12px 0;
+}
+
+.todo-tag-manual-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border-radius: 3px;
+  border: 1px solid #eceef1;
+  outline: none;
+}
+
+.todo-tag-manual-search input:focus {
+  border-color: #6c6c75;
+}
+
+.todo-tag-manual-tree {
+  padding: 8px 6px 10px 6px;
+  overflow: auto;
+  flex: 1;
+}
+
+.todo-tag-group {
+  margin: 0 6px;
+}
+
+.todo-tag-group-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #282832;
+  padding: 6px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.todo-tag-group-title .count {
+  font-weight: 500;
+  color: #9a9aa5;
+}
+
+.todo-tag-list {
+  padding: 0 0 0 0;
+  margin: 0;
+  list-style: none;
+}
+
+.todo-tag-item {
+  margin: 2px 0;
+}
+
+.todo-tag-item a {
+  display: block;
+  padding: 4px 22px;
+  border-radius: 3px;
+  color: #62626d;
+  text-decoration: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+}
+
+.todo-tag-item a:hover, .todo-tag-group-title:hover {
+  background: #f3f3fb;
+  color: #006dbf;
+}
+
+.todo-tag-item a.active {
+  background: #dee3f6;
+  color: #1f2a6b;
+}
+
+.btn-normal.disabled,
+.btn-normal[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.todo-tag-manual-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: auto;
+  background-color: #fff; border-radius: 3px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.mbody .todo-tag-manual-content {
+  min-width: 100%;
+}
+
+.todo-tag-manual-content-inner {
+  padding: 18px 20px;
+  overflow: auto;
+  flex: 1;
+}
+
+.todo-tag-manual-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid #efeff5;
+}
+
+.todo-tag-card-title {
+  margin: 0;
+  font-size: 22px;
+  color: #282832;
+  letter-spacing: .2px;
+}
+
+.todo-tag-meta {
+  margin-top: 6px;
+  color: #6c6c75;
+  font-size: 14px;
+}
+
+.todo-tag-section {
+  margin-top: 18px;
+}
+
+.todo-tag-section h3 {
+  margin: 40px 0 10px 0;
+  font-size: 16px;
+  font-weight: 400
+}
+
+.todo-tag-desc {
+  color: #2c2c34;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.todo-tag-notes {
+  margin: 0;
+  padding-left: 18px;
+  color: #2c2c34;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.todo-tag-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.todo-tag-related a {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid #eceef1;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #2c2c34;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+}
+
+.todo-tag-related a:hover {
+  background: #f3f3fb;
+}
+
+.todo-code {
+  background: #282832;
+  color: #e8eaf0;
+  border-radius: 3px;
+  padding: 12px 14px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.todo-param-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #efeff5;
+}
+
+.todo-param-table th,
+.todo-param-table td {
+  border-bottom: 1px solid #efeff5;
+  padding: 10px 10px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.todo-param-table th {
+  background: #fafafe;
+  color: #2c2c34;
+  font-weight: 500;
+  border-bottom: 1px solid #eceef1;
+}
+
+.todo-snippet {
+  background: #fafafe;
+  border: 1px solid #efeff5;
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.todo-empty {
+  color: #6c6c75;
+  font-size: 13px;
+  padding: 12px 6px;
+}
+
+.todo-tag-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+  padding-bottom: 2px;
+}
+
+.todo-tag-quick-filters .quick-filter {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #f1f2f6;
+  color: #646c79;
+  cursor: pointer;
+  user-select: none;
+  transition: all .15s ease;
+  line-height: 1.6;
+}
+
+.todo-tag-quick-filters .quick-filter:hover {
+  background: #e2e5ec;
+  color: #282832;
+}
+
+.todo-tag-quick-filters .quick-filter.active {
+  background: #282832;
+  color: #fff;
+  font-weight: 500;
+}
+
+.todo-tag-scenes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 12px 7px;
+  background: #f8fafd;
+  border-radius: 4px;
+}
+
+.todo-tag-scenes .scene-label {
+  font-size: 13px;
+  color: #8b919b;
+  margin-inline-end: 5px;
+}
+
+.todo-scene-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  font-size: 12px;
+  color: #282832;
+  border: 1px solid #e1e7ef;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .15s ease;
+  line-height: 1.5;
+}
+
+.todo-scene-badge:hover {
+  background: #282832;
+  color: #fff;
+  border-color: #282832;
+}

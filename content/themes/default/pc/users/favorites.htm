@@ -1,0 +1,178 @@
+{{todo:include file="users/users_header.htm"}}
+    
+    <div class="user-center-container">
+        <div class="container">
+            <div class="row">
+                <!-- 左侧导航 -->
+                <div class="col-3">
+                    {{todo:include file="users/users_sidebar.htm"}}
+                </div>
+                
+                <!-- 主要内容区域 -->
+                <div style="flex: 1;">
+                    <div class="user-main-content">
+                        <!-- 收藏分类标签 -->
+                        <div class="favorites-tabs">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#products" role="tab">
+                                        {{todo:t text="商品收藏"}} <span class="badge">{{todo:favorite_products_count}}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#articles" role="tab">
+                                        {{todo:t text="文章收藏"}} <span class="badge">{{todo:favorite_articles_count}}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <!-- 商品收藏 -->
+                            <div class="tab-pane fade show active" id="products" role="tabpanel">
+                                {{todo:if condition="favorite_products_count > 0"}}
+                                <div class="favorites-grid" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; padding: 0 20px;">
+                                    {{todo:favorite_products}}
+                                    <div class="favorite-item d-flex gap-2" data-id="{{todo:product_id}}">
+                                        <div class="item-image mr-2">
+                                            <a href="{{todo:product_url}}">
+                                                <img src="{{todo:product_image}}" alt="{{todo:product_name}}" style="max-width: 110px;">
+                                            </a>
+                                        </div>
+                                        
+                                        <div class="item-info" style="display: flex; flex-direction: column; justify-content: center;">
+                                            <h4 class="item-title">
+                                                <a href="{{todo:product_url}}">{{todo:product_name}}</a>
+                                            </h4>
+                                            
+                                            <div class="item-price">
+                                                <span class="current-price">{{todo:product_price}}</span>
+                                            </div>
+                                            
+                                            <div class="item-meta">
+                                                <span class="category">{{todo:product_category}}</span>
+                                                <span class="favorite-time">{{todo:t text="收藏于"}} {{todo:favorite_time}}</span>
+                                            </div>
+                                            
+                                            <div class="item-actions">
+                                                <button type="button" class="btn btn-outline btn-sm" onclick="removeFavorite('product', '{{todo:product_id}}')">
+                                                    {{todo:t text="取消收藏"}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{/todo:favorite_products}}
+                                </div>
+                                
+                                {{todo:else}}
+                                <div class="empty-info">
+                                    <h3>{{todo:t text="还没有收藏的商品"}}</h3>
+                                    <p>{{todo:t text="快去发现喜欢的商品吧"}}</p>
+                                    <a href="{{todo:shop_url}}" class="btn btn-primary">{{todo:t text="去购物"}}</a>
+                                </div>
+                                {{/todo:if}}
+                            </div>
+                            
+                            <!-- 文章收藏 -->
+                            <div class="tab-pane fade" id="articles" role="tabpanel">
+                                {{todo:if condition="favorite_articles_count > 0"}}
+                                <div class="favorites-list" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; padding: 0 20px;">
+                                    {{todo:favorite_articles}}
+                                    <div class="favorite-item d-flex gap-2" data-id="{{todo:article_id}}">
+                                        <div class="item-image mr-2">
+                                            <a href="{{todo:article_url}}">
+                                                <img src="{{todo:article_image}}" alt="{{todo:article_title}}" style="max-width: 110px;">
+                                            </a>
+                                        </div>
+                                        
+                                        <div class="item-info" style="display: flex; flex-direction: column; justify-content: center;">
+                                            <h4 class="item-title">
+                                                <a href="{{todo:article_url}}">{{todo:article_title}}</a>
+                                            </h4>
+                                            
+                                            <div class="item-summary">
+                                                {{todo:article_summary}}
+                                            </div>
+                                            
+                                            <div class="item-meta">
+                                                <span class="category">{{todo:article_category}}</span>
+                                                <span class="favorite-time">{{todo:t text="收藏于"}} {{todo:favorite_time}}</span>
+                                            </div>
+                                            
+                                            <div class="item-actions">
+                                                <button type="button" class="btn btn-outline btn-sm" 
+                                                        onclick="removeFavorite('article', '{{todo:article_id}}')">
+                                                    {{todo:t text="取消收藏"}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{/todo:favorite_articles}}
+                                </div>
+                                
+                                {{todo:else}}
+                                <div class="empty-info">
+                                    <h3>{{todo:t text="还没有收藏的文章"}}</h3>
+                                    <p>{{todo:t text="快去发现有趣的内容吧"}}</p>
+                                    <a href="{{todo:site_url}}" class="btn btn-primary">{{todo:t text="去浏览"}}</a>
+                                </div>
+                                {{/todo:if}}
+                            </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script src="{{todo:public_url}}/static/common/js/jquery.min.js"></script>
+    <script src="{{todo:public_url}}/plugins/layer-v3.5.1/layer.js"></script>
+    <script src="{{todo:theme_url}}/users/skin/js/layout.js"></script>
+    
+    <script>
+    // 取消收藏
+    function removeFavorite(type, itemId) {
+        var typeName = type === 'product' ? '{{todo:t text="商品"}}' : '{{todo:t text="文章"}}';
+        var baseUrl = (typeof TODO !== 'undefined' && TODO.SITE_URL) ? TODO.SITE_URL : '{{todo:site_url}}';
+        var ajaxUrl = (typeof TODO !== 'undefined' && TODO.join && TODO.INCLUDES_AJAX) 
+            ? TODO.join(TODO.INCLUDES_AJAX, 'favorites-handler.php') 
+            : baseUrl.replace(/\/+$/, '') + '/includes/ajax/favorites-handler.php';
+        
+        layer.confirm(('{{todo:t text="确定要取消收藏这个{n}？"}}').replace('{n}', typeName.toLowerCase()), {
+            icon: 3,
+            title: '{{todo:t text="取消收藏"}}',
+            btn: [__t('确定'), __t('取消')]
+        }, function(index) {
+            $.post(ajaxUrl, {
+                action: 'remove',
+                type: type,
+                item_id: itemId,
+                _todononce: $('meta[name="csrf-token"]').attr('content') || $('meta[name="csrf_token"]').attr('content')
+            }, function(response) {
+                if (response.success) {
+                    layer.msg('{{todo:t text="取消收藏成功"}}', {icon: 1});
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(response.message || response.data || '{{todo:t text="操作失败"}}', {icon: 2});
+                }
+            }).fail(function() {
+                layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+            });
+            layer.close(index);
+        });
+    }
+    </script>
+
+    <style>
+        .item-info .item-title a:not(:hover) { text-decoration: none; }
+        .item-info .item-summary { font-size: 14px; color: #999; }
+        .item-info .item-meta { font-size: 13px; line-height: normal; margin-bottom: 5px; }
+    </style>
+</body>
+</html>

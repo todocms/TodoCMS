@@ -1,0 +1,584 @@
+{{todo:include file="users/users_header.htm"}}
+    
+    <div class="user-center-container">
+        <div class="container">
+            <div class="row">
+                <!-- 左侧导航 -->
+                <div class="col-3">
+                    {{todo:include file="users/users_sidebar.htm"}}
+                </div>
+                
+                <!-- 主要内容区域 -->
+                <div style="flex: 1;">
+                    <div class="user-main-content">
+                        <div class="page-header" style="margin-bottom: 0;">
+                            <h2>{{todo:t text="购物车"}}</h2>
+                            <span>{{todo:cart_count}} {{todo:t text="件商品"}}</span>
+                            {{todo:if cart_count > 0}}
+                            <button type="button" class="btn btn-link" onclick="clearCart()" style="margin-inline-end: -15px; margin-inline-start: -15px;">{{todo:t text="清空购物车"}}</button>
+                            {{/todo:if}}
+                        </div>
+                        
+                        {{todo:if condition="cart_count > 0"}}
+                        <div class="cart-container">
+                            <div class="cart-content">
+                                <div class="cart-table">
+                                    <div class="cart-table-header">
+                                        <div class="col-check">
+                                            <label class="checkbox-wrapper">
+                                                <input type="checkbox" id="select-all" onchange="toggleSelectAll()">
+                                                <span class="checkmark" style="opacity: 0.5; filter: grayscale(1);"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-product">{{todo:t text="商品信息"}}</div>
+                                        <div class="col-price col-num">{{todo:t text="单价"}}</div>
+                                        <div class="col-quantity">{{todo:t text="数量"}}</div>
+                                        <div class="col-total col-num">{{todo:t text="小计"}}</div>
+                                        <div class="col-actions">{{todo:t text="操作"}}</div>
+                                    </div>
+                                    <div class="cart-items">
+                                        {{todo:cart_items}}
+                                        <div class="cart-item" data-id="{{todo:item_id}}">
+                                            <div class="col-check">
+                                                <label class="checkbox-wrapper">
+                                                    <input type="checkbox" name="selected_items[]" value="{{todo:item_id}}" class="item-checkbox" onchange="updateCartTotal()">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </div>
+                                            <div class="col-product">
+                                                <div class="product-info">
+                                                    <div class="product-image">
+                                                        <img src="{{todo:product_image}}" alt="{{todo:product_title}}">
+                                                    </div>
+                                                    <div class="product-details">
+                                                        <h4 class="product-name">
+                                                            <a href="{{todo:product_url}}">{{todo:product_title}}</a>
+                                                        </h4>
+                                                        {{todo:if condition="spec_name"}}
+                                                        <div class="product-specs">{{todo:spec_name}}</div>
+                                                        {{/todo:if}}
+                                                        {{todo:if product_unit_text}}
+                                                        <div class="product-unit">x1 {{todo:product_unit_text}}</div>
+                                                        {{/todo:if}}
+                                                        {{todo:if condition="product_stock > 0 && product_stock < 10"}}
+                                                        <div class="stock-warning">{{todo:t text="库存仅剩"}} {{todo:product_stock}}</div>
+                                                        {{/todo:if}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-price">
+                                                <div class="price-info col-num">
+                                                    <span class="current-price">{{todo:product_price}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-quantity">
+                                                <div class="quantity-control">
+                                                    <button type="button" class="quantity-btn minus" onclick="updateQuantity('{{todo:item_id}}', -1)" {{todo:if condition="quantity <= 1"}}disabled{{/todo:if}}>
+                                                        <i class="icon-minus"></i>
+                                                    </button>
+                                                    <input type="number" class="quantity-input" value="{{todo:quantity}}" min="1" max="{{todo:if condition="product_stock > 0"}}{{todo:product_stock}}{{todo:else}}999999{{/todo:if}}" onchange="setQuantity('{{todo:item_id}}', this.value)">
+                                                    <button type="button" class="quantity-btn plus" onclick="updateQuantity('{{todo:item_id}}', 1)" {{todo:if condition="product_stock > 0 && quantity >= product_stock"}}disabled{{/todo:if}}>
+                                                        <i class="icon-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-total col-num">
+                                                <span class="item-total">{{todo:currency_code}}{{todo:item_total}}</span>
+                                            </div>
+                                            <div class="col-actions">
+                                                <button type="button" class="btn btn-link" onclick="removeItem('{{todo:item_id}}')">
+                                                    <i class="icon-trash"></i> {{todo:t text="删除"}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {{/todo:cart_items}}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="cart-footer">
+                                <div class="cart-summary">
+                                    <div class="summary-left">
+                                        <label class="checkbox-wrapper">
+                                            <input type="checkbox" id="footer-select-all" onchange="toggleSelectAll()">
+                                            <span class="checkmark" style="opacity: 0.5; filter: grayscale(1);"></span>
+                                        </label>
+                                        <span class="selected-count">{{todo:t text="已选"}} <strong id="selected-count">0</strong> {{todo:t text="件商品"}}</span>
+                                    </div>
+                                    <div class="summary-right">
+                                        <div class="price-summary">
+                                            <div class="summary-item total">
+                                                <span class="label">{{todo:t text="总计"}}:&nbsp;</span>
+                                                <span class="value price" id="cart-total">{{todo:currency_code}}0.00</span>
+                                            </div>
+                                        </div>
+                                        <div class="checkout-actions">
+                                            <button type="button" class="btn btn-primary" id="checkout-btn" onclick="checkout()" disabled>{{todo:t text="结算"}} <span id="checkout-count">0</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{todo:else}}
+                        <!-- 空购物车 -->
+                        <div id="todo-cart-dynamic"></div>
+                        <div class="empty-info" id="todo-empty-cart">
+                            <h3>{{todo:t text="购物车是空的"}}</h3>
+                            <p>{{todo:t text="快去挑选喜欢的商品吧"}}</p>
+                            <a href="{{todo:shop_url}}" class="btn btn-primary">{{todo:t text="去购物"}}</a>
+                        </div>
+                        {{/todo:if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script src="{{todo:public_url}}/static/common/js/jquery.min.js"></script>
+    <script src="{{todo:public_url}}/plugins/layer-v3.5.1/layer.js"></script>
+    <script src="{{todo:theme_url}}/users/skin/js/layout.js"></script>
+    <script src="{{todo:theme_url}}/assets/js/csrf-manager.js"></script>
+    
+    <script>
+    // 购物车 AJAX 请求地址（使用 default 参数获取原始基准路径，避免带有语言前缀导致 404）
+    var cartAjaxUrl = (window.TODO && window.TODO.join && window.TODO.INCLUDES_AJAX)
+        ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'cart-handler.php')
+        : '{{todo:site_url|default}}'.replace(/\/+$/, '') + '/includes/ajax/cart-handler.php';
+
+    // 选中的商品 ID 映射表 (参考小程序存储 cart_selected_map)
+    function getSelectedMap() {
+        try {
+            var raw = localStorage.getItem('cart_selected_map');
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function setSelectedMap(map) {
+        try {
+            localStorage.setItem('cart_selected_map', JSON.stringify(map || {}));
+        } catch (e) {}
+    }
+
+    // 格式化单位文本 (参考小程序 api.formatUnitText)
+    function formatUnitText(unitQty, unit) {
+        if (!unit) return '';
+        var qty = parseFloat(unitQty) || 1;
+        var qtyStr = (Math.floor(qty) === qty) ? qty.toString() : qty.toFixed(2).replace(/\.?0+$/, '');
+        if (qtyStr === '1' || qty <= 0) return unit;
+        return qtyStr + unit;
+    }
+    
+    // 格式化总数量单位文本 (数量 × 单件单位)
+    function formatTotalUnitText(cartQty, unitQty, unit) {
+        if (!unit) return '';
+        var totalQty = (parseFloat(cartQty) || 0);
+        if (totalQty <= 0) return '';
+        var totalStr = (Math.floor(totalQty) === totalQty) ? totalQty.toString() : totalQty.toFixed(2).replace(/\.?0+$/, '');
+        return totalStr + ' ' + unitQty + unit;
+    }
+
+    // 格式化规格文本 (参考小程序 api.formatSpecsText)
+    function formatSpecsText(specs) {
+        if (!specs) return '';
+        if (typeof specs === 'string') return specs;
+        if (typeof specs === 'object') {
+            var parts = [];
+            Object.keys(specs).forEach(function(k) {
+                var v = specs[k];
+                if (k && v) parts.push(k + ':' + v);
+            });
+            return parts.join('，');
+        }
+        return '';
+    }
+
+    // 同步更新顶部导航栏购物车 badge
+    function updateCartBadge(count) {
+        count = parseInt(count) || 0;
+        var $badge = $('.cart-link .cart-badge');
+        if (count > 0) {
+            if ($badge.length) {
+                $badge.text(count).show();
+            } else if ($('.cart-link').length) {
+                $('.cart-link').append('<span class="cart-badge">' + count + '</span>');
+            }
+        } else {
+            $badge.remove();
+        }
+    }
+
+    // 全局当前货币符号 (来自后端系统配置及多语言逻辑)
+    var currentCurrencySymbol = (window.TODO && window.TODO.CURRENCY_SYMBOL) || '{{todo:currency_code}}';
+
+    // 前端获取并解析购物车数据 (对应小程序 updateData)
+    async function loadCartData() {
+        try {
+            const resp = await fetch(cartAjaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'cart_action=get'
+            });
+            const json = await resp.json();
+            const cart = json && json.success ? (json.cart || (json.data && json.data.cart)) : null;
+            if (cart && (cart.currency_symbol || cart.currency_code)) {
+                currentCurrencySymbol = cart.currency_symbol || cart.currency_code;
+            }
+            const itemsObj = cart && cart.items ? cart.items : null;
+            const keys = itemsObj && typeof itemsObj === 'object' ? Object.keys(itemsObj) : [];
+
+            if (!keys.length) {
+                $('.page-header span').text('0 {{todo:t text="件商品"}}');
+                if ($('.cart-container').length) $('.cart-container').hide();
+                $('#todo-empty-cart').show();
+                updateCartBadge(0);
+                return;
+            }
+
+            $('#todo-empty-cart').hide();
+            $('.cart-container').show();
+
+            const cartCount = cart.count || keys.reduce((sum, k) => sum + (parseInt(itemsObj[k].quantity || 0) || 0), 0);
+            $('.page-header span').text(cartCount + ' {{todo:t text="件商品"}}');
+            updateCartBadge(cartCount);
+
+            const selectedMap = getSelectedMap();
+
+            let itemsHtml = '';
+            keys.forEach(function(cartKey) {
+                const it = itemsObj[cartKey] || {};
+                const qty = parseInt(it.quantity || 0) || 0;
+                const price = parseFloat(it.price || it.current_price || it.regular_price || it.sale_price || 0) || 0;
+                const unitQty = parseFloat(it.unit_qty || 0) || 1;
+                const unitText = formatTotalUnitText(qty, it.unit_qty, it.unit);
+                const displayTotal = (price * qty).toFixed(2);
+                const stock = parseInt(it.stock || 0) || 0;
+                const name = it.title || '';
+                const img = it.image || it.featured_image || '';
+                const pid = it.product_id || 0;
+                const href = (it.url || it.product_url) ? (it.url || it.product_url) : ('{{todo:site_url}}/?p=' + encodeURIComponent(pid));
+                const specsText = it.specs_text || formatSpecsText(it.specs);
+                
+                const isSelected = typeof selectedMap[cartKey] === 'boolean' ? selectedMap[cartKey] : true;
+
+                itemsHtml += '<div class="cart-item" data-id="' + cartKey + '">'
+                    + '<div class="col-check"><label class="checkbox-wrapper"><input type="checkbox" name="selected_items[]" value="' + cartKey + '" class="item-checkbox" ' + (isSelected ? 'checked' : '') + ' onchange="onItemSelectChange(\'' + cartKey + '\')"><span class="checkmark"></span></label></div>'
+                    + '<div class="col-product"><div class="product-info"><div class="product-image"><img src="' + img + '" alt="' + name + '"></div><div class="product-details"><h4 class="product-name"><a href="' + href + '">' + name + '</a></h4>'
+                    + (specsText ? '<div class="product-specs">' + specsText + '</div>' : '')
+                    + (unitText ? '<div class="product-unit">x' + unitText + '</div>' : '')
+                    + (stock > 0 && stock < 10 ? '<div class="stock-warning">{{todo:t text="库存仅剩"}} ' + stock + '</div>' : '')
+                    + '</div></div></div>'
+                    + '<div class="col-price"><div class="price-info col-num"><span class="current-price">' + currentCurrencySymbol + price.toFixed(2) + '</span></div></div>'
+                    + '<div class="col-quantity"><div class="quantity-control">'
+                    + '<button type="button" class="quantity-btn minus" onclick="updateQuantity(\'' + cartKey + '\', -1)" ' + (qty <= 1 ? 'disabled' : '') + '><i class="icon-minus"></i></button>'
+                    + '<input type="number" class="quantity-input" value="' + qty + '" min="1" max="' + (stock > 0 ? stock : 999999) + '" onchange="setQuantity(\'' + cartKey + '\', this.value)">'
+                    + '<button type="button" class="quantity-btn plus" onclick="updateQuantity(\'' + cartKey + '\', 1)" ' + (stock > 0 && qty >= stock ? 'disabled' : '') + '><i class="icon-plus"></i></button>'
+                    + '</div></div>'
+                    + '<div class="col-total col-num"><span class="item-total">' + currentCurrencySymbol + displayTotal + '</span></div>'
+                    + '<div class="col-actions"><button type="button" class="btn btn-link" onclick="removeItem(\'' + cartKey + '\')"><i class="icon-trash"></i> {{todo:t text="删除"}}</button></div>'
+                    + '</div>';
+            });
+
+            if ($('.cart-items').length) {
+                $('.cart-items').html(itemsHtml);
+            } else if ($('#todo-cart-dynamic').length) {
+                const html = '<div class="cart-container">'
+                    + '<div class="cart-content"><div class="cart-table">'
+                    + '<div class="cart-table-header"><div class="col-check"><label class="checkbox-wrapper"><input type="checkbox" id="select-all" onchange="toggleSelectAll()"><span class="checkmark" style="opacity: 0.5; filter: grayscale(1);"></span></label></div><div class="col-product">{{todo:t text="商品信息"}}</div><div class="col-price col-num">{{todo:t text="单价"}}</div><div class="col-quantity">{{todo:t text="数量"}}</div><div class="col-total col-num">{{todo:t text="小计"}}</div><div class="col-actions">{{todo:t text="操作"}}</div></div>'
+                    + '<div class="cart-items">' + itemsHtml + '</div>'
+                    + '</div></div>'
+                    + '<div class="cart-footer"><div class="cart-summary"><div class="summary-left"><label class="checkbox-wrapper"><input type="checkbox" id="footer-select-all" onchange="toggleSelectAll()"><span class="checkmark" style="opacity: 0.5; filter: grayscale(1);"></span></label><span class="selected-count">{{todo:t text="已选"}} <strong id="selected-count">0</strong> {{todo:t text="件商品"}}</span></div><div class="summary-right"><div class="price-summary"><div class="summary-item total"><span class="label">{{todo:t text="总计"}}:&nbsp;</span><span class="value price" id="cart-total">' + currentCurrencySymbol + '0.00</span></div></div><div class="checkout-actions"><button type="button" class="btn btn-primary" id="checkout-btn" onclick="checkout()" disabled>{{todo:t text="结算"}} <span id="checkout-count">0</span></button></div></div></div></div>'
+                    + '</div>';
+                $('#todo-cart-dynamic').html(html);
+            }
+
+            updateCartTotal();
+        } catch (e) {
+            console.error('Failed to load shopping cart data:', e);
+        }
+    }
+
+    function onItemSelectChange(cartKey) {
+        var $checkbox = $('.cart-item[data-id="' + cartKey + '"] .item-checkbox');
+        var selectedMap = getSelectedMap();
+        selectedMap[cartKey] = $checkbox.is(':checked');
+        setSelectedMap(selectedMap);
+        updateCartTotal();
+    }
+
+    function toggleSelectAll() {
+        var allChecked = $('.item-checkbox').length > 0 && $('.item-checkbox').length === $('.item-checkbox:checked').length;
+        var selectAll = !allChecked;
+        $('.item-checkbox').prop('checked', selectAll);
+        $('#select-all, #footer-select-all').prop('checked', selectAll);
+        
+        var selectedMap = getSelectedMap();
+        $('.item-checkbox').each(function() {
+            var val = $(this).val();
+            if (val) {
+                selectedMap[val] = selectAll;
+            }
+        });
+        setSelectedMap(selectedMap);
+        
+        updateCartTotal();
+    }
+    
+    // 更新购物车总计 (对应小程序 calculateTotal)
+    function updateCartTotal() {
+        var selectedItems = $('.item-checkbox:checked');
+        var selectedCount = selectedItems.length;
+        var totalCount = $('.item-checkbox').length;
+        var productsTotal = 0;
+        
+        selectedItems.each(function() {
+            var $item = $(this).closest('.cart-item');
+            var rawText = $item.find('.item-total').text() || '';
+            var n = parseFloat(rawText.replace(/[^\d.]/g, ''));
+            if (!isNaN(n)) {
+                productsTotal += n;
+            }
+        });
+        
+        $('#selected-count').text(selectedCount);
+        $('#checkout-count').text(selectedCount);
+        $('#cart-total').text(currentCurrencySymbol + productsTotal.toFixed(2));
+        
+        var allSelected = selectedCount === totalCount && totalCount > 0;
+        $('#select-all, #footer-select-all').prop('checked', allSelected);
+        
+        $('#checkout-btn').prop('disabled', selectedCount === 0);
+    }
+    
+    function updateQuantity(itemId, change) {
+        var $item = $('.cart-item').filter(function() {
+            return String($(this).data('id')) === String(itemId);
+        });
+        if (!$item.length) {
+            console.warn('Cart item not found:', itemId);
+            return;
+        }
+        var $input = $item.find('.quantity-input');
+        var currentQty = parseInt($input.val()) || 1;
+        var newQty = currentQty + change;
+        var maxQty = parseInt($input.attr('max')) || 999999;
+        
+        if (newQty >= 1 && newQty <= maxQty) {
+            setQuantity(itemId, newQty);
+        }
+    }
+    
+    // 设置商品数量 (对应小程序 updateQuantity)
+    async function setQuantity(itemId, quantity) {
+        var num = parseInt(quantity, 10);
+        if (isNaN(num) || num < 1) {
+            num = 1;
+        }
+        var $item = $('.cart-item').filter(function() {
+            return String($(this).data('id')) === String(itemId);
+        });
+        if ($item.length) {
+            var $input = $item.find('.quantity-input');
+            var maxQty = parseInt($input.attr('max'), 10) || 999999;
+            if (num > maxQty) {
+                num = maxQty;
+            }
+            $input.val(num);
+        }
+        quantity = num;
+        try {
+            const token = await (window.todoCSRF && window.todoCSRF.getToken ? window.todoCSRF.getToken('update_cart') : null);
+            if (!token) {
+                layer.msg('{{todo:t text="安全验证失败，请刷新页面重试"}}', {icon: 2});
+                return;
+            }
+            $.post(cartAjaxUrl, {
+                cart_action: 'update',
+                cart_key: itemId,
+                quantity: quantity,
+                _todononce: token
+            }, function(response) {
+                const ok = response && response.success;
+                if (ok) {
+                    loadCartData();
+                } else {
+                    layer.msg((response && response.message) ? response.message : '{{todo:t text="更新失败"}}', {icon: 2});
+                }
+            }).fail(function() {
+                layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+            });
+        } catch (e) {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        }
+    }
+    
+    // 删除商品 (对应小程序 removeItem)
+    function removeItem(itemId) {
+        layer.confirm('{{todo:t text="确定删除该商品"}}', {
+            icon: 3,
+            title: '{{todo:t text="确认删除"}}',
+            btn: [__t('确定'), __t('取消')]
+        }, async function(index) {
+            try {
+                const token = await (window.todoCSRF && window.todoCSRF.getToken ? window.todoCSRF.getToken('remove_from_cart') : null);
+                if (!token) {
+                    layer.msg('{{todo:t text="安全验证失败，请刷新页面重试"}}', {icon: 2});
+                    return;
+                }
+                $.post(cartAjaxUrl, {
+                    cart_action: 'remove',
+                    cart_key: itemId,
+                    _todononce: token
+                }, function(response) {
+                    const ok = response && response.success;
+                    if (ok) {
+                        layer.msg('{{todo:t text="删除成功"}}', {icon: 1});
+                        var selectedMap = getSelectedMap();
+                        delete selectedMap[itemId];
+                        setSelectedMap(selectedMap);
+                        loadCartData();
+                    } else {
+                        layer.msg((response && response.message) ? response.message : '{{todo:t text="删除失败"}}', {icon: 2});
+                    }
+                }).fail(function() {
+                    layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+                });
+            } finally {
+                layer.close(index);
+            }
+        });
+    }
+    
+    // 移至收藏夹
+    function moveToFavorites(itemId) {
+        $.post((window.TODO && window.TODO.join) ? window.TODO.join(window.TODO.ADMIN_AJAX, 'cart-move-to-favorites.php') : ('{{todo:site_url}}/admin/ajax/cart-move-to-favorites.php'), {
+            item_id: itemId,
+            _token: TodoCSRF.getToken('cart_move_favorites')
+        }, function(response) {
+            if (response.success) {
+                layer.msg('{{todo:t text="已移至收藏夹"}}', {icon: 1});
+                loadCartData();
+            } else {
+                layer.msg(response.message || '{{todo:t text="操作失败"}}', {icon: 2});
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        });
+    }
+    
+    // 清空购物车
+    function clearCart() {
+        layer.confirm('{{todo:t text="确定清空购物车"}}', {
+            icon: 3,
+            title: '{{todo:t text="确认清空"}}',
+            btn: [__t('确定'), __t('取消')]
+        }, async function(index) {
+            try {
+                const token = await (window.todoCSRF && window.todoCSRF.getToken ? window.todoCSRF.getToken('clear_cart') : null);
+                if (!token) {
+                    layer.msg('{{todo:t text="安全验证失败，请刷新页面重试"}}', {icon: 2});
+                    return;
+                }
+                $.post(cartAjaxUrl, {
+                    cart_action: 'clear',
+                    _todononce: token
+                }, function(response) {
+                    const ok = response && response.success;
+                    if (ok) {
+                        layer.msg('{{todo:t text="购物车已清空"}}', {icon: 1});
+                        setSelectedMap({});
+                        loadCartData();
+                    } else {
+                        layer.msg((response && response.message) ? response.message : '{{todo:t text="操作失败"}}', {icon: 2});
+                    }
+                }).fail(function() {
+                    layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+                });
+            } finally {
+                layer.close(index);
+            }
+        });
+    }
+    
+    // 结算 (对应小程序 checkout)
+    function checkout() {
+        var $selected = $('.item-checkbox:checked');
+        if ($selected.length === 0) {
+            layer.msg('{{todo:t text="请选择要结算的商品"}}', {icon: 0});
+            return;
+        }
+        var selectedIds = [];
+        var checkoutItems = [];
+        $selected.each(function() {
+            var $item = $(this).closest('.cart-item');
+            var id = $item.data('id') || $(this).val();
+            selectedIds.push(id);
+
+            var title = $item.find('.product-name a').text().trim();
+            var spec = $item.find('.product-specs').text().trim();
+            var qty = parseInt($item.find('.quantity-input').val()) || 1;
+            var price = parseFloat($item.find('.current-price').text().replace(/[^0-9.]/g, '')) || 0;
+            checkoutItems.push({
+                item_id: String(id),
+                item_name: title,
+                item_variant: spec,
+                price: price,
+                quantity: qty
+            });
+        });
+
+        // Google Ads & GA4: begin_checkout event
+        if (window.dataLayer && checkoutItems.length > 0) {
+            try {
+                var totalVal = parseFloat($('#cart-total').text().replace(/[^0-9.]/g, '')) || 0;
+                window.dataLayer.push({
+                    event: 'begin_checkout',
+                    ecommerce: {
+                        currency: (window.TODO && window.TODO.CURRENCY_CODE) || '{{todo:currency_iso|default="USD"}}',
+                        value: totalVal,
+                        items: checkoutItems
+                    }
+                });
+            } catch (e) {
+                console && console.warn && console.warn('begin_checkout tracking error:', e);
+            }
+        }
+
+        var checkoutUrl = (window.TODO && window.TODO.SITE_URL) ? window.TODO.SITE_URL : ('{{todo:site_url}}');
+        checkoutUrl = checkoutUrl.replace(/\/+$/, '');
+        checkoutUrl += '/?user=checkout&selected=' + encodeURIComponent(selectedIds.join(','));
+        window.location.href = checkoutUrl;
+    }
+    
+    // 添加到购物车
+    function addToCart(productId) {
+        $.post('{{todo:cart_url}}/add', {
+            product_id: productId,
+            quantity: 1,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        }, function(response) {
+            if (response.success) {
+                layer.msg('{{todo:t text="添加成功"}}', {icon: 1});
+                loadCartData();
+            } else {
+                layer.msg(response.message || '{{todo:t text="添加失败"}}', {icon: 2});
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        });
+    }
+    
+    // 页面加载完成后初始化前端解析
+    $(document).ready(function() {
+        loadCartData();
+    });
+    </script>
+</body>
+</html>

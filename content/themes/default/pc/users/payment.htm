@@ -1,0 +1,661 @@
+{{todo:include file="users/users_header.htm"}}
+    
+    <div class="payment-page">
+        <div class="container">
+            <div class="page-header mt-4">
+                <h2 class="page-title">{{todo:t text="订单支付"}}</h2>
+            </div>
+
+            <div class="payment-content">
+                <div class="payment-main">
+                    <div class="order-info-section">
+                        <div class="order-summary-card">
+                            <div class="order-header">
+                                <div class="order-no">
+                                    <span>{{todo:t text="订单号"}}:&nbsp;</span><span id="display-order-no">{{todo:order.order_no}}</span>
+                                </div>
+                                <div class="order-time">
+                                    <span>{{todo:t text="下单时间"}}:&nbsp;</span><span id="display-order-time">{{todo:order.created_at_format}}</span>
+                                </div>
+                            </div>
+                            {{todo:if condition="order.order_notes"}}
+                            <div class="order-notes-box" style="margin-top: 10px; padding: 8px 12px; background: #f8fafc; border-radius: 4px; font-size: 13px; color: #475569;">
+                                <strong>{{todo:t text="客户备注"}}:&nbsp;</strong><span id="display-order-notes">{{todo:order.order_notes}}</span>
+                            </div>
+                            {{/todo:if}}
+                            
+                            <div class="order-items" id="display-order-items">
+                                {{todo:order.items}}
+                                <div class="order-item" style="align-items: center;">
+                                    <div class="item-image">
+                                        {{todo:if condition="product_image"}}
+                                            <img src="{{todo:product_image}}" alt="{{todo:product_title}}">
+                                        {{todo:else}}
+                                            <div class="no-image">📦</div>
+                                        {{/todo:if}}
+                                    </div>
+                                    <div class="item-info">
+                                        <h4>{{todo:product_title}}</h4>
+                                        {{todo:if condition="spec_name"}}
+                                            <div class="item-specs">
+                                                {{todo:spec_name}}
+                                            </div>
+                                        {{/todo:if}}
+                                        <div class="item-quantity">{{todo:t text="数量"}}:&nbsp;{{todo:quantity}}</div>
+                                        <div class="item-quantity">{{todo:unit_text}}</div>
+                                    </div>
+                                    <div class="item-price">
+                                        {{todo:currency_code}}{{todo:total_price_format}}
+                                    </div>
+                                </div>
+                                {{/todo:order.items}}
+                            </div>
+                            
+                            <div class="order-totals">
+                                <div class="total-row">
+                                    <span>{{todo:t text="小计"}}</span>
+                                    <span id="display-subtotal">{{todo:currency_code}}{{todo:order.subtotal_amount_format}}</span>
+                                </div>
+                                <div class="total-row" id="row-shipping-fee" {{todo:if condition="order.shipping_fee > 0"}}style="display:flex;"{{todo:else}}style="display:none;"{{/todo:if}}>
+                                    <span>{{todo:t text="运费"}}</span>
+                                    <span id="display-shipping-fee">{{todo:currency_code}}{{todo:order.shipping_fee_format}}</span>
+                                </div>
+                                {{todo:if condition="order.coupon_discount_amount > 0"}}
+                                <div class="total-row discount" id="row-coupon-discount" style="color: #e94b4b; display: flex;">
+                                    <span>{{todo:t text="券抵扣"}}</span>
+                                    <span id="display-coupon-discount">-{{todo:currency_code}}{{todo:order.coupon_discount_amount_format}}</span>
+                                </div>
+                                {{/todo:if}}
+                                {{todo:if condition="order.points_discount_amount > 0"}}
+                                <div class="total-row discount" id="row-points-discount" style="color: #e94b4b; display: flex;">
+                                    <span>{{todo:t text="积分抵扣"}} (<span id="display-points-used">{{todo:order.points_used}}</span>{{todo:t text="积分"}})</span>
+                                    <span id="display-points-discount">-{{todo:currency_code}}{{todo:order.points_discount_amount_format}}</span>
+                                </div>
+                                {{/todo:if}}
+                                <div class="total-row total-final">
+                                    <span>{{todo:t text="总计"}}</span>
+                                    <span class="total-amount" id="display-total-amount">{{todo:currency_code}}{{todo:order.total_amount_format}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-methods-section">
+                        <h3 class="section-title mb-2">{{todo:t text="支付方式"}}</h3>
+                        <form id="payment-form" class="payment-form">
+                            <div class="payment-methods">
+                                {{todo:payment_methods}}
+                                <label class="method-radio" style="cursor: default;">
+                                    <input type="radio" name="payment_method" value="{{todo:code}}" {{todo:if condition="is_default"}}checked{{/todo:if}}>
+                                    <div class="method-content">
+                                        <div class="method-icon">
+                                            {{todo:if condition="code == 'balance'"}}
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                                            {{todo:else}}
+                                                {{todo:initial}}
+                                            {{/todo:if}}
+                                        </div>
+                                        <div class="method-info">
+                                            <strong>{{todo:name}}</strong>
+                                            {{todo:if condition="code == 'balance'"}}
+                                                <div class="method-description balance-desc" style="font-size: 12px; color: #666;">
+                                                    {{todo:t text="您的余额为"}} {{todo:currency_code}}<span class="user-balance-text">{{todo:user_balance}}</span>, <span class="balance-diff-tip"></span>
+                                                </div>
+                                                <div class="balance-recharge-btn-wrap" style="margin-top: 10px; display: none;">
+                                                    <a href="{{todo:user_page_url page='wallet'}}" target="_blank" class="btn btn-outline btn-sm" style="background: #fff; border-radius: 4px; padding: 4px 12px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-color: #d9d9d9; color: #333;">
+                                                        <span style="font-size: 15px; font-weight: bold; line-height: 1;">+</span> {{todo:t text="充值余额"}}
+                                                    </a>
+                                                </div>
+                                            {{todo:else}}
+                                                {{todo:if condition="description"}}
+                                                <div class="method-description" style="font-size: 12px; color: #666;">{{todo:description}}</div>
+                                                {{/todo:if}}
+                                            {{/todo:if}}
+                                            {{todo:if condition="cod_instructions"}}
+                                            <div class="method-instructions" style="margin-inline-start: -8px;font-size: 12px;color: #cd5200;padding: 4px 8px;background: #fff;border-radius: 4px;">
+                                                <strong>{{todo:t text="付款说明"}}:&nbsp;</strong>{{todo:cod_instructions}}
+                                            </div>
+                                            {{/todo:if}}
+                                            {{todo:if condition="bank_instructions"}}
+                                            <div class="method-instructions" style="margin-inline-start: -8px;font-size: 12px;color: #cd5200;padding: 4px 8px;background: #fff;border-radius: 4px;">
+                                                <strong>{{todo:t text="转账说明"}}:&nbsp;</strong>{{todo:bank_instructions}}
+                                            </div>
+                                            {{/todo:if}}
+                                        </div>
+                                    </div>
+                                </label>
+                                {{/todo:payment_methods}}
+                            </div>
+                            
+                            <!-- 支付按钮 -->
+                            <div class="payment-actions" style="margin-top: 20px;">
+                                {{todo:if condition="order.before_payment_note"}}
+                                <div class="payment-note" data-field-key="before_payment_note" style="margin-bottom: 15px; padding: 12px 15px; background: #fffbe6; border: 1px solid #ffe58f; border-radius: 6px; color: #595959; font-size: 14px; line-height: 1.5;">
+                                    <div style="font-weight: bold; color: #d46b08; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                        <span>{{todo:t text="支付前说明"}}</span>
+                                    </div>
+                                    <div>{{todo:order.before_payment_note}}</div>
+                                </div>
+                                {{/todo:if}}
+                                <div class="payment-amount" style="margin-bottom: 15px;">
+                                    <span class="amount-label">{{todo:t text="应付金额"}}</span>
+                                    <span class="amount-value" id="btn-total-amount" style="font-size: 22px; color: #e74c3c; font-weight: bold;">{{todo:currency_code}}{{todo:order.pay_amount_format}}</span>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-large" id="pay-now-btn" style="min-width: 200px; padding: 10px 30px; font-size: 16px; background: #FF6600; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+                                    {{todo:t text="立即支付"}}
+                                </button>
+                            </div>
+                            
+                            <!-- 隐藏字段 -->
+                            <input type="hidden" name="action" value="process_payment">
+                            <input type="hidden" name="order_id" id="input-order-id" value="{{todo:order.id}}">
+                            <input type="hidden" name="recharge_id" id="input-recharge-id" value="">
+                            <input type="hidden" name="_todononce" value="{{todo:csrf_token action='process_payment'}}">
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- 侧边栏 -->
+                <div class="payment-sidebar">
+                    <!-- 安全提示 -->
+                    <div class="security-notice m-0">
+                        <h4>{{todo:t text="安全保障"}}</h4>
+                        <ul>
+                            <li>✓ {{todo:t text="SSL加密传输"}}</li>
+                            <li>✓ {{todo:t text="银行级安全防护"}}</li>
+                            <li>✓ {{todo:t text="资金安全保障"}}</li>
+                            <li>✓ {{todo:t text="7×24小时监控"}}</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 支付帮助 -->
+                    <div class="payment-help mt-5">
+                        <h4>{{todo:t text="支付帮助"}}</h4>
+                        <ul>
+                            <li><a href="javascript:void(0);" onclick="openFaqModal(this.textContent.trim(), 'payment-faq-1');">{{todo:t text="支付遇到问题?"}}</a></li>
+                            <li><a href="javascript:void(0);" onclick="openFaqModal(this.textContent.trim(), 'payment-faq-2');">{{todo:t text="如何申请退款?"}}</a></li>
+                            <li><a href="javascript:void(0);" onclick="openFaqModal(this.textContent.trim(), 'payment-faq-3');">{{todo:t text="联系客服"}}</a></li>
+                        </ul>
+                        <div id="payment-faq-1" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="1"}}</div></div>
+                        <div id="payment-faq-2" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="2"}}</div></div>
+                        <div id="payment-faq-3" style="display: none;"><div style="padding: 0 20px;">{{todo:anywhere_post id="3"}}</div></div>
+                    </div>
+                    <script>
+                    function openFaqModal(label, contentId) {
+                        var el = document.getElementById(contentId);
+                        var html = el ? el.innerHTML : '';
+                        if (window.layer) {
+                            layer.open({
+                                type: 1,
+                                title: label,
+                                area: ['800px', '80%'],
+                                shadeClose: true,
+                                scrollbar: false,
+                                content: html
+                            });
+                        }
+                    }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支付处理模态框 -->
+    <div id="payment-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-content" style="border-radius: 12px;width: 420px;text-align: center;">
+            <div class="modal-header">
+                <h4 style="margin: 0; font-size: 18px; color: #333;" id="payment-modal-title">{{todo:t text="正在处理支付"}}</h4>
+                <button type="button" class="modal-close" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #999; line-height: 1;" onclick="document.getElementById('payment-modal').style.display='none'; if(document.getElementById('pay-now-btn')) document.getElementById('pay-now-btn').disabled=false; if(typeof window.stopPaymentStatusCheck === 'function') window.stopPaymentStatusCheck();">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-processing">
+                    <div class="loading-spinner" style="width: 44px; height: 44px; margin: 0 auto 15px; border: 4px solid #f3f3f3; border-top: 4px solid #FF6600; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p id="payment-modal-msg" style="margin: 0 0 40px; color: #666; font-size: 14px;">{{todo:t text="请稍候，正在为您处理支付"}}</p>
+                    <div id="qr-code-container" style="display: none; margin: -20px 0 20px;">
+                        <div id="qr-code"></div>
+                    </div>
+                    <div id="pay-url-container" style="display: none; margin: -20px 0 20px;">
+                        <a id="pay-url-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-block; padding-inline-end: 15px; background: #FF6600; border-color: #FF6600;">{{todo:t text="前往支付页面"}} ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .order-header { display: flex; align-items: center; gap: 0 20px; flex-wrap: wrap; justify-content: space-between; font-size: 14px; color: #999; word-break: break-all; }
+        .payment-content { display: flex; margin: 30px 0 100px; justify-content: space-between; gap: 100px; }
+        .payment-main { flex: 1; }
+        .payment-sidebar { width: 200px; text-align: center; }
+        .payment-sidebar li { list-style: none; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script src="{{todo:theme_url}}/assets/js/csrf-manager.js"></script>
+    <script>window.TODO_SITE_URL = '{{todo:site_url}}';</script>
+    <script>
+    // 支付处理JavaScript
+    (function() {
+        'use strict';
+        var SITE_URL = (window.TODO_SITE_URL ||
+            (document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : '') ||
+            window.location.origin).replace(/\/+$/, '');
+
+        function getPaymentAjaxUrl() {
+            var baseUrl = (window.TODO_SITE_URL ||
+                (document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : '') ||
+                window.location.origin).replace(/\/+$/, '');
+            // 剥离多语言前缀（如 /en, /zh-CN 等），确保请求定位到 /includes/ajax/
+            baseUrl = baseUrl.replace(/\/[a-z]{2}(?:-[A-Za-z]{2,4})?$/i, '');
+            return baseUrl + '/includes/ajax/payment-process.php';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var paymentForm = document.getElementById('payment-form');
+            var payNowBtn = document.getElementById('pay-now-btn');
+            var paymentModal = document.getElementById('payment-modal');
+            var hiddenOrderId = document.getElementById('input-order-id');
+            var hiddenRechargeId = document.getElementById('input-recharge-id');
+
+            function setVerifiedTarget(orderId, rechargeId) {
+                if (hiddenOrderId) hiddenOrderId.value = orderId || 0;
+                if (hiddenRechargeId) hiddenRechargeId.value = rechargeId || 0;
+            }
+
+            function disablePaymentForm(message) {
+                setVerifiedTarget(0, 0);
+                if (payNowBtn) {
+                    payNowBtn.disabled = true;
+                    payNowBtn.textContent = message || '{{todo:t text="订单不可支付"}}';
+                }
+            }
+
+            // 动态异步获取订单详情
+            var urlParams = new URLSearchParams(window.location.search);
+            var orderId = urlParams.get('order_id') || urlParams.get('id');
+            var rechargeId = urlParams.get('recharge_id');
+            var payMethodFromUrl = urlParams.get('pay_method');
+            if (payMethodFromUrl) {
+                var initRadio = document.querySelector('input[name="payment_method"][value="' + payMethodFromUrl + '"]');
+                if (initRadio && !initRadio.disabled) {
+                    initRadio.checked = true;
+                }
+            }
+
+            if (orderId || rechargeId) {
+                var queryParam = rechargeId ? ('recharge_id=' + encodeURIComponent(rechargeId)) : ('order_id=' + encodeURIComponent(orderId));
+
+                fetch(getPaymentAjaxUrl() + '?action=get_order_info&' + queryParam, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(res) {
+                    if (res && res.success && res.order) {
+                        var o = res.order;
+                        setVerifiedTarget(res.is_recharge ? 0 : (o.id || 0), res.is_recharge ? (o.id || 0) : 0);
+
+                        var activePayMethod = payMethodFromUrl || o.payment_method;
+                        if (activePayMethod) {
+                            var targetRadio = document.querySelector('input[name="payment_method"][value="' + activePayMethod + '"]');
+                            if (targetRadio && !targetRadio.disabled) {
+                                targetRadio.checked = true;
+                            }
+                        }
+                        var displayOrderNo = document.getElementById('display-order-no');
+                        var displayOrderTime = document.getElementById('display-order-time');
+                        var displaySubtotal = document.getElementById('display-subtotal');
+                        var displayTotalAmount = document.getElementById('display-total-amount');
+                        var btnTotalAmount = document.getElementById('btn-total-amount');
+                        var displayOrderItems = document.getElementById('display-order-items');
+
+                        var currSymbol = (window.TODO && window.TODO.CURRENCY_SYMBOL) || '';
+                        if (displayOrderNo && o.order_no) displayOrderNo.textContent = o.order_no;
+                        if (displayOrderTime && o.created_at) displayOrderTime.textContent = o.created_at;
+                        if (displaySubtotal && o.subtotal_amount !== undefined) displaySubtotal.textContent = currSymbol + o.subtotal_amount;
+                        if (displayTotalAmount && o.total_amount !== undefined) displayTotalAmount.textContent = currSymbol + o.total_amount;
+                        if (btnTotalAmount && (o.pay_amount_format || o.total_amount) !== undefined) btnTotalAmount.textContent = currSymbol + (o.pay_amount_format || o.total_amount);
+
+                        if (displayOrderItems && Array.isArray(o.items) && o.items.length > 0) {
+                            var itemsHtml = '';
+                            o.items.forEach(function(item) {
+                                var imgHtml = item.product_image ? '<img src="' + item.product_image + '" alt="' + (item.product_title || '') + '">' : '<div class="no-image">📦</div>';
+                                var specHtml = item.spec_name ? '<div class="item-specs">' + item.spec_name + '</div>' : '';
+                                itemsHtml += '<div class="order-item" style="align-items: center;">' +
+                                    '<div class="item-image">' + imgHtml + '</div>' +
+                                    '<div class="item-info">' +
+                                        '<h4>' + (item.product_title || item.product_name || '') + '</h4>' +
+                                        specHtml +
+                                        '<div class="item-quantity">{{todo:t text="数量"}}:&nbsp;' + (item.quantity || 1) + '</div>' +
+                                        '<div class="item-quantity">' + (item.unit_text || '') + '</div>' +
+                                    '</div>' +
+                                    '<div class="item-price">' + currSymbol + (item.total_price || item.price || '0.00') + '</div>' +
+                                '</div>';
+                            });
+                            displayOrderItems.innerHTML = itemsHtml;
+                        }
+
+
+                        if (res.is_recharge) {
+                            var balanceOption = document.querySelector('.payment-method-item[data-method="balance"], input[value="balance"]');
+                            if (balanceOption) {
+                                var parentItem = balanceOption.closest('.payment-method-item') || balanceOption.closest('label') || balanceOption.parentNode;
+                                if (parentItem) parentItem.style.display = 'none';
+                            }
+                        } else if (typeof o.total_amount !== 'undefined') {
+                            var userBalEl = document.querySelector('.user-balance-text');
+                            var balanceRadio = document.querySelector('input[name="payment_method"][value="balance"]');
+                            if (userBalEl && balanceRadio) {
+                                var userBal = parseFloat(userBalEl.textContent.replace(/[^0-9.]/g, '')) || 0;
+                                var totalAmt = parseFloat(o.total_amount) || 0;
+                                var diffTipEl = document.querySelector('.balance-diff-tip');
+                                var btnWrapEl = document.querySelector('.balance-recharge-btn-wrap');
+                                var methodItem = balanceRadio.closest('.method-radio');
+                                if (userBal < totalAmt) {
+                                    var diff = totalAmt - userBal;
+                                    if (diffTipEl) diffTipEl.textContent = '{{todo:t text="再充值"}} ' + currSymbol + diff.toFixed(2) + ' {{todo:t text="即可使用账户余额支付"}}';
+                                    if (btnWrapEl) btnWrapEl.style.display = 'block';
+                                    balanceRadio.disabled = true;
+                                    if (methodItem) methodItem.classList.add('is-disabled');
+                                } else {
+                                	if (diffTipEl) diffTipEl.textContent = '';
+                                    if (btnWrapEl) btnWrapEl.style.display = 'none';
+                                    balanceRadio.disabled = false;
+                                    if (methodItem) methodItem.classList.remove('is-disabled');
+                                }
+                            }
+                        }
+
+                        if (parseFloat(o.shipping_fee) > 0) {
+                            var rowShipping = document.getElementById('row-shipping-fee');
+                            if (rowShipping) {
+                                rowShipping.style.display = 'flex';
+                            }
+                        }
+                        var couponVal = parseFloat(o.coupon_discount_amount) || 0;
+                        var pointsVal = parseFloat(o.points_discount_amount) || 0;
+                        var rowCoupon = document.getElementById('row-coupon-discount');
+                        var elCoupon = document.getElementById('display-coupon-discount');
+                        if (couponVal > 0) {
+                            if (rowCoupon) rowCoupon.style.display = 'flex';
+                            if (elCoupon) elCoupon.textContent = '-' + currSymbol + couponVal.toFixed(2);
+                        } else {
+                            if (rowCoupon) rowCoupon.style.display = 'none';
+                        }
+                        var rowPoints = document.getElementById('row-points-discount');
+                        var elPoints = document.getElementById('display-points-discount');
+                        var elPointsUsed = document.getElementById('display-points-used');
+                        if (pointsVal > 0) {
+                            if (rowPoints) rowPoints.style.display = 'flex';
+                            if (elPoints) elPoints.textContent = '-' + currSymbol + pointsVal.toFixed(2);
+                            if (elPointsUsed) elPointsUsed.textContent = parseInt(o.points_used) || 0;
+                        } else {
+                            if (rowPoints) rowPoints.style.display = 'none';
+                        }
+                    } else {
+                        disablePaymentForm((res && res.message) ? res.message : '{{todo:t text="订单不可支付"}}');
+                    }
+                })
+                .catch(function(err) {
+                    disablePaymentForm('{{todo:t text="订单校验失败"}}');
+                    console.error('Failed to retrieve order details:', err);
+                });
+            }
+
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    if ((!hiddenOrderId || !hiddenOrderId.value || hiddenOrderId.value === '0') &&
+                        (!hiddenRechargeId || !hiddenRechargeId.value || hiddenRechargeId.value === '0')) {
+                        alert('{{todo:t text="订单校验失败"}}');
+                        return;
+                    }
+
+                    // 立即显示 payment-modal 弹窗
+                    if (paymentModal) {
+                        paymentModal.style.display = 'flex';
+                        paymentModal.classList.add('show');
+                        var modalTitle = document.getElementById('payment-modal-title');
+                        if (modalTitle) modalTitle.textContent = '{{todo:t text="支付中"}}';
+                        var modalMsg = document.getElementById('payment-modal-msg');
+                        if (modalMsg) modalMsg.textContent = '{{todo:t text="请稍候，正在为您处理支付"}}';
+                        var spinner = paymentModal.querySelector('.loading-spinner');
+                        if (spinner) spinner.style.display = 'block';
+                        var qrContainer = document.getElementById('qr-code-container');
+                        if (qrContainer) qrContainer.style.display = 'none';
+                        var payUrlContainer = document.getElementById('pay-url-container');
+                        if (payUrlContainer) payUrlContainer.style.display = 'none';
+                    }
+                    payNowBtn.disabled = true;
+
+                    var formData = new FormData(paymentForm);
+
+                    try {
+                        var deviceData = {
+                            screen: (window.screen ? window.screen.width + 'x' + window.screen.height + ' (' + (window.screen.colorDepth || 24) + '-bit)' : ''),
+                            language: navigator.language || navigator.userLanguage || '',
+                            platform: navigator.platform || '',
+                            timezone: (Intl && Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions) ? Intl.DateTimeFormat().resolvedOptions().timeZone : '',
+                            user_agent: navigator.userAgent || '',
+                            hardware_concurrency: navigator.hardwareConcurrency || '',
+                            device_memory: navigator.deviceMemory || ''
+                        };
+                        formData.append('device_info', JSON.stringify(deviceData));
+                    } catch (e) {
+                        console.warn('Device fingerprint collection error:', e);
+                    }
+
+                    // 尝试动态刷新 CSRF 令牌，失败时保留表单内置的预渲染令牌
+                    if (window.todoCSRF && typeof window.todoCSRF.getToken === 'function') {
+                        try {
+                            var token = await Promise.race([
+                                window.todoCSRF.getToken('process_payment'),
+                                new Promise(function(resolve) { setTimeout(function() { resolve(null); }, 1500); })
+                            ]);
+                            if (token) formData.set('_todononce', token);
+                        } catch (err) { console.warn('Skip CSRF refresh:', err); }
+                    }
+
+                    fetch(getPaymentAjaxUrl(), {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            var orderNo = data.order_no || (data.data && data.data.order_no) || '';
+                            var redirectUrl = data.redirect_url || (data.data && data.data.redirect_url) || '';
+                            var qrCode = data.qr_code || (data.data && data.data.qr_code) || '';
+                            var payUrl = data.pay_url || (data.data && data.data.pay_url) || '';
+
+                            var htmlForm = data.html_form || (data.data && data.data.html_form) || '';
+
+                            var modalMsg = document.getElementById('payment-modal-msg');
+                            var spinner = paymentModal ? paymentModal.querySelector('.loading-spinner') : null;
+
+                            if (htmlForm) {
+                                if (modalMsg) modalMsg.textContent = '{{todo:t text="正在跳转支付页面"}}';
+                                var formDiv = document.createElement('div');
+                                formDiv.id = 'unionpay-form-wrapper-' + Date.now();
+                                formDiv.style.display = 'none';
+                                formDiv.innerHTML = htmlForm;
+                                document.body.appendChild(formDiv);
+                                var realForm = formDiv.querySelector('form');
+                                if (realForm) {
+                                    realForm.submit();
+                                }
+                            } else if (redirectUrl) {
+                                if (modalMsg) modalMsg.textContent = '{{todo:t text="处理成功，正在跳转"}}';
+                                setTimeout(function() { window.location.href = redirectUrl; }, 800);
+                            } else if (qrCode) {
+                                if (modalMsg) modalMsg.textContent = '{{todo:t text="扫描二维码完成支付"}}';
+                                if (spinner) spinner.style.display = 'none';
+                                var qrContainer = document.getElementById('qr-code-container');
+                                var qrDiv = document.getElementById('qr-code');
+                                if (qrContainer && qrDiv) {
+                                    qrDiv.innerHTML = '<img src="' + escapeHtmlAttr(qrCode) + '" alt="{{todo:t text="支付二维码"}}" style="max-width: 200px;">';
+                                    qrContainer.style.display = 'block';
+                                }
+                                checkPaymentStatus(orderNo);
+                            } else if (payUrl) {
+                                if (modalMsg) modalMsg.textContent = '{{todo:t text="等待处理结果"}}';
+                                var payUrlContainer = document.getElementById('pay-url-container');
+                                var payUrlBtn = document.getElementById('pay-url-btn');
+                                if (payUrlContainer && payUrlBtn) {
+                                    payUrlBtn.href = payUrl;
+                                    payUrlContainer.style.display = 'block';
+                                }
+                                try { window.open(payUrl, '_blank'); } catch(e) {}
+                                checkPaymentStatus(orderNo);
+                            } else {
+                                if (paymentModal) {
+                                    paymentModal.style.display = 'none';
+                                    paymentModal.classList.remove('show');
+                                }
+                                payNowBtn.disabled = false;
+                                if (typeof layer !== 'undefined' && layer.alert) {
+                                    layer.alert('{{todo:t text="支付返回异常，请前往订单中心查看"}}', { icon: 2, title: '{{todo:t text="提示信息"}}', btn: [__t('确定')] }, function() {
+                                        window.location.href = SITE_URL + '/?user=orders';
+                                    });
+                                } else {
+                                    alert('{{todo:t text="支付返回异常，请前往订单中心查看"}}');
+                                    window.location.href = SITE_URL + '/?user=orders';
+                                }
+                            }
+                        } else {
+                            if (paymentModal) {
+                                paymentModal.style.display = 'none';
+                                paymentModal.classList.remove('show');
+                            }
+                            payNowBtn.disabled = false;
+                            var msg = data.message || data.error || data.msg || '{{todo:t text="支付处理失败"}}';
+                            if (typeof layer !== 'undefined' && layer.alert) {
+                                layer.alert(msg, { icon: 2, title: '{{todo:t text="提示信息"}}', btn: [__t('确定')] });
+                            } else {
+                                alert(msg);
+                            }
+                        }
+                    })
+                    .catch(function(err) {
+                        if (paymentModal) {
+                            paymentModal.style.display = 'none';
+                            paymentModal.classList.remove('show');
+                        }
+                        payNowBtn.disabled = false;
+                        console.error('Payment request failed:', err);
+                        if (typeof layer !== 'undefined' && layer.msg) {
+                            layer.msg('{{todo:t text="支付请求失败"}}', { icon: 2 });
+                        } else {
+                            alert('{{todo:t text="支付请求失败"}}');
+                        }
+                    });
+                });
+            }
+
+            function escapeHtmlAttr(str) {
+                return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+
+            var currentPayCheckTimer = null;
+            function stopPaymentStatusCheck() {
+                if (currentPayCheckTimer) {
+                    clearInterval(currentPayCheckTimer);
+                    currentPayCheckTimer = null;
+                }
+            }
+            window.stopPaymentStatusCheck = stopPaymentStatusCheck;
+
+            function checkPaymentStatus(orderNo) {
+                if (!orderNo) return;
+                stopPaymentStatusCheck();
+
+                var defaultNonce = '{{todo:csrf_token action="check_payment_status"}}';
+                var startTime = Date.now();
+                var maxDuration = 300000; // 5分钟超时
+
+                currentPayCheckTimer = setInterval(async function() {
+                    if (Date.now() - startTime > maxDuration) {
+                        stopPaymentStatusCheck();
+                        return;
+                    }
+
+                    var nonce = defaultNonce;
+                    if (window.todoCSRF && typeof window.todoCSRF.getToken === 'function') {
+                        try {
+                            var dynamicToken = await Promise.race([
+                                window.todoCSRF.getToken('check_payment_status'),
+                                new Promise(function(resolve) { setTimeout(function() { resolve(null); }, 1000); })
+                            ]);
+                            if (dynamicToken) nonce = dynamicToken;
+                        } catch (e) {}
+                    }
+
+                    var body = 'action=' + encodeURIComponent('check_payment_status')
+                        + '&order_no=' + encodeURIComponent(orderNo)
+                        + '&_todononce=' + encodeURIComponent(nonce);
+
+                    fetch(getPaymentAjaxUrl(), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: body
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        var ok = data && data.success;
+                        var paid = ok && (data.paid || (data.data && data.data.paid));
+                        if (paid) {
+                            stopPaymentStatusCheck();
+                            var modalMsg = document.getElementById('payment-modal-msg');
+                            if (modalMsg) modalMsg.textContent = '{{todo:t text="支付成功"}}';
+                            var spinner = paymentModal ? paymentModal.querySelector('.loading-spinner') : null;
+                            if (spinner) spinner.style.display = 'block';
+                            var qrContainer = document.getElementById('qr-code-container');
+                            if (qrContainer) qrContainer.style.display = 'none';
+                            var payUrlContainer = document.getElementById('pay-url-container');
+                            if (payUrlContainer) payUrlContainer.style.display = 'none';
+
+                            setTimeout(function() {
+                                var targetUrl = data.redirect_url || (data.data && data.data.redirect_url);
+                                if (!targetUrl) {
+                                    var currentRechargeId = hiddenRechargeId ? hiddenRechargeId.value : null;
+                                    var currentOrderId = hiddenOrderId ? hiddenOrderId.value : null;
+                                    if (currentRechargeId && currentRechargeId !== '0') {
+                                        targetUrl = SITE_URL + '/?user=wallet';
+                                    } else if (currentOrderId && currentOrderId !== '0') {
+                                        targetUrl = SITE_URL + '/?user=order-detail&id=' + encodeURIComponent(currentOrderId);
+                                    } else {
+                                        targetUrl = SITE_URL + '/?user=orders';
+                                    }
+                                }
+                                window.location.href = targetUrl;
+                            }, 1200);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Failed to check payment status:', err);
+                    });
+                }, 3000);
+            }
+
+            document.addEventListener('click', function(e) {
+                if (e.target === paymentModal) {
+                    paymentModal.style.display = 'none';
+                    paymentModal.classList.remove('show');
+                    payNowBtn.disabled = false;
+                    stopPaymentStatusCheck();
+                }
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

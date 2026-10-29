@@ -1,0 +1,17 @@
+{
+    "name": "Default HTML",
+    "title": "Default HTML",
+    "description": "基于 TodoCMS 模版标签的纯HTML主题。<br>系统默认主题由 TodoCMS 官方维护，更新会被覆盖；仅供开发参考，请勿用于正式环境。",
+    "version": "1.0.0",
+    "author": "TodoCMS",
+    "author_url": "http://todocms.com",
+    "tags": ["responsive", "html", "clean", "modern"],
+    "template": "default",
+    "supports": {
+        "post-thumbnails": true,
+        "custom-logo": true,
+        "menus": true,
+        "widgets": true,
+        "html5": ["search-form", "comment-form", "comment-list", "gallery", "caption"]
+    }
+}

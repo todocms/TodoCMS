@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html {{todo:html_attributes}}>
+<head>
+    <meta charset="utf-8">
+    <title>{{todo:t text="我的钱包"}} - {{todo:site_name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{todo:site_description}}">
+    <link rel="stylesheet" href="{{todo:theme_url}}/users/skin/css/layout.css">
+    <link rel="stylesheet" href="{{todo:public_url}}/static/common/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{todo:public_url}}/plugins/layer-v3.5.1/theme/default/layer.css">
+    <style>
+        .wallet-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 30px;
+            color: #3d2323;
+            --grad-angle: 45deg;
+            background: linear-gradient(var(--grad-angle), #e2ffc6, #f8c86f, #e5c88c5c, transparent);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        [dir="rtl"] .wallet-card {
+            --grad-angle: -45deg;
+        }
+
+        .transaction-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px 0;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .transaction-item:last-child {
+            border: none;
+        }
+
+        .transaction-item .transaction-amount {
+            display: flex;
+            flex-direction: column;
+            align-items: end;
+            margin-inline-start: auto;
+            margin-inline-end: 10px;
+        }
+
+        .transaction-item .transaction-amount .balance-after {
+            font-size: 14px;
+        }
+
+        .transaction-item .transaction-actions {
+            min-width: 150px;
+            text-align: end;
+        }
+
+        .transaction-desc, .transaction-meta { color: #999; }
+    </style>
+</head>
+<body>
+    {{todo:include file="users/users_header.htm"}}
+    
+    <div class="user-center-container">
+        <div class="container">
+            <div class="row">
+                <!-- 左侧导航 -->
+                <div class="col-3">
+                    {{todo:include file="users/users_sidebar.htm"}}
+                </div>
+                
+                <!-- 主要内容区域 -->
+                <div style="flex: 1;">
+                    <div class="user-main-content">
+                        <div class="page-header">
+                            <h2>{{todo:t text="我的钱包"}}</h2>
+                        </div>
+                        
+                        <!-- 钱包概览 -->
+                        <div class="wallet-overview">
+                            <div class="wallet-card">
+                                <div style="line-height: normal;">
+                                    {{todo:t text="账户余额"}}
+                                    <h3 class="amount" style="margin-top: 5px;">{{todo:currency_code}}{{todo:user_balance}}</h3>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="showRechargeModal()">
+                                    <i class="icon todofont todo-Wallet" style="margin-inline-end: 3px;margin-top: -4px;display: inline-block;"></i> {{todo:t text="充值"}}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 交易记录 -->
+                        <div class="transaction-history" style="padding: 0 30px;">
+                            <div class="nav-tabs">
+                                <li>
+                                    <a href="{{todo:wallet_url}}&type=all"{{todo:if condition="current_type == 'all'"}} class="active"{{/todo:if}}>{{todo:t text="全 部"}}</a>
+                                </li>
+                                <li>
+                                    <a href="{{todo:wallet_url}}&type=recharge"{{todo:if condition="current_type == 'recharge'"}} class="active"{{/todo:if}}>{{todo:t text="充 值"}}</a>
+                                </li>
+                                <li>
+                                    <a href="{{todo:wallet_url}}&type=consume"{{todo:if condition="current_type == 'consume'"}} class="active"{{/todo:if}}>{{todo:t text="消 费"}}</a>
+                                </li>
+                                <li>
+                                    <a href="{{todo:wallet_url}}&type=refund"{{todo:if condition="current_type == 'refund'"}} class="active"{{/todo:if}}>{{todo:t text="退 款"}}</a>
+                                </li>
+                            </div>
+                            
+                            {{todo:if condition="transactions_count > 0"}}
+                            <div class="transactions-list">
+                                {{todo:wallet_transactions}}
+                                <div class="transaction-item">
+                                    <div class="transaction-content">
+                                        <div class="transaction-title">{{todo:transaction_title}}</div>
+                                        <div class="transaction-desc">{{todo:transaction_description}}</div>
+                                        <div class="transaction-meta">
+                                            <span class="transaction-time">{{todo:transaction_time}}</span>
+                                            {{todo:if condition="order_number"}}
+                                            <span class="order-number">{{todo:t text="订单号"}}:&nbsp;{{todo:order_number}}</span>
+                                            {{/todo:if}}
+                                            <span class="transaction-status status-{{todo:transaction_status}}">
+                                                {{todo:if condition="transaction_status == 'pending'"}}{{todo:t text="处理中"}}
+                                                {{todo:elseif condition="transaction_status == 'success'"}}{{todo:t text="成功"}}
+                                                {{todo:elseif condition="transaction_status == 'failed'"}}{{todo:t text="失败"}}
+                                                {{todo:elseif condition="transaction_status == 'cancelled'"}}{{todo:t text="已取消"}}
+                                                {{todo:else}}{{todo:transaction_status}}{{/todo:if}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="transaction-amount">
+                                        {{todo:if condition="amount_type == 'income'"}}
+                                        <span class="amount income">+{{todo:currency_code}}{{todo:transaction_amount}}</span>
+                                        {{todo:else}}
+                                        <span class="amount expense">-{{todo:currency_code}}{{todo:transaction_amount}}</span>
+                                        {{/todo:if}}
+                                        <div class="balance-after">{{todo:t text="余额"}}:&nbsp;{{todo:currency_code}}{{todo:balance_after}}</div>
+                                    </div>
+                                    
+                                    <div class="transaction-actions">
+                                        {{todo:if condition="transaction_type == 'recharge' && transaction_status == 'pending'"}}
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="continuePayment('{{todo:transaction_id}}')">
+                                            {{todo:t text="继续支付"}}
+                                        </button>
+                                        {{/todo:if}}
+                                        
+                                        {{todo:if condition="order_id"}}
+                                        <a href="{{todo:user_page_url page='order-detail'}}&id={{todo:order_id}}" class="btn btn-outline btn-sm">
+                                            {{todo:t text="查看订单"}}
+                                        </a>
+                                        {{todo:else}}
+                                        <a href="javascript:void(0);" class="btn btn-outline btn-sm" style="visibility: hidden;">
+                                            {{todo:t text="查看订单"}}
+                                        </a>
+                                        {{/todo:if}}
+                                        
+                                        <button type="button" class="btn btn-outline btn-sm" onclick="viewTransactionDetail('{{todo:transaction_id}}', '{{todo:transaction_title}}', '{{todo:transaction_time}}', '{{todo:transaction_sign}}{{todo:currency_code}}{{todo:transaction_amount}}', '{{todo:currency_code}}{{todo:balance_after}}')">
+                                            {{todo:t text="详情"}}
+                                        </button>
+                                    </div>
+                                </div>
+                                {{/todo:wallet_transactions}}
+                            </div>
+                            
+                            <!-- 分页 -->
+                            {{todo:if condition="transactions_pages > 1"}}
+                            <div class="pagination-wrapper">
+                                {{todo:pagination}}
+                            </div>
+                            {{/todo:if}}
+                            
+                            {{todo:else}}
+                            <!-- 空交易记录 -->
+                            <div class="empty-info">
+                                <h3>{{todo:t text="暂无交易记录"}}</h3>
+                                <p>{{todo:t text="您还没有任何交易记录"}}</p>
+                            </div>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 充值模态框 -->
+    <div class="modal fade" id="rechargeModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{todo:t text="账户充值"}}</h4>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                
+                <form id="rechargeForm" method="post" action="{{todo:recharge_api_url}}" onsubmit="return handleRechargeSubmit(this, event);">
+                    <input type="hidden" name="_todononce" value="{{todo:csrf_token name='recharge'}}">
+                    
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="d-flex mb-3 align-items-center">
+                                <span class="currency-symbol" style="background: #ebebeb;font-size: 14px;font-weight: bold;height: 32px;line-height: 32px;padding-inline-start: 5px;padding-inline-end: 4px;border-start-start-radius: 3px;border-end-start-radius: 3px;">{{todo:currency_code}}</span>
+                                <input type="number" class="form-control" id="recharge_amount" name="amount" 
+                                       placeholder="{{todo:t text='请输入充值金额'}}" min="0.00" step="0.01" required style="margin-inline-end: 5px;padding: 0;padding-inline-start: 15px;height: 43px;line-height: 43px;font-weight: bold;">
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap ml-3">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="setAmount(20)">20</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="setAmount(50)">50</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="setAmount(100)">100</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="setAmount(200)">200</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="setAmount(500)">500</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="setAmount(1000)">1000</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group m-0">
+                            <label>{{todo:t text="支付方式"}}</label>
+                            <div class="payment-methods">
+                                {{todo:payment_methods exclude="balance,offline,cod"}}
+                                <label class="payment-method gap-2" style="border: 1px solid #eee;background-color: #fbfbfb;padding: 5px 10px;border-radius: 5px;">
+                                    <input type="radio" name="payment_method" value="{{todo:code}}"{{todo:if condition='is_default'}} checked{{/todo:if}}>
+                                    <div class="method-content">
+                                        <span class="method-name">{{todo:name}}</span>
+                                        {{todo:if condition="description"}}
+                                        <small class="method-desc" style="display:block; color:#999; font-size:12px;">{{todo:description}}</small>
+                                        {{/todo:if}}
+                                    </div>
+                                </label>
+                                {{/todo:payment_methods}}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{todo:t text="取消"}}</button>
+                        <button type="submit" class="btn btn-primary">{{todo:t text="确认充值"}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script>
+    function showRechargeModal() {
+        if (typeof $ !== 'undefined' && $('#rechargeModal').length) {
+            $('#rechargeModal').modal('show');
+        }
+    }
+    
+    function setAmount(amount) {
+        $('#recharge_amount').val(amount);
+    }
+    
+    function handleRechargeSubmit(formEl, e) {
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
+        
+        var $form = $(formEl);
+        var amount = parseFloat($('#recharge_amount').val());
+        if (isNaN(amount) || amount < 1) {
+            if (window.layer) layer.msg('{{todo:t text="充值金额不能少于1"}}', {icon: 2});
+            return false;
+        }
+        
+        var formData = $form.serialize();
+        var actionUrl = $form.attr('action') || '{{todo:recharge_api_url}}';
+        
+        $.ajax({
+            url: actionUrl,
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                var res = response;
+                if (typeof response === 'string') {
+                    try { res = JSON.parse(response); } catch(err) {}
+                }
+                if (res && res.success) {
+                    if (res.payment_url) {
+                        window.location.href = res.payment_url;
+                    } else {
+                        if (window.layer) layer.msg('{{todo:t text="充值申请提交成功"}}', {icon: 1});
+                        if (typeof $('#rechargeModal').modal === 'function') {
+                            $('#rechargeModal').modal('hide');
+                        }
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    }
+                } else {
+                    if (window.layer) layer.msg((res && res.message) || '{{todo:t text="充值失败"}}', {icon: 2});
+                }
+            },
+            error: function(xhr) {
+                var msg = '{{todo:t text="网络错误"}}';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                if (window.layer) layer.msg(msg, {icon: 2});
+            }
+        });
+        
+        return false;
+    }
+    
+    function continuePayment(transactionId) {
+        $.get('{{todo:wallet_url}}/payment-info/' + transactionId, function(response) {
+            if (response.success && response.payment_url) {
+                window.location.href = response.payment_url;
+            } else {
+                layer.msg('{{todo:t text="获取支付信息失败"}}', {icon: 2});
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        });
+    }
+    
+    function viewTransactionDetail(transactionId, title, time, amount, balance) {
+        var contentHtml = '<div style="padding:0 20px; line-height:2;">' +
+            '<p><span style="opacity: 0.5;">{{todo:t text="交易编号"}}:&nbsp;</span><b>' + (transactionId || '-') + '</b></p>' +
+            '<p><span style="opacity: 0.5;">{{todo:t text="交易时间"}}:&nbsp;</span><b>' + (time || '-') + '</b></p>' +
+            '<p><span style="opacity: 0.5;">{{todo:t text="说明"}}:&nbsp;</span><b style="word-break: break-all;">' + (title || '{{todo:t text="余额变动"}}') + '</b></p>' +
+            '<p><span style="opacity: 0.5;">{{todo:t text="变动金额"}}:&nbsp;</span><b>' + (amount || '-') + '</b></p>' +
+            '<p><span style="opacity: 0.5;">{{todo:t text="变动后余额"}}:&nbsp;</span><b>' + (balance || '-') + '</b></p>' +
+            '</div>';
+        
+        layer.open({
+            type: 1,
+            title: '{{todo:t text="交易详情"}}',
+            content: contentHtml,
+            area: ['450px', '300px']
+        });
+    }
+    </script>
+</body>
+</html>

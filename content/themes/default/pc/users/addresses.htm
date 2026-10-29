@@ -1,0 +1,827 @@
+{{todo:include file="users/users_header.htm"}}
+<style>
+/* 地址管理页面样式 */
+.addresses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    margin-top: 20px;
+    gap: 20px;
+}
+.address-card:hover {
+    border-color: #d1d1d1;
+}
+.address-header {
+    width: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 5px 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 10px;
+}
+.address-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0 10px;
+}
+.recipient-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+.recipient-phone {
+    font-size: 14px;
+    color: #666;
+}
+.address-content {
+    flex-grow: 1;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+.address-region {
+    margin-bottom: 5px;
+    color: #333;
+}
+.address-detail {
+    color: #666;
+}
+.postal-code {
+    color: #999;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.address-footer {
+    width: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 -8px;
+    opacity: 0;
+}
+.address-card:hover .address-footer {
+    opacity: 1;
+}
+
+.site-sec {
+    display: flex;
+    gap: 10px;
+}
+
+.site-sec > div {
+    flex: 1;
+    position: relative;
+}
+
+.site-sec > div .invalid-feedback {
+    position: absolute;
+}
+</style>
+    
+    <div class="user-center-container">
+        <div class="container">
+            <div class="row">
+                <!-- 左侧导航 -->
+                <div class="col-3">
+                    {{todo:include file="users/users_sidebar.htm"}}
+                </div>
+                
+                <!-- 主要内容区域 -->
+                <div style="flex: 1;">
+                    <div class="user-main-content">
+                        <div class="page-header">
+                            <h2>{{todo:t text="地址管理"}}</h2>
+                            <div class="page-actions">
+                                <button type="button" class="btn btn-outline" onclick="showAddressModal()">
+                                    <i class="icon-plus" style="margin-inline-end: 3px;"></i> {{todo:t text="新增地址"}}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {{todo:if condition="user_address_count > 0"}}
+                        <div class="addresses-container">
+                            <div class="addresses-grid">
+                                {{todo:user_addresses}}
+                                <div class="address-card" data-id="{{todo:address_id}}">
+                                    <div class="address-header">
+                                        <div class="address-info">
+                                            <span class="recipient-name">{{todo:recipient_name}}</span>
+                                            <span class="recipient-phone">{{todo:recipient_phone}}</span>
+                                        </div>
+                                        <div class="address-actions" style="flex-shrink: 0;">
+                                            {{todo:if condition="is_default == 1"}}
+                                            <span class="status-badge status-success"><i class="fa fa-map-marker"></i> {{todo:t text="默认"}}</span>
+                                            {{/todo:if}}
+                                            <span class="status-badge status-secondary">{{todo:address_label}}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="address-content">
+                                        {{todo:if condition="region_type == 'intl'"}}
+                                        <div class="address-region">
+                                            {{todo:detailed_address}}
+                                        </div>
+                                        <div class="address-detail">
+                                            {{todo:if condition="city_name"}}{{todo:city_name}}, {{/todo:if}}{{todo:intl_state}}{{todo:if condition="postal_code"}} {{todo:postal_code}}{{/todo:if}}, {{todo:intl_country}}
+                                        </div>
+                                        {{todo:else}}
+                                        <div class="address-region">
+                                            {{todo:province_name}} {{todo:city_name}} {{todo:district_name}}
+                                        </div>
+                                        <div class="address-detail">
+                                            {{todo:detailed_address}}
+                                        </div>
+                                        {{todo:if condition="postal_code"}}
+                                        <div class="postal-code">
+                                            {{todo:t text="邮编"}}:&nbsp;{{todo:postal_code}}
+                                        </div>
+                                        {{/todo:if}}
+                                        {{/todo:if}}
+                                    </div>
+                                    
+                                    <div class="address-footer">
+                                        <div style="margin-inline-end: auto;">
+                                            <button type="button" class="btn btn-link btn-sm" onclick="editAddress('{{todo:address_id}}')">
+                                                <i class="icon-edit"></i> {{todo:t text="编辑"}}
+                                            </button>
+                                            {{todo:if condition="is_default != 1"}}
+                                            <button type="button" class="btn btn-link btn-sm" onclick="deleteAddress('{{todo:address_id}}')">
+                                                <i class="icon-trash"></i> {{todo:t text="删除"}}
+                                            </button>
+                                            {{/todo:if}}
+                                        </div>
+                                        {{todo:if condition="is_default != 1"}}
+                                        <button type="button" class="btn btn-link btn-sm" onclick="setDefaultAddress('{{todo:address_id}}')">
+                                            {{todo:t text="设为默认"}}
+                                        </button>
+                                        {{/todo:if}}
+                                    </div>
+                                </div>
+                                {{/todo:user_addresses}}
+                            </div>
+                            
+                            <!-- 分页 -->
+                            {{todo:if condition="addresses_pages > 1"}}
+                            <div class="pagination-wrapper">
+                                {{todo:pagination}}
+                            </div>
+                            {{/todo:if}}
+                        </div>
+                        
+                        {{todo:else}}
+                        <!-- 空地址列表 -->
+                        <div class="empty-info">
+                            <h3>{{todo:t text="还没有收货地址"}}</h3>
+                            <p>{{todo:t text="添加收货地址，让购物更便捷"}}</p>
+                            <button type="button" class="btn btn-primary" onclick="showAddressModal()">
+                                {{todo:t text="新增地址"}}
+                            </button>
+                        </div>
+                        {{/todo:if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 地址编辑模态框 -->
+    <div class="modal fade" id="addressModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="addressModalTitle">{{todo:t text="新增地址"}}</h4>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form id="addressForm" method="post">
+                    {{todo:csrf_field action='address_action'}}
+                    <div class="modal-body">
+                        <input type="hidden" id="address_id" name="address_id" value="">
+                        <input type="hidden" name="address_region_type" id="address_region_type" value="cn">
+                        
+                        <div class="form-group">
+                            <label for="recipient_name">{{todo:t text="收货人姓名"}} <span class="required" style="color:red;">*</span></label>
+                            <input type="text" class="form-control" id="recipient_name" name="recipient_name" 
+                                   placeholder="{{todo:t text='请输入收货人姓名'}}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recipient_phone">{{todo:t text="联系电话"}} <span class="required" style="color:red;">*</span></label>
+                            <input type="tel" class="form-control" id="recipient_phone" name="recipient_phone" 
+                                   placeholder="{{todo:t text='请输入联系电话'}}" required>
+                        </div>
+                        
+                        <!-- 大陆地址结构 -->
+                        <div id="fields-cn">
+                            <div class="form-group">
+                                <label>{{todo:t text="所在地区"}} <span class="required" style="color:red;">*</span></label>
+                                <div class="site-sec">
+                                    <div>
+                                        <select class="form-control" id="province" name="province_id">
+                                            <option value="">{{todo:t text="请选择省份"}}</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <select class="form-control" id="city" name="city_id">
+                                            <option value="">{{todo:t text="请选择城市"}}</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <select class="form-control" id="district" name="district_id">
+                                            <option value="">{{todo:t text="请选择区县"}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="detailed_address">{{todo:t text="详细地址"}} <span class="required" style="color:red;">*</span></label>
+                                <textarea class="form-control" id="detailed_address" name="detailed_address" 
+                                          rows="3" placeholder="{{todo:t text='请输入详细地址，如街道、门牌号等'}}"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="postal_code">{{todo:t text="邮政编码"}}</label>
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" 
+                                       placeholder="{{todo:t text='请输入邮政编码（可选）'}}">
+                            </div>
+                        </div>
+
+                        <!-- 国际地址结构 (Standard International Address Format) -->
+                        <div id="fields-intl" style="display: none;">
+                            <div class="form-row d-flex gap-2 mb-3">
+                                <div class="form-group flex-1">
+                                    <label>Country / Region <span class="required" style="color:red;">*</span></label>
+	                                <select name="intl_country" id="input-intl-country" class="form-control">
+	                                    {{todo:country_options}}
+	                                </select>
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label>State / Province <span class="required" style="color:red;">*</span></label>
+                                    <input type="text" name="intl_state" id="input-intl-state" class="form-control" placeholder="State / Province">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label>City <span class="required" style="color:red;">*</span></label>
+                                    <input type="text" name="intl_city" id="input-intl-city" class="form-control" placeholder="City">
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Street Address <span class="required" style="color:red;">*</span></label>
+                                <input type="text" name="intl_address" id="input-intl-address" class="form-control" placeholder="Street address, P.O. box, company name, c/o">
+                            </div>
+
+                            <div class="form-group mb-3" style="width: 50%;">
+                                <label>ZIP / Postal Code <span class="required" style="color:red;">*</span></label>
+                                <input type="text" name="intl_zipcode" id="input-intl-zipcode" class="form-control" placeholder="ZIP / Postal Code">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address_label">{{todo:t text="地址标签"}}</label>
+                            <div class="label-options">
+                                <label class="radio-wrapper">
+                                    <input type="radio" name="address_label" value="{{todo:t text='家'}}" checked>
+                                    <span class="radio-mark"></span>
+                                    {{todo:t text="家"}}
+                                </label>
+                                <label class="radio-wrapper">
+                                    <input type="radio" name="address_label" value="{{todo:t text='公司'}}">
+                                    <span class="radio-mark"></span>
+                                    {{todo:t text="公司"}}
+                                </label>
+                                <label class="radio-wrapper">
+                                    <input type="radio" name="address_label" value="{{todo:t text='学校'}}">
+                                    <span class="radio-mark"></span>
+                                    {{todo:t text="学校"}}
+                                </label>
+                                <label class="radio-wrapper">
+                                    <input type="radio" name="address_label" value="{{todo:t text='其他'}}">
+                                    <span class="radio-mark"></span>
+                                    {{todo:t text="其他"}}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="is_default" name="is_default" value="1">
+                                <span class="checkmark"></span>
+                                {{todo:t text="设为默认地址"}}
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{todo:t text="取消"}}</button>
+                        <button type="submit" class="btn btn-primary">{{todo:t text="保存地址"}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script src="{{todo:public_url}}/static/common/js/jquery.min.js"></script>
+    <script src="{{todo:public_url}}/plugins/layer-v3.5.1/layer.js"></script>
+    <script src="{{todo:theme_url}}/users/skin/js/layout.js"></script>
+    
+    <script>
+    // 显示地址编辑模态框
+    function showAddressModal(addressId) {
+        var $modal = $('#addressModal');
+        var title = addressId ? '{{todo:t text="编辑地址"}}' : '{{todo:t text="新增地址"}}';
+        $('#addressModalTitle').text(title);
+
+        ensureProvincesLoaded().then(function() {
+            if (addressId) {
+                loadAddressData(addressId);
+            } else {
+                resetAddressForm();
+            }
+            $modal.modal('show');
+        }).fail(function() {
+            layer.msg('{{todo:t text="地区数据加载失败"}}', {icon: 2});
+        });
+    }
+
+    var REGION_JSON_BASE = "{{todo:public_url}}/static/json";
+    var REGION_CACHE = {
+        provinces: null,
+        cities: null,
+        districts: null
+    };
+
+    function normalizeRegionCode(code, targetLevel) {
+        var s = String(code || '').replace(/[^\d]/g, '');
+        if (!s) return '';
+        if (s.length === 12) return s;
+        if (s.length === 9) return s + '000';
+        if (s.length === 6) return s + '000000';
+        if (s.length === 4) return s + '00000000';
+        if (s.length === 2) return s + '0000000000';
+        if (s.length > 12) return s.slice(0, 12);
+        if (targetLevel === 1) return s.padEnd(12, '0');
+        if (targetLevel === 2) return s.padEnd(12, '0');
+        if (targetLevel === 3) return s.padEnd(12, '0');
+        return s.padEnd(12, '0');
+    }
+
+    function loadRegionJson(level) {
+        var cacheKey = level === 1 ? 'provinces' : (level === 2 ? 'cities' : 'districts');
+        if (REGION_CACHE[cacheKey]) {
+            return $.Deferred().resolve(REGION_CACHE[cacheKey]).promise();
+        }
+        var file = level === 1 ? '01-province.json' : (level === 2 ? '02-city.json' : '03-district.json');
+        return $.getJSON(REGION_JSON_BASE + '/' + encodeURIComponent(file)).then(function(list) {
+            REGION_CACHE[cacheKey] = Array.isArray(list) ? list : [];
+            return REGION_CACHE[cacheKey];
+        });
+    }
+
+    function findRegionCodeByName(level, name) {
+        name = String(name || '').trim();
+        if (!name) return $.Deferred().resolve('').promise();
+        return loadRegionJson(level).then(function(list) {
+            for (var i = 0; i < list.length; i++) {
+                if (String(list[i].name || '').trim() === name) {
+                    return String(list[i].code || '');
+                }
+            }
+            return '';
+        });
+    }
+
+    function fillSelectOptions($select, items, placeholder, selectedCode) {
+        var html = '<option value="">' + placeholder + '</option>';
+        for (var i = 0; i < items.length; i++) {
+            var it = items[i];
+            var code = String(it.code || '');
+            var name = String(it.name || '');
+            html += '<option value="' + code + '">' + name + '</option>';
+        }
+        $select.html(html);
+        if (selectedCode) {
+            $select.val(String(selectedCode));
+        }
+    }
+
+    function getAddressAjaxUrl() {
+        if (window.TODO && window.TODO.INCLUDES_AJAX && window.TODO.join) {
+            return window.TODO.join(window.TODO.INCLUDES_AJAX, 'address-handler.php');
+        }
+        var siteUrl = (document.querySelector('meta[name="site-url"]') ? document.querySelector('meta[name="site-url"]').getAttribute('content') : window.location.origin);
+        return siteUrl.replace(/\/+$/, '') + '/includes/ajax/address-handler.php';
+    }
+
+    function getAddressNonce() {
+        var $f = $('#addressForm');
+        var v = $f.find('input[name="_todononce"]').val();
+        return v ? String(v) : '';
+    }
+
+    function ensureProvincesLoaded(selectedCode) {
+        return loadRegionJson(1).then(function(provinces) {
+            var list = Array.isArray(provinces) ? provinces.slice() : [];
+            list.sort(function(a, b) {
+                return String(a.code || '').localeCompare(String(b.code || ''));
+            });
+            fillSelectOptions($('#province'), list, '{{todo:t text="请选择省份"}}', selectedCode ? String(selectedCode) : '');
+            return list;
+        });
+    }
+
+    function setProvinceCityDistrictFromData(data) {
+        var cityCandidate = (data.city_id !== undefined && data.city_id !== null && String(data.city_id) !== '') ? data.city_id : (data.city_name || '');
+        var districtCandidate = (data.district_id !== undefined && data.district_id !== null && String(data.district_id) !== '') ? data.district_id : (data.district_name || '');
+
+        var rawProvince = (data.province_id !== undefined && data.province_id !== null) ? data.province_id : '';
+        var provinceCode = normalizeRegionCode(rawProvince, 1);
+
+        if (provinceCode && $('#province option[value="' + provinceCode + '"]').length) {
+            $('#province').val(provinceCode).trigger('change', [cityCandidate, districtCandidate]);
+            return;
+        }
+
+        var provinceName = data.province_name || data.province || '';
+        if (provinceName) {
+            findRegionCodeByName(1, provinceName).then(function(found) {
+                if (found && $('#province option[value="' + found + '"]').length) {
+                    $('#province').val(found).trigger('change', [cityCandidate, districtCandidate]);
+                } else {
+                    $('#province').val('').trigger('change');
+                }
+            });
+            return;
+        }
+
+        if (rawProvince && $('#province option[value="' + String(rawProvince) + '"]').length) {
+            $('#province').val(String(rawProvince)).trigger('change', [cityCandidate, districtCandidate]);
+            return;
+        }
+
+        $('#province').val('').trigger('change');
+    }
+    
+    function setModalRegionType(type) {
+        var $cn = $('#fields-cn');
+        var $intl = $('#fields-intl');
+        var $typeInput = $('#address_region_type');
+
+        $typeInput.val(type);
+
+        if (type === 'intl') {
+            $cn.hide();
+            $intl.show();
+
+            $('#province, #city, #district, #detailed_address').removeAttr('required');
+            $('#input-intl-country, #input-intl-state, #input-intl-city, #input-intl-address, #input-intl-zipcode').attr('required', 'required');
+        } else {
+            $cn.show();
+            $intl.hide();
+
+            $('#province, #city, #district, #detailed_address').attr('required', 'required');
+            $('#input-intl-country, #input-intl-state, #input-intl-city, #input-intl-address, #input-intl-zipcode').removeAttr('required');
+        }
+    }
+    window.setModalRegionType = setModalRegionType;
+
+    // 重置地址表单
+    function resetAddressForm() {
+        $('#addressForm')[0].reset();
+        $('#address_id').val('');
+        $('#province').val('');
+        fillSelectOptions($('#city'), [], '{{todo:t text="请选择城市"}}');
+        fillSelectOptions($('#district'), [], '{{todo:t text="请选择区县"}}');
+
+        $('input[name="address_label"][value="{{todo:t text="家"}}"]').prop('checked', true);
+        $('#is_default').prop('checked', false);
+
+        var currentPath = window.location.pathname || '';
+        var searchStr = window.location.search || '';
+        var htmlLang = (document.documentElement && document.documentElement.lang) ? document.documentElement.lang.toLowerCase() : '';
+        var todoLang = (window.TODO && window.TODO.LANG) ? String(window.TODO.LANG).toLowerCase() : '';
+
+        var isIntlByDefault = false;
+        if (todoLang && todoLang !== 'zh' && todoLang !== 'zh-cn' && todoLang !== 'zh-tw' && todoLang !== 'zh-hk') {
+            isIntlByDefault = true;
+        } else if (htmlLang && htmlLang !== 'zh' && htmlLang !== 'zh-cn' && htmlLang !== 'zh-tw' && htmlLang !== 'zh-hk') {
+            isIntlByDefault = true;
+        } else if (/^\/([a-z]{2}(?:-[A-Z]{2})?)\//.test(currentPath) && !/^\/zh(?:-CN|-TW|-HK)?\//i.test(currentPath)) {
+            isIntlByDefault = true;
+        } else if (/\b(lang|locale)=(?!zh)[a-z]{2}/i.test(searchStr)) {
+            isIntlByDefault = true;
+        }
+
+        setModalRegionType(isIntlByDefault ? 'intl' : 'cn');
+    }
+    
+    // 加载地址数据
+    function loadAddressData(addressId) {
+        $.get(getAddressAjaxUrl(), {action: 'get_address', id: addressId, _todononce: getAddressNonce()}, function(response) {
+            if (response.success) {
+                var data = response.data;
+                $('#address_id').val(data.address_id);
+                $('#recipient_name').val(data.recipient_name);
+                $('#recipient_phone').val(data.recipient_phone);
+
+                // 回填地址标签单选框与默认地址复选框
+                var labelVal = data.address_label || '{{todo:t text="家"}}';
+                var $matchedRadio = $('input[name="address_label"][value="' + labelVal + '"]');
+                if ($matchedRadio.length) {
+                    $matchedRadio.prop('checked', true);
+                } else {
+                    $('input[name="address_label"][value="{{todo:t text="家"}}"]').prop('checked', true);
+                }
+                $('#is_default').prop('checked', data.is_default == 1);
+
+                // 准确判断该记录是大陆地区联动地址还是国际地区文本地址
+                var pId = String(data.province_id || '').trim();
+                var cId = String(data.city_id || '').trim();
+                var dId = String(data.district_id || '').trim();
+                var isNumericRegion = /^\d+$/.test(pId) && parseInt(pId, 10) > 0;
+                var isIntl = !isNumericRegion;
+
+                if (isIntl) {
+                    setModalRegionType('intl');
+                    var countryVal = data.intl_country || '';
+                    var stateVal = data.intl_state || '';
+                    if (!countryVal) {
+                        var fullProvince = (data.province_name || data.province_id || '').trim();
+                        if (fullProvince.indexOf(' | ') !== -1) {
+                            var pParts = fullProvince.split(' | ');
+                            countryVal = pParts[0] || '';
+                            stateVal = pParts[1] || '';
+                        } else {
+                            countryVal = fullProvince;
+                            stateVal = '';
+                        }
+                    }
+                    (function() {
+                        var el = document.getElementById('input-intl-country');
+                        if (!el || !countryVal) return;
+                        var trimmed = String(countryVal).trim();
+                        el.value = trimmed;
+                        if (el.value === trimmed) return;
+                        var upper = trimmed.toUpperCase();
+                        el.value = upper;
+                        if (el.value === upper) return;
+                        for (var i = 0; i < el.options.length; i++) {
+                            var opt = el.options[i];
+                            if (opt.value && (opt.text.toLowerCase().indexOf(trimmed.toLowerCase()) !== -1 || trimmed.toLowerCase().indexOf(opt.text.toLowerCase()) !== -1)) {
+                                el.value = opt.value;
+                                break;
+                            }
+                        }
+                    })();
+                    $('#input-intl-state').val(stateVal);
+                    $('#input-intl-city').val(data.city_name || data.city_id || '');
+                    $('#input-intl-address').val(data.detailed_address || '');
+                    $('#input-intl-zipcode').val(data.postal_code || '');
+                } else {
+                    setModalRegionType('cn');
+                    $('#detailed_address').val(data.detailed_address || '');
+                    $('#postal_code').val(data.postal_code || '');
+                    setProvinceCityDistrictFromData(data);
+                }
+            } else {
+                layer.msg(response.message || response.error || '{{todo:t text="加载地址信息失败"}}', {icon: 2});
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        });
+    }
+    
+    // 编辑地址
+    function editAddress(addressId) {
+        showAddressModal(addressId);
+    }
+    
+    // 删除地址
+    function deleteAddress(addressId) {
+        layer.confirm('{{todo:t text="确定删除该地址"}}', {
+            icon: 3,
+            title: '{{todo:t text="确认删除"}}',
+            btn: [__t('确定'), __t('取消')]
+        }, function(index) {
+            $.post(getAddressAjaxUrl(), {
+                action: 'delete_address',
+                address_id: addressId,
+                _todononce: getAddressNonce()
+            }, function(response) {
+                if (response.success) {
+                    layer.msg('{{todo:t text="删除成功"}}', {icon: 1});
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(response.message || response.error || '{{todo:t text="删除失败"}}', {icon: 2});
+                }
+            }).fail(function() {
+                layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+            });
+            layer.close(index);
+        });
+    }
+    
+    // 设为默认地址
+    function setDefaultAddress(addressId) {
+        $.post(getAddressAjaxUrl(), {
+            action: 'set_default_address',
+            address_id: addressId,
+            _todononce: getAddressNonce()
+        }, function(response) {
+            if (response.success) {
+                layer.msg('{{todo:t text="设置成功"}}', {icon: 1});
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                layer.msg(response.message || response.error || '{{todo:t text="设置失败"}}', {icon: 2});
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        });
+    }
+    
+    // 省市区联动
+    $('#province').on('change', function(e, cityId, districtId) {
+        var $province = $(this);
+        var provinceVal = $province.val();
+        var provinceText = $province.find('option:selected').text();
+        var $city = $('#city');
+        var $district = $('#district');
+        fillSelectOptions($city, [], '{{todo:t text="请选择城市"}}');
+        fillSelectOptions($district, [], '{{todo:t text="请选择区县"}}');
+        if (!provinceVal) {
+            return;
+        }
+        var provinceCode = normalizeRegionCode(provinceVal, 1);
+        loadRegionJson(1).then(function(provinces) {
+            var hasProvince = false;
+            for (var i = 0; i < provinces.length; i++) {
+                if (String(provinces[i].code) === provinceCode) {
+                    hasProvince = true;
+                    break;
+                }
+            }
+            if (hasProvince) return provinceCode;
+            return findRegionCodeByName(1, provinceText);
+        }).then(function(code) {
+            var finalProvinceCode = String(code || provinceCode || '');
+            if (!finalProvinceCode) {
+                return [];
+            }
+            return loadRegionJson(2).then(function(cities) {
+                var list = [];
+                for (var i = 0; i < cities.length; i++) {
+                    if (String(cities[i].parent_code || '') === finalProvinceCode) {
+                        list.push(cities[i]);
+                    }
+                }
+                list.sort(function(a, b) {
+                    return String(a.code || '').localeCompare(String(b.code || ''));
+                });
+                return list;
+            });
+        }).then(function(cityList) {
+            fillSelectOptions($city, cityList || [], '{{todo:t text="请选择城市"}}');
+            if (cityId) {
+                var cityCode = normalizeRegionCode(cityId, 2);
+                if (cityCode && $city.find('option[value="' + cityCode + '"]').length) {
+                    $city.val(cityCode).trigger('change', [districtId]);
+                    return;
+                }
+                var cityName = String(cityId || '').trim();
+                if (cityName) {
+                    for (var i = 0; i < (cityList || []).length; i++) {
+                        if (String(cityList[i].name || '').trim() === cityName) {
+                            $city.val(String(cityList[i].code || '')).trigger('change', [districtId]);
+                            return;
+                        }
+                    }
+                }
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="地区数据加载失败，请刷新重试"}}', {icon: 2});
+        });
+    });
+    
+    $('#city').on('change', function(e, districtId) {
+        var $city = $(this);
+        var cityVal = $city.val();
+        var cityText = $city.find('option:selected').text();
+        var $district = $('#district');
+        fillSelectOptions($district, [], '{{todo:t text="请选择区县"}}');
+        if (!cityVal) {
+            return;
+        }
+        var cityCode = normalizeRegionCode(cityVal, 2);
+        loadRegionJson(2).then(function(cities) {
+            var hasCity = false;
+            for (var i = 0; i < cities.length; i++) {
+                if (String(cities[i].code) === cityCode) {
+                    hasCity = true;
+                    break;
+                }
+            }
+            if (hasCity) return cityCode;
+            return findRegionCodeByName(2, cityText);
+        }).then(function(code) {
+            var finalCityCode = String(code || cityCode || '');
+            if (!finalCityCode) {
+                return [];
+            }
+            return loadRegionJson(3).then(function(districts) {
+                var list = [];
+                for (var i = 0; i < districts.length; i++) {
+                    if (String(districts[i].parent_code || '') === finalCityCode) {
+                        list.push(districts[i]);
+                    }
+                }
+                list.sort(function(a, b) {
+                    return String(a.code || '').localeCompare(String(b.code || ''));
+                });
+                return list;
+            });
+        }).then(function(districtList) {
+            fillSelectOptions($district, districtList || [], '{{todo:t text="请选择区县"}}');
+            if (districtId) {
+                var districtCode = normalizeRegionCode(districtId, 3);
+                if (districtCode && $district.find('option[value="' + districtCode + '"]').length) {
+                    $district.val(districtCode);
+                    return;
+                }
+                var districtName = String(districtId || '').trim();
+                if (districtName) {
+                    for (var i = 0; i < (districtList || []).length; i++) {
+                        if (String(districtList[i].name || '').trim() === districtName) {
+                            $district.val(String(districtList[i].code || ''));
+                            return;
+                        }
+                    }
+                }
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="地区数据加载失败，请刷新重试"}}', {icon: 2});
+        });
+    });
+
+    $(function() {
+        ensureProvincesLoaded();
+    });
+    
+    // 表单提交
+    $('#addressForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = $(this).serialize();
+        
+        formData += '&action=save_address';
+        $.post(getAddressAjaxUrl(), formData, function(response) {
+            if (response.success) {
+                layer.msg('{{todo:t text="保存成功"}}', {icon: 1});
+                $('#addressModal').modal('hide');
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                layer.msg(response.message || response.error || '{{todo:t text="保存失败"}}', {icon: 2});
+            }
+        }).fail(function() {
+            layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+        });
+    });
+    
+    // 手机号码格式验证（支持国内及跨境/海外电话格式）
+    $('#recipient_phone').on('blur', function() {
+        var phone = $.trim($(this).val());
+        var phoneRegex = /^\+?[\d\s\-()]{6,20}$/;
+        
+        if (phone && !phoneRegex.test(phone)) {
+            layer.tips('{{todo:t text="请输入正确的手机号码"}}', this, {
+                tips: [1, '#ff6666'],
+                time: 3000
+            });
+        }
+    });
+    
+    // 邮政编码格式验证（支持国内及国际邮编格式）
+    $('#postal_code').on('blur', function() {
+        var postal = $.trim($(this).val());
+        var postalRegex = /^[a-zA-Z0-9\s\-]{3,10}$/;
+        
+        if (postal && !postalRegex.test(postal)) {
+            layer.tips('{{todo:t text="请输入正确的邮政编码"}}', this, {
+                tips: [1, '#ff6666'],
+                time: 3000
+            });
+        }
+    });
+    </script>
+</body>
+</html>

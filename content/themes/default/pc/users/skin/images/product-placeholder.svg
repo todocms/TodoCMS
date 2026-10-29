@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="productGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0" style="stop-color:#f8f9fa;stop-opacity:1"/>
+      <stop offset="1" style="stop-color:#e9ecef;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#productGradient)" stroke="#dee2e6" style="stroke-width: 0px;"/>
+  <g fill="#6c757d" opacity="0.6">
+    <path d="M40 120 L80 80 L120 100 L160 60 L200 100 L200 160 L0 160 Z"/>
+    <circle cx="160" cy="40" r="15" fill="#ffc107"/>
+    <g transform="translate(85, 85)">
+      <rect x="0" y="5" width="30" height="20" rx="3" fill="#495057"/>
+      <rect x="3" y="0" width="8" height="5" rx="2" fill="#495057"/>
+      <circle cx="15" cy="15" r="6" fill="none" stroke="#6c757d" stroke-width="2"/>
+      <circle cx="15" cy="15" r="3" fill="#6c757d"/>
+    </g>
+  </g>
+</svg>

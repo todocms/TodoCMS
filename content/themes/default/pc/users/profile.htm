@@ -1,0 +1,752 @@
+{{todo:include file="users/users_header.htm"}}
+    
+    <div class="user-center-container">
+        <div class="container">
+            <div class="row">
+                <!-- 左侧导航 -->
+                <div class="col-3">
+                    {{todo:include file="users/users_sidebar.htm"}}
+                </div>
+                
+                <!-- 主要内容区域 -->
+                <div style="flex: 1;">
+                    <div class="user-main-content">
+                        {{todo:if condition="message"}}
+                            <div class="alert alert-success">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20,6 9,17 4,12"></polyline>
+                                </svg>
+                                {{todo:message}}
+                            </div>
+                        {{/todo:if}}
+
+                        {{todo:if condition="error"}}
+                            <div class="alert alert-danger">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                {{todo:error}}
+                            </div>
+                        {{/todo:if}}
+                        <div class="page-header">
+                            <h2>{{todo:t text="个人资料"}}</h2>
+                        </div>
+                        <div class="profile-content">
+                            <form method="post" class="profile-form" enctype="multipart/form-data" action="{{todo:user_page_url page='profile'}}">
+                                <input type="hidden" name="action" value="update_profile">
+                                <input type="hidden" name="_todononce" value="{{todo:csrf_token name='update_profile'}}">
+                                
+                                <!-- 头像上传 -->
+                                <div class="form-section">
+                                    <div class="avatar-upload-section">
+                                        <div class="current-avatar">
+                                            {{todo:if condition="user.avatar"}}
+                                                <img src="{{todo:user.avatar}}" alt="{{todo:t text='当前头像'}}" id="current-avatar-img">
+                                            {{todo:else}}
+                                                <div class="avatar-placeholder" id="current-avatar-img" style="width: 100px; height: 100px;">
+                                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                                        <circle cx="12" cy="7" r="4"/>
+                                                    </svg>
+                                                </div>
+                                            {{/todo:if}}
+                                            <button type="button" class="btn btn-outline" id="upload-avatar-btn">✚</button>
+                                            <input type="file" id="avatar-input" name="avatar" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 基本信息 -->
+                                <div class="form-section">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="display_name" class="form-label">{{todo:t text="显示名称"}} <span class="required">*</span></label>
+                                            <input type="text" id="display_name" name="display_name" class="form-control" 
+                                                value="{{todo:user.display_name}}" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="user_email" class="form-label">{{todo:t text="邮箱地址"}} <span class="required">*</span></label>
+                                            <input type="email" id="user_email" name="user_email" class="form-control" 
+                                                value="{{todo:user.user_email}}" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="phone" class="form-label">{{todo:t text="手机号"}}</label>
+                                            <input type="tel" id="phone" name="phone" class="form-control" 
+                                                value="{{todo:user.phone}}">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="gender" class="form-label">{{todo:t text="性别"}}</label>
+                                            <select id="gender" name="gender" class="form-control">
+                                                <option value="">{{todo:t text="请选择"}}</option>
+                                                <option value="male" {{todo:if condition="user.gender == 'male'"}}selected{{/todo:if}}>{{todo:t text="男"}}</option>
+                                                <option value="female" {{todo:if condition="user.gender == 'female'"}}selected{{/todo:if}}>{{todo:t text="女"}}</option>
+                                                <option value="other" {{todo:if condition="user.gender == 'other'"}}selected{{/todo:if}}>{{todo:t text="其他"}}</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="birthday" class="form-label">{{todo:t text="生日"}}</label>
+                                            <input type="date" id="birthday" name="birthday" class="form-control"
+                                                value="{{todo:user.birthday}}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <div class="form-group">
+                                        <label for="description" class="form-label">{{todo:t text="简介"}}</label>
+                                        <textarea id="description" name="description" class="form-control" rows="4" 
+                                                placeholder="{{todo:t text='介绍一下自己吧'}}">{{todo:user.description}}</textarea>
+                                        <div class="form-help">{{todo:t text="最多200个字符"}}</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <div class="account-info">
+                                        <div class="info-item">
+                                            <label>{{todo:t text="用户名"}}:</label>
+                                            <h4>{{todo:user.user_login}}</h4>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>{{todo:t text="注册时间"}}:</label>
+                                            <span>{{todo:user.user_registered_format}}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>{{todo:t text="最后登录"}}:</label>
+                                            <span>{{todo:user.last_login_format}}</span>
+                                        </div>
+                                        {{todo:if_option name="cookie_consent_enabled"}}
+                                        <div class="info-item" style="align-items: flex-start;">
+                                            <label style="flex-shrink: 0;">{{todo:t text="数据与权利"}}:</label>
+                                            <div style="display: flex; gap: 0 12px; flex-wrap: wrap; flex-direction: column; align-items: flex-end;">
+                                                <p style="font-size: 13px; color: #64748b;">{{todo:t text="查阅、导出属于您的全部个人数据，或申请注销您的账号"}}</p>
+                                                <span>
+                                                    <a href="{{todo:site_url default=1}}/includes/ajax/user-dsr-handler.php?action=export_data" class="btn" target="_blank" style="padding: 8px 0; padding-inline-end: 24px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;text-align: start;line-height: normal;">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                                        {{todo:t text="导出个人数据"}}
+                                                    </a>
+                                                    <button type="button" class="btn" id="todo-gdpr-delete-account-btn" style="padding: 8px 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;text-align: start;line-height: normal;">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                                        {{todo:t text="注销账号"}}
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {{/todo:if_option}}
+                                    </div>
+                                </div>
+
+                                <div class="form-actions" style="margin-top: 25px;">
+                                    <button type="submit" class="btn btn-primary">{{todo:t text="保存修改"}}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script src="{{todo:theme_url}}/users/skin/js/profile.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteBtn = document.getElementById('todo-gdpr-delete-account-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function() {
+                var confirmMsg = '{{todo:t text="注销后您的登录凭证与联系方式将被彻底匿名，此操作不可撤销"}}';
+                var confirmTitle = '{{todo:t text="注销账号"}}';
+                var btnConfirm = (typeof window.__t === 'function') ? window.__t('确定') : '{{todo:t text="确定"}}';
+                var btnCancel = (typeof window.__t === 'function') ? window.__t('取消') : '{{todo:t text="取消"}}';
+
+                var doDelete = function() {
+                    var loadIdx = (typeof layer !== 'undefined' && layer.load) ? layer.load(2) : null;
+                    var targetHomeUrl = '{{todo:site_url}}'.replace(/\/?$/, '/');
+                    var formData = new FormData();
+                    formData.append('redirect_to', targetHomeUrl);
+                    fetch('{{todo:site_url default=1}}/includes/ajax/user-dsr-handler.php?action=delete_account', {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        body: formData
+                    }).then(function(r){ return r.json(); }).then(function(res) {
+                        if (loadIdx !== null) layer.close(loadIdx);
+                        if (res.success) {
+                            if (typeof layer !== 'undefined' && layer.msg) {
+                                layer.msg(res.message, {icon: 1, time: 1500}, function() {
+                                    window.location.href = res.redirect || targetHomeUrl;
+                                });
+                            } else {
+                                alert(res.message);
+                                window.location.href = res.redirect || targetHomeUrl;
+                            }
+                        } else {
+                            var errMsg = res.message || '{{todo:t text="操作失败"}}';
+                            if (typeof layer !== 'undefined' && layer.msg) {
+                                layer.msg(errMsg, {icon: 2});
+                            } else {
+                                alert(errMsg);
+                            }
+                        }
+                    }).catch(function() {
+                        if (loadIdx !== null) layer.close(loadIdx);
+                        var netErrMsg = '{{todo:t text="网络错误"}}';
+                        if (typeof layer !== 'undefined' && layer.msg) {
+                            layer.msg(netErrMsg, {icon: 2});
+                        } else {
+                            alert(netErrMsg);
+                        }
+                    });
+                };
+
+                if (typeof layer !== 'undefined' && layer.confirm) {
+                    layer.confirm(confirmMsg, {
+                        icon: 3,
+                        title: confirmTitle,
+                        btn: [btnConfirm, btnCancel]
+                    }, function(index) {
+                        layer.close(index);
+                        doDelete();
+                    });
+                } else if (confirm(confirmMsg)) {
+                    doDelete();
+                }
+            });
+        }
+    });
+    </script>
+    <script>
+    (function() {
+        'use strict';
+        
+        function ensureAvatarCropStyles() {
+            if (document.getElementById('todo-avatar-crop-styles')) return;
+            var style = document.createElement('style');
+            style.id = 'todo-avatar-crop-styles';
+            style.textContent =
+                '.todo-avatar-crop-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }' +
+                '.todo-avatar-crop-modal { width: min(720px, 94vw); background: #fff; border-radius: 6px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3); overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }' +
+                '.todo-avatar-crop-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #eee; background: #fafafa; }' +
+                '.todo-avatar-crop-title { font-size: 15px; font-weight: 600; color: #333; margin: 0; }' +
+                '.todo-avatar-crop-body { display: flex; gap: 20px; padding: 20px; flex-wrap: wrap; justify-content: center; }' +
+                '.todo-avatar-crop-stage { flex: 1; min-width: 300px; display: flex; align-items: center; justify-content: center; }' +
+                '.todo-avatar-crop-canvas { width: 320px; height: 320px; max-width: 80vw; max-height: 80vw; border-radius: 8px; background: #f3f4f6; touch-action: none; cursor: move; }' +
+                '.todo-avatar-crop-controls { width: 220px; min-width: 200px; display: flex; flex-direction: column; gap: 14px; }' +
+                '.todo-avatar-crop-controls label { font-size: 13px; font-weight: 500; color: #444; }' +
+                '.todo-avatar-crop-controls input[type="range"] { width: 100%; }' +
+                '.todo-avatar-crop-footer { display: flex; justify-content: flex-end; gap: 12px; padding: 14px 20px; border-top: 1px solid #eee; background: #fafafa; }' +
+                '.todo-avatar-crop-btn { height: 36px; line-height: 34px; padding: 0 16px; border: 1px solid #dcdfe6; background: #fff; color: #606266; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }' +
+                '.todo-avatar-crop-btn:hover { border-color: #c6e2ff; color: #409eff; background: #ecf5ff; }' +
+                '.todo-avatar-crop-btn.primary { background: #409eff; border-color: #409eff; color: #fff; }' +
+                '.todo-avatar-crop-btn.primary:hover { background: #66b1ff; border-color: #66b1ff; color: #fff; }';
+            document.head.appendChild(style);
+        }
+
+        function openSquareCropModal(imgEl) {
+            ensureAvatarCropStyles();
+            return new Promise(function(resolve, reject) {
+                var viewport = 360;
+                var canvas = document.createElement('canvas');
+                canvas.width = viewport;
+                canvas.height = viewport;
+                canvas.className = 'todo-avatar-crop-canvas';
+                var ctx = canvas.getContext('2d');
+
+                var overlay = document.createElement('div');
+                overlay.className = 'todo-avatar-crop-overlay';
+                var modal = document.createElement('div');
+                modal.className = 'todo-avatar-crop-modal';
+
+                var header = document.createElement('div');
+                header.className = 'todo-avatar-crop-header';
+                var title = document.createElement('div');
+                title.className = 'todo-avatar-crop-title';
+                title.textContent = '{{todo:t text="头像裁剪"}}';
+                header.appendChild(title);
+                modal.appendChild(header);
+
+                var body = document.createElement('div');
+                body.className = 'todo-avatar-crop-body';
+                var stage = document.createElement('div');
+                stage.className = 'todo-avatar-crop-stage';
+                stage.appendChild(canvas);
+                body.appendChild(stage);
+
+                var controls = document.createElement('div');
+                controls.className = 'todo-avatar-crop-controls';
+                var zoomLabel = document.createElement('label');
+                zoomLabel.textContent = '{{todo:t text="缩放级别"}}';
+                var zoom = document.createElement('input');
+                zoom.type = 'range';
+                zoom.min = '1';
+                zoom.max = '3';
+                zoom.step = '0.01';
+                zoom.value = '1';
+                controls.appendChild(zoomLabel);
+                controls.appendChild(zoom);
+
+                var hint = document.createElement('div');
+                hint.style.fontSize = '12px';
+                hint.style.color = '#888';
+                hint.textContent = '{{todo:t text="拖拽图片调整中心位置"}}';
+                controls.appendChild(hint);
+
+                body.appendChild(controls);
+                modal.appendChild(body);
+
+                var footer = document.createElement('div');
+                footer.className = 'todo-avatar-crop-footer';
+                var cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'todo-avatar-crop-btn';
+                cancelBtn.textContent = '{{todo:t text="取消"}}';
+                var okBtn = document.createElement('button');
+                okBtn.type = 'button';
+                okBtn.className = 'todo-avatar-crop-btn primary';
+                okBtn.textContent = '{{todo:t text="确认裁剪并使用"}}';
+                footer.appendChild(cancelBtn);
+                footer.appendChild(okBtn);
+                modal.appendChild(footer);
+
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+
+                var imgW = imgEl.naturalWidth || imgEl.width;
+                var imgH = imgEl.naturalHeight || imgEl.height;
+                var baseScale = Math.max(viewport / imgW, viewport / imgH);
+                var scale = baseScale;
+                var dx = (viewport - imgW * scale) / 2;
+                var dy = (viewport - imgH * scale) / 2;
+
+                function render() {
+                    ctx.clearRect(0, 0, viewport, viewport);
+                    ctx.fillStyle = '#f3f4f6';
+                    ctx.fillRect(0, 0, viewport, viewport);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(imgEl, dx, dy, imgW * scale, imgH * scale);
+                }
+
+                function clamp() {
+                    var w = imgW * scale;
+                    var h = imgH * scale;
+                    if (w < viewport) {
+                        dx = (viewport - w) / 2;
+                    } else {
+                        dx = Math.min(0, Math.max(viewport - w, dx));
+                    }
+                    if (h < viewport) {
+                        dy = (viewport - h) / 2;
+                    } else {
+                        dy = Math.min(0, Math.max(viewport - h, dy));
+                    }
+                }
+
+                var dragging = false;
+                var lastX = 0;
+                var lastY = 0;
+
+                function getPoint(e) {
+                    if (e.touches && e.touches.length) {
+                        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    }
+                    return { x: e.clientX, y: e.clientY };
+                }
+
+                function onDown(e) {
+                    e.preventDefault();
+                    dragging = true;
+                    var p = getPoint(e);
+                    lastX = p.x;
+                    lastY = p.y;
+                }
+                function onMove(e) {
+                    if (!dragging) return;
+                    e.preventDefault();
+                    var p = getPoint(e);
+                    var mx = p.x - lastX;
+                    var my = p.y - lastY;
+                    lastX = p.x;
+                    lastY = p.y;
+                    dx += mx;
+                    dy += my;
+                    clamp();
+                    render();
+                }
+                function onUp() {
+                    dragging = false;
+                }
+
+                canvas.addEventListener('mousedown', onDown);
+                canvas.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+                canvas.addEventListener('touchstart', onDown, { passive: false });
+                canvas.addEventListener('touchmove', onMove, { passive: false });
+                canvas.addEventListener('touchend', onUp);
+
+                zoom.addEventListener('input', function() {
+                    var z = parseFloat(zoom.value || '1');
+                    var centerX = viewport / 2;
+                    var centerY = viewport / 2;
+                    var prevScale = scale;
+                    scale = baseScale * z;
+                    dx = centerX - ((centerX - dx) * (scale / prevScale));
+                    dy = centerY - ((centerY - dy) * (scale / prevScale));
+                    clamp();
+                    render();
+                });
+
+                render();
+
+                function cleanup() {
+                    try { document.body.removeChild(overlay); } catch (e) {}
+                    canvas.removeEventListener('mousedown', onDown);
+                    canvas.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                    canvas.removeEventListener('touchstart', onDown);
+                    canvas.removeEventListener('touchmove', onMove);
+                    canvas.removeEventListener('touchend', onUp);
+                }
+
+                cancelBtn.addEventListener('click', function() {
+                    cleanup();
+                    reject(new Error('cancelled'));
+                });
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        cleanup();
+                        reject(new Error('cancelled'));
+                    }
+                });
+                okBtn.addEventListener('click', function() {
+                    okBtn.disabled = true;
+                    cancelBtn.disabled = true;
+                    var out = document.createElement('canvas');
+                    out.width = 512;
+                    out.height = 512;
+                    var octx = out.getContext('2d');
+                    octx.imageSmoothingEnabled = true;
+                    octx.imageSmoothingQuality = 'high';
+                    octx.drawImage(canvas, 0, 0, viewport, viewport, 0, 0, 512, 512);
+                    out.toBlob(function(blob) {
+                        cleanup();
+                        if (!blob) {
+                            reject(new Error('blob_failed'));
+                            return;
+                        }
+                        resolve(blob);
+                    }, 'image/jpeg', 0.92);
+                });
+            });
+        }
+
+        var avatarInput = document.getElementById('avatar-input');
+        var uploadBtn = document.getElementById('upload-avatar-btn');
+
+        if (uploadBtn && avatarInput) {
+            uploadBtn.addEventListener('click', function() {
+                avatarInput.value = '';
+                avatarInput.click();
+            });
+
+            avatarInput.addEventListener('change', function() {
+                var file = this.files && this.files[0];
+                if (!file) return;
+
+                if (!file.type.match(/^image\/(jpeg|png|gif|webp)$/i)) {
+                    alert('{{todo:t text="请选择有效的图片文件（仅支持 JPG、PNG、GIF、WebP 格式）"}}');
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('{{todo:t text="原图片文件过大，请选择不超过 10MB 的图片"}}');
+                    return;
+                }
+
+                var blobUrl = URL.createObjectURL(file);
+                var img = new Image();
+                img.onload = function() {
+                    openSquareCropModal(img).then(function(croppedBlob) {
+                        var croppedFile = new File([croppedBlob], 'avatar_cropped.jpg', { type: 'image/jpeg' });
+                        if (window.DataTransfer) {
+                            var dt = new DataTransfer();
+                            dt.items.add(croppedFile);
+                            avatarInput.files = dt.files;
+                        }
+
+                        var previewUrl = URL.createObjectURL(croppedBlob);
+                        var currentAvatar = document.getElementById('current-avatar-img');
+                        if (currentAvatar) {
+                            if (currentAvatar.tagName === 'IMG') {
+                                currentAvatar.src = previewUrl;
+                            } else {
+                                var newImg = document.createElement('img');
+                                newImg.src = previewUrl;
+                                newImg.alt = '{{todo:t text="当前头像"}}';
+                                newImg.id = 'current-avatar-img';
+                                currentAvatar.parentNode.replaceChild(newImg, currentAvatar);
+                            }
+                        }
+                    }).catch(function(err) {
+                        if (err && err.message !== 'cancelled') {
+                            console.warn('Avatar crop failed:', err);
+                        }
+                    }).finally(function() {
+                        URL.revokeObjectURL(blobUrl);
+                    });
+                };
+                img.onerror = function() {
+                    URL.revokeObjectURL(blobUrl);
+                    alert('{{todo:t text="图片加载失败"}}');
+                };
+                img.src = blobUrl;
+            });
+        }
+        
+        document.querySelector('.profile-form').addEventListener('submit', function(e) {
+            const displayName = document.getElementById('display_name').value.trim();
+            const userEmail = document.getElementById('user_email').value.trim();
+            
+            if (!displayName) {
+                alert('{{todo:t text="请输入显示名称"}}');
+                document.getElementById('display_name').focus();
+                e.preventDefault();
+                return false;
+            }
+            
+            if (!userEmail) {
+                alert('{{todo:t text="请输入邮箱地址"}}');
+                document.getElementById('user_email').focus();
+                e.preventDefault();
+                return false;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(userEmail)) {
+                alert('{{todo:t text="请输入有效的邮箱地址"}}');
+                document.getElementById('user_email').focus();
+                e.preventDefault();
+                return false;
+            }
+            
+            const descriptionEl = document.getElementById('description');
+            if (descriptionEl) {
+                const descriptionVal = descriptionEl.value;
+                if (descriptionVal.length > 200) {
+                    alert('{{todo:t text="个人简介不能超过200个字符"}}');
+                    descriptionEl.focus();
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+        
+        const descInput = document.getElementById('description');
+        if (descInput) {
+            descInput.addEventListener('input', function() {
+                const length = this.value.length;
+                const helpElement = this.parentNode.querySelector('.form-help');
+                if (helpElement) {
+                    helpElement.textContent = '{{todo:t text="最多200个字符"}} (' + length + '/200)';
+                    if (length > 200) {
+                        helpElement.style.color = '#e74c3c';
+                    } else {
+                        helpElement.style.color = '#666';
+                    }
+                }
+            });
+        }
+        
+    })();
+    </script>
+    
+    <style>
+    .profile-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-section {
+        padding: 30px;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+    }
+
+    .avatar-upload-section {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .current-avatar {
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .current-avatar img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+    }
+
+    .current-avatar button {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100px;
+        height: 100px;
+        z-index: 1;
+    }
+
+    .current-avatar button:not(:hover) {
+        color: transparent;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .required {
+        color: #e74c3c;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #007cba;
+        box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+    }
+
+    .form-help {
+        margin-top: 5px;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .account-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 5px 20px;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0 20px;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-item label {
+        font-weight: 500;
+        color: #666;
+        line-height: normal;
+    }
+
+    .info-item span {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .form-actions {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #666;
+        border: 1px solid #ddd;
+    }
+
+    .btn-outline:hover {
+        background: rgba(248, 249, 250, 0.8);
+        border-color: #282832;
+        color: #282832;
+    }
+
+    @media (max-width: 768px) {
+        .form-section {
+            padding: 20px 0;
+        }
+        
+        .avatar-upload-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 20px;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        .info-item > div {
+            align-items: flex-start !important;
+        }
+        
+        .form-actions {
+            padding: 20px 0;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+        }
+    }
+    </style>
+</body>
+</html>

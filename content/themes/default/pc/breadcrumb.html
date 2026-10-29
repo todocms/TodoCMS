@@ -1,0 +1,39 @@
+<nav aria-label="breadcrumb">
+  <ul class="breadcrumb-list">
+    {{todo:loop breadcrumb_list}}
+    <li class="breadcrumb-item">
+      {{todo:if item.is_current}}
+      <span class="breadcrumb-current" aria-current="page">{{todo:item.title}}</span>
+      {{todo:else}}
+      <a href="{{todo:item.url}}">
+        {{todo:if is_first}}<i class="icon todofont todo-Home"></i> {{/todo:if}}<span>{{todo:item.title}}</span>
+      </a>
+      {{/todo:if}}
+    </li>
+    {{todo:if !is_last}}
+    <li class="breadcrumb-separator" aria-hidden="true">></li>
+    {{/todo:if}}
+    {{/todo:loop}}
+  </ul>
+</nav>
+
+<!-- Google SERP Rich Results: BreadcrumbList Schema.org -->
+{{todo:if breadcrumb_list}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {{todo:loop breadcrumb_list}}
+    {
+      "@type": "ListItem",
+      "position": {{todo:index_1}},
+      "name": "{{todo:item.title format='json'}}",
+      "item": "{{todo:item.url}}"
+    }{{todo:if !is_last}},{{/todo:if}}
+    {{/todo:loop}}
+  ]
+}
+</script>
+{{/todo:if}}
+

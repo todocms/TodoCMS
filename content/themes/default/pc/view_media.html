@@ -1,0 +1,333 @@
+{{todo:include file="header.html"}}
+
+<style>
+/* 视频详情页核心样式 */
+.media-detail-header {
+    margin-bottom: 20px;
+}
+.media-detail-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.35;
+    margin-bottom: 12px;
+}
+.media-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+.media-detail-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.media-badges {
+    display: inline-flex;
+    gap: 6px;
+    vertical-align: middle;
+}
+.badge-hd {
+    background: #e11d48;
+    color: #ffffff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.badge-vip {
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* 播放器容器 */
+.media-player-box {
+    background: #000000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+.media-player-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    outline: none;
+}
+
+/* 播放资源与选集 */
+.media-resources-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+.media-panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.playlist-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.playlist-item-btn {
+    padding: 8px 16px;
+    background: #f3f4f6;
+    color: #374151;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+}
+.playlist-item-btn:hover, .playlist-item-btn.active {
+    background: #0073aa;
+    color: #ffffff;
+    border-color: #0073aa;
+}
+
+/* 视频介绍正文 */
+.media-body-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #374151;
+    margin-bottom: 30px;
+}
+.media-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #0073aa;
+}
+
+/* 上一个 / 下一个导航 */
+.media-post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+.media-post-nav .nav-item {
+    flex: 1;
+    max-width: 50%;
+}
+.media-post-nav a {
+    display: block;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 6px;
+    color: #374151;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 14px;
+}
+.media-post-nav a:hover {
+    background: #0073aa;
+    color: #ffffff;
+}
+.media-post-nav .nav-label {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 4px;
+    display: block;
+}
+.media-post-nav .nav-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 标签 */
+.media-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.media-tags .tag {
+    padding: 4px 12px;
+    background: #f3f4f6;
+    color: #4b5563;
+    border-radius: 4px;
+    font-size: 13px;
+    text-decoration: none;
+}
+.media-tags .tag:hover {
+    background: #0073aa;
+    color: #ffffff;
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+
+        <div class="row gap-5">
+            <main class="col">
+                <article class="media-detail">
+                    <!-- 头部标题及 Meta -->
+                    <header class="media-detail-header">
+                        <h1 class="media-detail-title">
+                            {{todo:post_title}}
+                            <span class="media-badges">
+                                {{todo:if custom_field|name="is_hd"}}
+                                <span class="badge-hd">HD</span>
+                                {{/todo:if}}
+                                {{todo:if custom_field|name="is_vip"}}
+                                <span class="badge-vip">VIP</span>
+                                {{/todo:if}}
+                            </span>
+                        </h1>
+
+                        <div class="media-detail-meta">
+                            <span class="meta-item">
+                                <i class="far fa-user"></i>
+                                <span>{{todo:author_name}}</span>
+                            </span>
+
+                            <span class="meta-item">
+                                <i class="far fa-calendar"></i>
+                                <time datetime="{{todo:post_date}}">{{todo:post_date}}</time>
+                            </span>
+
+                            {{todo:if category_name}}
+                            <span class="meta-item">
+                                <i class="far fa-folder"></i>
+                                <a href="{{todo:category_url}}">{{todo:category_name}}</a>
+                            </span>
+                            {{/todo:if}}
+
+                            <span class="meta-item">
+                                <i class="far fa-play-circle"></i>
+                                <span>{{todo:views}} {{todo:t text="次播放"}}</span>
+                            </span>
+
+                            {{todo:if custom_field|name="media_duration"}}
+                            <span class="meta-item">
+                                <i class="far fa-clock"></i>
+                                <span>{{todo:t text="时长"}}:&nbsp;{{todo:custom_field name="media_duration"}}</span>
+                            </span>
+                            {{/todo:if}}
+                        </div>
+                    </header>
+
+                    <!-- 播放器区域 -->
+                    <div class="media-player-box">
+                        <video id="mainVideoPlayer" controls controlsList="nodownload" preload="metadata" poster="{{todo:if custom_field|name="poster_url"}}{{todo:custom_field name="poster_url"}}{{todo:else}}{{todo:post_thumbnail_url}}{{/todo:if}}">
+                            {{todo:if custom_field|name="media_url"}}
+                            <source src="{{todo:custom_field name="media_url"}}" type="video/mp4">
+                            {{/todo:if}}
+                            {{todo:t text="您的浏览器不支持 HTML5 视频播放"}}
+                        </video>
+                    </div>
+
+                    <!-- 播放列表/选集 -->
+                    {{todo:if custom_field|name="playlist"}}
+                    <div class="media-resources-panel">
+                        <div class="media-panel-title">
+                            <i class="fa fa-list-ol" style="color:#0073aa;"></i>
+                            <span>{{todo:t text="剧集"}} / {{todo:t text="选集"}}</span>
+                        </div>
+                        <div class="playlist-items">
+                            {{todo:loop custom_field|name="playlist"}}
+                            <a href="javascript:void(0);" onclick="playEpisode('{{todo:media_url}}', this)" class="playlist-item-btn {{todo:if index == 0}}active{{/todo:if}}">
+                                {{todo:title default="视频片段"}}
+                            </a>
+                            {{/todo:loop}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 视频介绍正文 -->
+                    {{todo:if post_content}}
+                    <div class="media-body-content">
+                        <h2 class="media-section-title">{{todo:t text="视频详细介绍"}}</h2>
+                        <div class="article-content">
+                            {{todo:post_content}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 视频标签 -->
+                    {{todo:if post_tags}}
+                    <div class="media-tags">
+                        {{todo:post_tags|limit=10}}
+                        <a href="{{todo:tag_url}}" class="tag"><i class="fa fa-tag m-r-05"></i>{{todo:tag_name}}</a>
+                        {{/todo:post_tags}}
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 上一个 / 下一个导航 -->
+                    {{todo:if condition="prev_post_url || next_post_url"}}
+                    <div class="media-post-nav">
+                        <div class="nav-item">
+                            {{todo:if prev_post_url}}
+                            <a href="{{todo:prev_post_url}}" title="{{todo:prev_post_title}}">
+                                <span class="nav-label"><i class="fa fa-chevron-left"></i> {{todo:t text="上一视频"}}</span>
+                                <div class="nav-title">{{todo:prev_post_title}}</div>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                        <div class="nav-item text-right">
+                            {{todo:if next_post_url}}
+                            <a href="{{todo:next_post_url}}" title="{{todo:next_post_title}}">
+                                <span class="nav-label">{{todo:t text="下一视频"}} <i class="fa fa-chevron-right"></i></span>
+                                <div class="nav-title">{{todo:next_post_title}}</div>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 评论区 -->
+                    {{todo:include file="comment_section.html"}}
+                </article>
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+<script>
+function playEpisode(url, btn) {
+    var player = document.getElementById('mainVideoPlayer');
+    if (!player || !url) return;
+    player.src = url;
+    player.play();
+    var btns = document.querySelectorAll('.playlist-item-btn');
+    btns.forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+}
+</script>
+
+{{todo:include file="footer.html"}}

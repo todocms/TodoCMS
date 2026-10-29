@@ -1,0 +1,103 @@
+{{todo:include file="header.html"}}
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}  
+        <div class="row gap-5">
+            <!-- 左侧内容区 -->
+            <main class="col">
+                <!-- 标签头部 -->
+                <header class="tag-header">
+                    <div class="tag-header-content">
+                        <div class="tag-icon">
+                            <i class="fa fa-tag"></i>
+                        </div>
+                        <div class="tag-info">
+                            <h1 class="tag-title">{{todo:tag_name}}</h1>
+                            {{todo:if tag_description}}
+                            <p class="tag-description">{{todo:tag_description}}</p>
+                            {{/todo:if}}
+                            <div class="tag-meta">
+                                <span class="post-count">
+                                    <i class="fa fa-file-alt"></i>
+                                    {{todo:total_posts}} {{todo:t text="篇文章"}}
+                                </span>
+                                <span class="tag-created">
+                                    <i class="fa fa-calendar-plus"></i>
+                                    {{todo:t text="创建于"}} {{todo:tag_created_date format="Y-m-d"}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                
+                <div class="tags-grid">
+                    {{todo:tags|per_page=24|order="tag_order ASC"}}
+                    <div class="tag-card">
+                        <div class="tag-card-header" style="margin-top: 20px; padding-inline-start: 5px; border-inline-start: 10px solid #dcdcdc; border-color: {{todo:tag_color}};">
+                            <span class="tag-card-count">{{todo:articles_count}} {{todo:t text="篇文章"}}</span>
+                        </div>
+                        <div class="tag-card-body">
+                            <h2 class="tag-card-title">
+                                <a href="{{todo:url}}">{{todo:name}}</a>
+                            </h2>
+                            {{todo:if description}}
+                            <p class="tag-card-desc">{{todo:description}}</p>
+                            {{/todo:if}}
+                        </div>
+                        <div class="tag-card-footer">
+                            <a href="{{todo:url}}" class="tag-card-link">
+                                {{todo:t text="查看全部"}} <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {{/todo:tags}}
+                </div>
+
+                <!-- 分页导航 -->
+                {{todo:if pagination}}
+                <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                    <div class="pagination flex gap-2">
+                        {{todo:if pagination_prev_page > 0}}
+                        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                            <i class="fa fa-chevron-left"></i>
+                            <span>{{todo:t text="上一页"}}</span>
+                        </a>
+                        {{/todo:if}}
+
+                        <div class="pagination-numbers flex gap-2 items-center">
+                            {{todo:loop pagination_pages}}
+                            {{todo:if page_is_dots}}
+                            <span class="pagination-number dots">...</span>
+                            {{todo:elseif page_is_current}}
+                            <span class="pagination-number current">{{todo:page_number}}</span>
+                            {{todo:else}}
+                            <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                            {{/todo:if}}
+                            {{/todo:loop}}
+                        </div>
+
+                        {{todo:if pagination_next_page > 0}}
+                        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                            <span>{{todo:t text="下一页"}}</span>
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                </div>
+                {{/todo:if}}
+                
+            </main>
+            
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script src="{{todo:theme_url}}/assets/js/jquery-3.6.0.min.js"></script>
+<script src="{{todo:theme_url}}/assets/js/theme.js"></script>
+{{todo:include file="footer.html"}}

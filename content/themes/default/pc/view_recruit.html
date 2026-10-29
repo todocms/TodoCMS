@@ -1,0 +1,403 @@
+{{todo:include file="header.html"}}
+
+<style>
+/* 招聘详情页专用样式 */
+.recruit-header-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+.recruit-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 14px;
+}
+.recruit-detail-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    line-height: 1.3;
+}
+.recruit-detail-salary {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ef4444;
+    white-space: nowrap;
+}
+.recruit-company-sub {
+    font-size: 15px;
+    color: #4b5563;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.recruit-info-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 14px;
+}
+.recruit-info-tag {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 5px 14px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 职位要求 / 福利 / 内容 */
+.recruit-section {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+.recruit-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0073aa;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.recruit-content-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #374151;
+    white-space: pre-line;
+}
+
+/* 福利待遇 */
+.benefit-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.benefit-chip {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 投递设置与 HR 方式 */
+.contact-hr-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+.contact-hr-info {
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.6;
+}
+.contact-hr-info .hr-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.contact-hr-info .hr-item:last-child {
+    margin-bottom: 0;
+}
+.apply-btn-large {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+.apply-btn-large:hover {
+    background: #059669;
+    color: #ffffff;
+}
+
+/* 上一个 / 下一个导航 */
+.recruit-post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+.recruit-post-nav .nav-item {
+    flex: 1;
+    max-width: 50%;
+}
+.recruit-post-nav a {
+    display: block;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 6px;
+    color: #374151;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 14px;
+}
+.recruit-post-nav a:hover {
+    background: #0073aa;
+    color: #ffffff;
+}
+.recruit-post-nav .nav-label {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 4px;
+    display: block;
+}
+.recruit-post-nav .nav-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 标签 */
+.recruit-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.recruit-tags .tag {
+    padding: 4px 12px;
+    background: #f3f4f6;
+    color: #4b5563;
+    border-radius: 4px;
+    font-size: 13px;
+    text-decoration: none;
+}
+.recruit-tags .tag:hover {
+    background: #0073aa;
+    color: #ffffff;
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+
+        <div class="row gap-5">
+            <main class="col">
+                <article class="recruit-detail">
+                    <!-- 职位头部卡片 -->
+                    <header class="recruit-header-card">
+                        <div class="recruit-header-top">
+                            <h1 class="recruit-detail-title">{{todo:post_title}}</h1>
+                            <div class="recruit-detail-salary">
+                                {{todo:if custom_field|name="salary"}}
+                                {{todo:custom_field name="salary"}}
+                                {{todo:else}}
+                                {{todo:t text="面议"}}
+                                {{/todo:if}}
+                            </div>
+                        </div>
+
+                        {{todo:if custom_field|name="company_name"}}
+                        <div class="recruit-company-sub">
+                            <i class="far fa-building"></i>
+                            <span>{{todo:custom_field name="company_name"}}</span>
+                        </div>
+                        {{/todo:if}}
+
+                        <div class="recruit-info-tags">
+                            {{todo:if custom_field|name="work_location"}}
+                            <span class="recruit-info-tag">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{todo:custom_field name="work_location"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="experience"}}
+                            <span class="recruit-info-tag">
+                                <i class="fas fa-briefcase"></i>
+                                <span>{{todo:t text="经验"}}:&nbsp;{{todo:custom_field name="experience"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="education"}}
+                            <span class="recruit-info-tag">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{todo:t text="学历"}}:&nbsp;{{todo:custom_field name="education"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="recruit_num"}}
+                            <span class="recruit-info-tag">
+                                <i class="fas fa-users"></i>
+                                <span>{{todo:t text="招聘"}} {{todo:custom_field name="recruit_num"}} {{todo:t text="人"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            <span class="recruit-info-tag">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>{{todo:t text="发布于"}} {{todo:post_date}}</span>
+                            </span>
+                        </div>
+                    </header>
+
+                    <!-- HR 投递与联系方式 -->
+                    {{todo:if custom_field|name="hr_email" || custom_field|name="hr_phone" || custom_field|name="work_address"}}
+                    <div class="contact-hr-box">
+                        <div class="contact-hr-info">
+                            {{todo:if custom_field|name="hr_email"}}
+                            <div class="hr-item">
+                                <i class="far fa-envelope" style="color:#0073aa;"></i>
+                                <span>{{todo:t text="投递邮箱"}}:&nbsp;<strong>{{todo:custom_field name="hr_email"}}</strong></span>
+                            </div>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="hr_phone"}}
+                            <div class="hr-item">
+                                <i class="fas fa-phone-alt" style="color:#0073aa;"></i>
+                                <span>{{todo:t text="联系电话"}}:&nbsp;<strong>{{todo:custom_field name="hr_phone"}}</strong></span>
+                            </div>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="work_address"}}
+                            <div class="hr-item">
+                                <i class="fas fa-map-marked-alt" style="color:#0073aa;"></i>
+                                <span>{{todo:t text="工作地址"}}:&nbsp;{{todo:custom_field name="work_address"}}</span>
+                            </div>
+                            {{/todo:if}}
+                        </div>
+
+                        {{todo:if custom_field|name="hr_email"}}
+                        <a href="mailto:{{todo:custom_field name='hr_email'}}?subject={{todo:post_title|urlencode}}" class="apply-btn-large">
+                            <i class="far fa-paper-plane"></i>
+                            <span>{{todo:t text="立即投递简历"}}</span>
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 任职要求 -->
+                    {{todo:if custom_field|name="requirements"}}
+                    <section class="recruit-section">
+                        <h2 class="recruit-section-title">
+                            <i class="fas fa-tasks" style="color:#0073aa;"></i>
+                            <span>{{todo:t text="任职要求"}}</span>
+                        </h2>
+                        <div class="recruit-content-text">
+                            {{todo:custom_field name="requirements"}}
+                        </div>
+                    </section>
+                    {{/todo:if}}
+
+                    <!-- 福利待遇 -->
+                    {{todo:if custom_field|name="benefits"}}
+                    <section class="recruit-section">
+                        <h2 class="recruit-section-title">
+                            <i class="fas fa-gift" style="color:#0073aa;"></i>
+                            <span>{{todo:t text="福利待遇"}}</span>
+                        </h2>
+                        <div class="recruit-content-text">
+                            {{todo:custom_field name="benefits"}}
+                        </div>
+                    </section>
+                    {{/todo:if}}
+
+                    <!-- 职位详细描述 -->
+                    {{todo:if post_content}}
+                    <section class="recruit-section">
+                        <h2 class="recruit-section-title">
+                            <i class="fas fa-align-left" style="color:#0073aa;"></i>
+                            <span>{{todo:t text="职位详细介绍"}}</span>
+                        </h2>
+                        <div class="article-content">
+                            {{todo:post_content}}
+                        </div>
+                    </section>
+                    {{/todo:if}}
+
+                    <!-- 公司简介 -->
+                    {{todo:if custom_field|name="company_desc"}}
+                    <section class="recruit-section">
+                        <h2 class="recruit-section-title">
+                            <i class="far fa-building" style="color:#0073aa;"></i>
+                            <span>{{todo:t text="关于公司"}}</span>
+                        </h2>
+                        <div class="recruit-content-text">
+                            {{todo:custom_field name="company_desc"}}
+                        </div>
+                    </section>
+                    {{/todo:if}}
+
+                    <!-- 职位标签 -->
+                    {{todo:if post_tags}}
+                    <div class="recruit-tags">
+                        {{todo:post_tags|limit=10}}
+                        <a href="{{todo:tag_url}}" class="tag"><i class="fa fa-tag m-r-05"></i>{{todo:tag_name}}</a>
+                        {{/todo:post_tags}}
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 上一个 / 下一个导航 -->
+                    {{todo:if condition="prev_post_url || next_post_url"}}
+                    <div class="recruit-post-nav">
+                        <div class="nav-item">
+                            {{todo:if prev_post_url}}
+                            <a href="{{todo:prev_post_url}}" title="{{todo:prev_post_title}}">
+                                <span class="nav-label"><i class="fa fa-chevron-left"></i> {{todo:t text="上一职位"}}</span>
+                                <div class="nav-title">{{todo:prev_post_title}}</div>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                        <div class="nav-item text-right">
+                            {{todo:if next_post_url}}
+                            <a href="{{todo:next_post_url}}" title="{{todo:next_post_title}}">
+                                <span class="nav-label">{{todo:t text="下一职位"}} <i class="fa fa-chevron-right"></i></span>
+                                <div class="nav-title">{{todo:next_post_title}}</div>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 评论区 -->
+                    {{todo:include file="comment_section.html"}}
+                </article>
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}

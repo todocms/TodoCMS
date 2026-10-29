@@ -1,0 +1,73 @@
+{
+    "imageActionName": "uploadimage",
+    "imageFieldName": "upfile",
+    "imageMaxSize": 20480000,
+    "imageAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg"],
+    "imageCompressEnable": false,
+    "imageCompressBorder": 1600,
+    "imageInsertAlign": "none",
+    "imageUrlPrefix": "",
+    "imagePathFormat": "/content/uploads/{yyyy}/{mm}/{dd}/{time}{rand:6}",
+
+    "scrawlActionName": "uploadscrawl",
+    "scrawlFieldName": "upfile",
+    "scrawlPathFormat": "/content/uploads/{yyyy}/{mm}/{dd}/{time}{rand:6}",
+    "scrawlMaxSize": 20480000,
+    "scrawlUrlPrefix": "",
+    "scrawlInsertAlign": "none",
+
+    "snapscreenActionName": "uploadimage",
+    "snapscreenPathFormat": "/content/uploads/{yyyy}/{mm}/{dd}/{time}{rand:6}",
+    "snapscreenUrlPrefix": "",
+    "snapscreenInsertAlign": "none",
+
+    "catcherLocalDomain": ["127.0.0.1", "localhost"],
+    "catcherActionName": "catchimage",
+    "catcherFieldName": "source",
+    "catcherPathFormat": "/content/uploads/{yyyy}/{mm}/{dd}/{time}{rand:6}",
+    "catcherUrlPrefix": "",
+    "catcherMaxSize": 20480000,
+    "catcherAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg"],
+
+    "videoActionName": "uploadvideo",
+    "videoFieldName": "upfile",
+    "videoPathFormat": "/content/uploads/{yyyy}/{mm}/{dd}/{time}{rand:6}",
+    "videoUrlPrefix": "",
+    "videoMaxSize": 525000000,
+    "videoAllowFiles": [
+        ".flv", ".swf", ".mkv", ".avi", ".rm", ".rmvb", ".mpeg", ".mpg",
+        ".ogg", ".ogv", ".mov", ".wmv", ".mp4", ".webm", ".mp3", ".wav", ".mid"
+    ],
+
+    "fileActionName": "uploadfile",
+    "fileFieldName": "upfile",
+    "filePathFormat": "/content/uploads/{yyyy}/{mm}/{dd}/{time}{rand:6}",
+    "fileUrlPrefix": "",
+    "fileMaxSize": 525000000,
+    "fileAllowFiles": [
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp",
+        ".flv", ".swf", ".mkv", ".avi", ".rm", ".rmvb", ".mpeg", ".mpg",
+        ".ogg", ".ogv", ".mov", ".wmv", ".mp4", ".webm", ".mp3", ".wav", ".mid",
+        ".rar", ".zip", ".tar", ".gz", ".7z", ".bz2", ".cab", ".iso", ".svg",
+        ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".txt", ".md", ".xml"
+    ],
+
+    "imageManagerActionName": "listimage",
+    "imageManagerListPath": "/content/uploads/",
+    "imageManagerListSize": 20,
+    "imageManagerUrlPrefix": "",
+    "imageManagerInsertAlign": "none",
+    "imageManagerAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg"],
+
+    "fileManagerActionName": "listfile",
+    "fileManagerListPath": "/content/uploads/",
+    "fileManagerUrlPrefix": "",
+    "fileManagerListSize": 20,
+    "fileManagerAllowFiles": [
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp",
+        ".flv", ".swf", ".mkv", ".avi", ".rm", ".rmvb", ".mpeg", ".mpg",
+        ".ogg", ".ogv", ".mov", ".wmv", ".mp4", ".webm", ".mp3", ".wav", ".mid",
+        ".rar", ".zip", ".tar", ".gz", ".7z", ".bz2", ".cab", ".iso", ".svg",
+        ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".txt", ".md", ".xml"
+    ]
+}

@@ -1,0 +1,225 @@
+{{todo:get_header}}
+    
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 面包屑导航 -->
+            <nav class="breadcrumb" aria-label="{{todo:t text='面包屑导航'}}">
+                <ol class="breadcrumb-list">
+                    <li class="breadcrumb-item">
+                        <a href="{{todo:site_url}}">
+                            <i class="fa fa-home"></i>
+                            <span>{{todo:t text="首页"}}</span>
+                        </a>
+                    </li>
+                    {{todo:category_parents}}
+                    <li class="breadcrumb-item">
+                        <a href="{{todo:category_url}}">{{todo:category_name}}</a>
+                    </li>
+                    {{/todo:category_parents}}
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{todo:category_name}}
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="content-wrapper">
+                <!-- 左侧内容区 -->
+                <div>
+                    <!-- 分类头部 -->
+                    <header class="category-header">
+                        {{todo:if category_image}}
+                        <div class="category-banner">
+                            <img src="{{todo:category_image}}" alt="{{todo:category_name}}" class="category-image">
+                            <div class="category-overlay">
+                                <div class="category-info">
+                                    <h1 class="category-title">{{todo:category_name}}</h1>
+                                    {{todo:if category_description}}
+                                    <p class="category-description">{{todo:category_description}}</p>
+                                    {{/todo:if}}
+                                    <div class="category-meta">
+                                        <span class="post-count">
+                                            <i class="fa fa-file-alt"></i>
+                                            {{todo:total_posts}} {{todo:t text="篇文章"}}
+                                        </span>
+                                        {{todo:if category_model}}
+                                        <span class="category-model">
+                                            <i class="fa fa-layer-group"></i>
+                                            {{todo:category_model}} {{todo:t text="模型"}}
+                                        </span>
+                                        {{/todo:if}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{todo:else}}
+                        <div class="category-header-simple">
+                            <h1 class="category-title">
+                                <i class="fa fa-folder-open"></i>
+                                {{todo:category_name}}
+                            </h1>
+                            {{todo:if category_description}}
+                            <p class="category-description">{{todo:category_description}}</p>
+                            {{/todo:if}}
+                            <div class="category-meta">
+                                <span class="post-count">
+                                    <i class="fa fa-file-alt"></i>
+                                    {{todo:total_posts}} {{todo:t text="篇文章"}}
+                                </span>
+                                {{todo:if category_model}}
+                                <span class="category-model">
+                                    <i class="fa fa-layer-group"></i>
+                                    {{todo:category_model}} {{todo:t text="模型"}}
+                                </span>
+                                {{/todo:if}}
+                            </div>
+                        </div>
+                        {{/todo:if}}
+                    </header>
+                    
+                    <!-- 子分类 -->
+                    {{todo:category_children}}
+                    <div class="sub-categories">
+                        <h2 class="sub-categories-title">
+                            <i class="fa fa-sitemap"></i>
+                            {{todo:t text="子分类"}}
+                        </h2>
+                        <div class="sub-categories-grid">
+                            <div class="sub-category-item">
+                                <a href="{{todo:category_url}}" class="sub-category-link">
+                                    {{todo:if category_image}}
+                                    <div class="sub-category-image">
+                                        <img src="{{todo:category_image}}" alt="{{todo:category_name}}" loading="lazy">
+                                    </div>
+                                    {{/todo:if}}
+                                    <div class="sub-category-content">
+                                        <h3 class="sub-category-name">{{todo:category_name}}</h3>
+                                        {{todo:if category_description}}
+                                        <p class="sub-category-description">{{todo:category_description}}</p>
+                                        {{/todo:if}}
+                                        <span class="sub-category-count">{{todo:post_count}} {{todo:t text="篇文章"}}</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {{/todo:category_children}}
+                    
+                    <!-- 文章列表 -->
+                    <div class="posts-container" id="postsContainer">
+                        {{todo:if posts}}
+                        <div class="posts-grid" id="postsGrid">
+                            {{todo:posts}}
+                            <article class="post-card">
+                                <div class="post-thumbnail">
+                                    <a href="{{todo:post_url}}" class="post-link">
+                                        <img src="{{todo:post_thumbnail_url}}" alt="{{todo:post_title}}" loading="lazy">
+                                        <div class="post-overlay">
+                                            <i class="fa fa-eye"></i>
+                                        </div>
+                                    </a>
+                                    {{todo:if post_featured}}
+                                    <span class="post-featured">
+                                        <i class="fa fa-star"></i>
+                                        {{todo:t text="推荐"}}
+                                    </span>
+                                    {{/todo:if}}
+                                </div>
+                                <div class="post-content">
+                                    <div class="post-meta">
+                                        <span class="post-category">
+                                            <a href="{{todo:post_category_url}}">{{todo:post_category_name}}</a>
+                                        </span>
+                                        <span class="post-date">
+                                            <i class="fa fa-calendar-alt"></i>
+                                            {{todo:post_date format="Y-m-d"}}
+                                        </span>
+                                    </div>
+                                    <h2 class="post-title">
+                                        <a href="{{todo:post_url}}">{{todo:post_title}}</a>
+                                    </h2>
+                                    <div class="post-excerpt">
+                                        {{todo:post_excerpt length="120"}}
+                                    </div>
+                                    <div class="post-footer">
+                                        <div class="post-stats">
+                                            <span class="post-views">
+                                                <i class="fa fa-eye"></i>
+                                                {{todo:post_views}}
+                                            </span>
+                                            {{todo:if comments_enabled && comment_count}}
+                                            <span class="post-comments">
+                                                <i class="fa fa-comments"></i>
+                                                {{todo:comment_count}}
+                                            </span>
+                                            {{/todo:if}}
+                                        </div>
+                                        <div class="post-tags">
+                                            {{todo:post_tags limit="3"}}
+                                            <a href="{{todo:tag_url}}" class="post-tag">{{todo:tag_name}}</a>
+                                            {{/todo:post_tags}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            {{/todo:posts}}
+                        </div>
+                        
+                        <!-- 分页导航 -->
+                        <nav class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                            {{todo:pagination}}
+                            <div class="pagination">
+                                {{todo:if prev_page}}
+                                <a href="{{todo:prev_page_url}}" class="pagination-btn prev-btn">
+                                    <i class="fa fa-chevron-left"></i>
+                                    <span>{{todo:t text="上一页"}}</span>
+                                </a>
+                                {{/todo:if}}
+                                
+                                <div class="pagination-numbers">
+                                    {{todo:pagination_numbers}}
+                                    {{todo:if current_page}}
+                                    <span class="pagination-number current">{{todo:page_number}}</span>
+                                    {{todo:else}}
+                                    <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                                    {{/todo:if}}
+                                    {{/todo:pagination_numbers}}
+                                </div>
+                                
+                                {{todo:if next_page}}
+                                <a href="{{todo:next_page_url}}" class="pagination-btn next-btn">
+                                    <span>{{todo:t text="下一页"}}</span>
+                                    <i class="fa fa-chevron-right"></i>
+                                </a>
+                                {{/todo:if}}
+                            </div>
+                            {{/todo:pagination}}
+                        </nav>
+                        
+                        {{todo:else}}
+                        <!-- 无文章状态 -->
+                        <div class="no-posts">
+                            <div class="no-posts-icon">
+                                <i class="fa fa-folder-open"></i>
+                            </div>
+                            <h3>{{todo:t text="暂无文章"}}</h3>
+                            <p>{{todo:t text="该分类下还没有内容"}}</p>
+                            <a href="{{todo:site_url}}" class="btn btn-primary">
+                                <i class="fa fa-home"></i>
+                                {{todo:t text="返回首页"}}
+                            </a>
+                        </div>
+                        {{/todo:if}}
+                    </div>
+                </div>
+                
+                <!-- 右侧边栏 -->
+                <aside>
+                    {{todo:get_sidebar}}
+                </aside>
+            </div>
+        </div>
+    </main>
+    
+<!-- 底部 -->
+{{todo:get_footer}}

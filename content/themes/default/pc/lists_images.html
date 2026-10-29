@@ -1,0 +1,304 @@
+{{todo:include file="header.html"}}
+
+<style>
+/* 图集列表核心样式 */
+.gallery-list-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.gallery-list-header .category-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 6px;
+}
+.gallery-list-header .category-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+.gallery-list-header .category-description {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* 3列网格卡片布局 */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 992px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 576px) {
+    .gallery-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+.gallery-card {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+.gallery-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.gallery-cover {
+    position: relative;
+    width: 100%;
+    padding-top: 66.66%; /* 3:2 纵横比 */
+    overflow: hidden;
+    background-color: #f3f4f6;
+}
+.gallery-cover a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.gallery-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.gallery-card:hover .gallery-cover img {
+    transform: scale(1.06);
+}
+
+/* 图片张数角标 */
+.gallery-badge-count {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
+}
+
+.gallery-info {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+.gallery-title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin: 0 0 12px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.gallery-title a {
+    color: #1f2937;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.gallery-title a:hover {
+    color: #0073aa;
+}
+
+.gallery-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #9ca3af;
+}
+.gallery-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 空状态 */
+.gallery-empty {
+    padding: 60px 0;
+    text-align: center;
+    color: #9ca3af;
+}
+.gallery-empty i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #d1d5db;
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+
+        <div class="row gap-5">
+            <main class="col">
+                <!-- 栏目信息 header -->
+                <header class="gallery-list-header">
+                    <h1 class="category-title">{{todo:category_name}}</h1>
+                    {{todo:if category_subtitle}}
+                    <p class="category-subtitle">{{todo:category_subtitle}}</p>
+                    {{/todo:if}}
+                    {{todo:if category_description}}
+                    <div class="category-description">
+                        {{todo:category_description}}
+                    </div>
+                    {{/todo:if}}
+                </header>
+
+                <!-- 图集列表 -->
+                {{todo:if posts|per_page=12}}
+                <div class="gallery-grid">
+                    {{todo:loop posts|per_page=12|pager=main|doc_properties="1"}}
+                    <article class="gallery-card">
+                        <div class="gallery-cover">
+                            <a href="{{todo:permalink}}" title="{{todo:title}}">
+                                {{todo:if custom_field|name="cover_image"}}
+                                <img src="{{todo:custom_field name='cover_image'}}" alt="{{todo:title}}" class="lazy-load" loading="lazy">
+                                {{todo:elseif post_thumbnail}}
+                                {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                                {{todo:else}}
+                                <div class="no-image flex items-center justify-center h-100" style="color: #9ca3af; font-size: 14px;">
+                                    <i class="far fa-image m-r-05"></i> {{todo:t text="暂无封面"}}
+                                </div>
+                                {{/todo:if}}
+                            </a>
+
+                            {{todo:if custom_field|name="is_featured"}}
+                            <span class="gallery-badge-featured" style="position: absolute; top: 10px; left: 10px; background: #e11d48; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500;">
+                                <i class="fa fa-star"></i> {{todo:t text="推荐"}}
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="image_count"}}
+                            <span class="gallery-badge-count">
+                                <i class="far fa-images"></i>
+                                <span>{{todo:custom_field name="image_count"}}P</span>
+                            </span>
+                            {{/todo:if}}
+                        </div>
+                        <div class="gallery-info">
+                            <h2 class="gallery-title">
+                                <a href="{{todo:permalink}}" title="{{todo:title}}">{{todo:title}}</a>
+                            </h2>
+                            <div class="gallery-meta">
+                                <span class="meta-item">
+                                    <i class="far fa-calendar"></i>
+                                    <span>{{todo:if custom_field|name="shoot_date"}}{{todo:custom_field name="shoot_date"}}{{todo:else}}{{todo:date}}{{/todo:if}}</span>
+                                </span>
+                                {{todo:if custom_field|name="photographer"}}
+                                <span class="meta-item" title="{{todo:t text='摄影师'}}">
+                                    <i class="fa fa-camera"></i>
+                                    <span>{{todo:custom_field name="photographer"}}</span>
+                                </span>
+                                {{/todo:if}}
+                                {{todo:if custom_field|name="location"}}
+                                <span class="meta-item" title="{{todo:t text='拍摄地点'}}">
+                                    <i class="fa fa-map-marker-alt"></i>
+                                    <span>{{todo:custom_field name="location"}}</span>
+                                </span>
+                                {{/todo:if}}
+                                <span class="meta-item">
+                                    <i class="far fa-eye"></i>
+                                    <span>{{todo:views}}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                    {{/todo:loop}}
+                </div>
+
+                <!-- 分页导航 -->
+                {{todo:if pagination}}
+                <div class="pagination-nav m-t-40" aria-label="{{todo:t text='图集分页'}}">
+                    <div class="pagination flex gap-2 justify-center">
+                        {{todo:if pagination_prev_page > 0}}
+                        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                            <i class="fa fa-chevron-left"></i>
+                            <span>{{todo:t text="上一页"}}</span>
+                        </a>
+                        {{/todo:if}}
+
+                        <div class="pagination-numbers flex gap-2 items-center">
+                            {{todo:loop pagination_pages}}
+                            {{todo:if page_is_dots}}
+                            <span class="pagination-number dots">...</span>
+                            {{todo:elseif page_is_current}}
+                            <span class="pagination-number current">{{todo:page_number}}</span>
+                            {{todo:else}}
+                            <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                            {{/todo:if}}
+                            {{/todo:loop}}
+                        </div>
+
+                        {{todo:if pagination_next_page > 0}}
+                        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                            <span>{{todo:t text="下一页"}}</span>
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                {{todo:else}}
+                <!-- 空状态 -->
+                <div class="gallery-empty">
+                    <i class="far fa-images"></i>
+                    <h3>{{todo:t text="暂无图集"}}</h3>
+                    <p>{{todo:t text="该分类下还没有内容"}}</p>
+                </div>
+                {{/todo:if}}
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:if subcategories}}
+                <div class="widget subcategories">
+                    <h3 class="widget-title">{{todo:if is_showing_siblings}}{{todo:parent_category_name}}{{todo:else}}{{todo:category_name}}{{/todo:if}}</h3>
+                    <ul class="subcategory-list">
+                        <li class="{{todo:if !current_subcategory}}current{{/todo:if}}">
+                            <a href="{{todo:if parent_category_url}}{{todo:parent_category_url}}{{todo:else}}{{todo:category_url}}{{/todo:if}}">{{todo:t text="全部"}}<span>({{todo:total_count}})</span></a>
+                        </li>
+                        {{todo:loop subcategories}}
+                        <li class="{{todo:if current_subcategory == sub_id}}current{{/todo:if}}">
+                            <a href="{{todo:sub_url}}">
+                                {{todo:sub_name}}<span>({{todo:sub_count}})</span>
+                            </a>
+                        </li>
+                        {{/todo:loop}}
+                    </ul>
+                </div>
+                {{/todo:if}}
+
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}

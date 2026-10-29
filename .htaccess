@@ -1,0 +1,44 @@
+# TodoCMS Root Security & URL Rewrite Rules
+Options -Indexes
+
+# 1. 保护敏感配置文件与安装文件
+<FilesMatch "^(config\.php|config-sample\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 2. 保护日志、备份和临时文件
+<FilesMatch "\.(md|log|bak|backup|sql|old|tmp|zip|tar\.gz|gz|rar|7z)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 3. HTTP 安全响应头设置
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 4. TodoCMS URL 重写规则
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # 如果站点运行在二级目录，请设置 RewriteBase
+    # RewriteBase /todocms/
+
+    # 通用路由 - 如果文件/目录不存在，则交给 index.php 处理
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>

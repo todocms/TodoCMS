@@ -1,0 +1,35 @@
+<!-- 用户中心底部 -->
+<footer class="user-footer">
+    &copy; {{todo:current_year}} {{todo:site_name}}. All rights reserved.
+    {{todo:if condition="option name='icp_number'"}}
+    <a href="https://beian.miit.gov.cn/" target="_blank">{{todo:option name='icp_number'}}</a>
+    {{/todo:if}}
+    Powered by <a href="http://todocms.com" target="_blank">TodoCMS</a>
+</footer>
+
+<!-- 返回顶部 -->
+<div class="back-to-top" id="backToTop">
+    <i class="icon todofont todo-ToTop"></i>
+</div>
+
+<script src="{{todo:public_url}}/static/common/js/jquery.min.js"></script>
+<script src="{{todo:public_url}}/plugins/layer-v3.5.1/layer.js"></script>
+<script>
+(function(){
+  function join(base, path){ return String(base||'').replace(/\/+$/, '') + '/' + String(path||'').replace(/^\/+/, ''); }
+  var siteUrl = '{{todo:site_url}}';
+  var siteRoot = '{{todo:site_url|default}}';
+  window.TODO = window.TODO || {};
+  window.TODO.SITE_URL = window.TODO.SITE_URL || siteUrl;
+  window.TODO.SITE_ROOT = window.TODO.SITE_ROOT || siteRoot;
+  window.TODO.join = window.TODO.join || join;
+  window.TODO.ADMIN_BASE = window.TODO.ADMIN_BASE || join(siteRoot, '/admin');
+  window.TODO.ADMIN_AJAX = window.TODO.ADMIN_AJAX || join(siteRoot, '/admin/ajax');
+  window.TODO.INCLUDES_AJAX = window.TODO.INCLUDES_AJAX || join(siteRoot, '/includes/ajax');
+  window.TODO.API_BASE = window.TODO.API_BASE || join(siteRoot, '/api');
+  window.TODO.CONTENT_BASE = window.TODO.CONTENT_BASE || join(siteRoot, '/content');
+  window.TODO.PUBLIC_BASE = window.TODO.PUBLIC_BASE || '{{todo:public_url}}';
+  window.TODO_LANG = {{todo:lang_pack_json}};
+})();
+</script>
+<script src="{{todo:theme_url}}/users/skin/js/layout.js"></script>

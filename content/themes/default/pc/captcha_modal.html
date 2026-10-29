@@ -1,0 +1,321 @@
+<!-- 图形验证码弹窗公共组件 -->
+<style>
+    /* Captcha Public Styles */
+    #captcha-modal, #todo-captcha-modal, .todo-captcha-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 99999; justify-content: center; align-items: center; }
+    .captcha-box { background: #fff; padding: 24px; border-radius: 12px; width: 350px; max-width: 90vw; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); position: relative; box-sizing: border-box; }
+    .captcha-img-box { position: relative; width: 300px; height: 150px; background: #eee; margin: 10px auto; overflow: hidden; border-radius: 4px; }
+    .captcha-img-box:before { content: '☯'; left: 50%; top: 50%; position: absolute; transform: translate(-50%, -50%); z-index: 0; font-size: 50px; line-height: 0; vertical-align: middle; opacity: 0.1; animation: captcha-spin 1s linear infinite; }
+    @keyframes captcha-spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    #captcha-piece { position: absolute; top: 0; left: 0; height: 100%; z-index: 2; }
+    .captcha-slider-box { position: relative; width: 285px; height: 40px; padding: 0 5px; background: #f7f9fa; margin: 15px auto 10px; border-radius: 20px; border: 1px solid #e4e7eb; }
+    #captcha-slider-bar { position: absolute; left: -1px; top: -1px; height: 42px; width: 0; background: #d1e9ff; border-radius: 20px 0 0 20px; border: 1px solid #1991fa; border-inline-end: 0; box-sizing: border-box; }
+    #captcha-slider-btn { position: absolute; left: -1px; top: -1px; height: 42px; width: 42px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; color: #666; border: 1px solid #ddd; z-index: 3; transition: background 0.2s; user-select: none; }
+    #captcha-slider-btn:hover { background: #1991fa; color: #fff; border-color: #1991fa; }
+    .captcha-text { text-align: center; line-height: 40px; color: #999; font-size: 12px; user-select: none; text-indent: 30px; overflow: hidden; height: 100%; }
+    .captcha-footer { text-align: right; }
+    .captcha-btn { background: none; border: none; cursor: pointer; font-size: 13px; padding: 5px 10px; }
+    .captcha-btn:hover { background: none; border: none; color: #333 !important; text-decoration: underline; }
+    #captcha-refresh { color: #0073aa; }
+    #captcha-close { color: #999; }
+    @media (max-width: 330px) {
+        .captcha-img-box { transform: scaleX(0.8); transform-origin: left; }
+        .captcha-slider-box { transform: scaleX(0.82); transform-origin: left; }
+    }
+    @media (max-width: 250px) {
+        .captcha-box { padding: 15px 10px; width: auto; max-width: 100vw; }
+        .captcha-img-box { transform: scaleX(0.73); transform-origin: left; }
+        .captcha-slider-box { transform: scaleX(0.75); transform-origin: left; }
+    }
+</style>
+
+<div id="captcha-modal" class="todo-captcha-modal">
+    <div class="captcha-box">
+        <h3 style="margin:0 0 15px; font-size:16px; font-weight: normal;">{{todo:t|text=安全验证}}</h3>
+        <div class="captcha-img-box">
+            <img id="captcha-bg" style="width:100%; height:100%; display:block; position: relative;">
+            <img id="captcha-piece" style="position:absolute; top:0; left:0; height:50px;">
+        </div>
+        <div class="captcha-slider-box">
+            <div id="captcha-slider-bar"></div>
+            <div id="captcha-slider-btn">➝</div>
+            <div class="captcha-text">{{todo:t|text=拖动滑块完成拼图}}</div>
+        </div>
+        <div class="captcha-footer">
+             <button type="button" id="captcha-close" class="captcha-btn">{{todo:t|text=关闭}}</button>
+             <button type="button" id="captcha-refresh" class="captcha-btn">{{todo:t|text=刷新}}</button>
+        </div>
+    </div>
+</div>
+
+<script>
+if (typeof window.Captcha === 'undefined') {
+    window.Captcha = {
+        modal: null,
+        bg: null,
+        piece: null,
+        sliderBtn: null,
+        sliderBar: null,
+        refreshBtn: null,
+        closeBtn: null,
+        isDragging: false,
+        startX: 0,
+        onSuccess: null,
+        
+        init: function() {
+            var self = this;
+            this.modal = document.getElementById('captcha-modal') || document.getElementById('todo-captcha-modal') || document.querySelector('.todo-captcha-modal');
+            this.bg = document.getElementById('captcha-bg');
+            this.piece = document.getElementById('captcha-piece');
+            this.sliderBtn = document.getElementById('captcha-slider-btn');
+            this.sliderBar = document.getElementById('captcha-slider-bar');
+            this.refreshBtn = document.getElementById('captcha-refresh');
+            this.closeBtn = document.getElementById('captcha-close');
+
+            if (!this.modal || !this.refreshBtn || !this.closeBtn) return;
+
+            this.refreshBtn.addEventListener('click', function() { self.load(); });
+            this.closeBtn.addEventListener('click', function() { self.hide(); });
+            
+            this.sliderBtn.addEventListener('mousedown', function(e) { self.startDrag(e); });
+            this.sliderBtn.addEventListener('touchstart', function(e) { self.startDrag(e); }, { passive: false });
+            document.addEventListener('mousemove', function(e) { self.onDrag(e); });
+            document.addEventListener('touchmove', function(e) { self.onDrag(e); }, { passive: false });
+            document.addEventListener('mouseup', function(e) { self.stopDrag(e); });
+            document.addEventListener('touchend', function(e) { self.stopDrag(e); });
+        },
+        
+        show: function(callback) {
+            if (!this.modal) this.init();
+            this.onSuccess = callback;
+            if (this.modal) this.modal.style.display = 'flex';
+            this.load();
+        },
+        
+        hide: function() {
+            if (this.modal) this.modal.style.display = 'none';
+        },
+        
+        powSeed: null,
+        powDifficulty: 3,
+        trackData: [],
+        
+        load: function() {
+            var self = this;
+            if (!this.sliderBtn || !this.sliderBar || !this.piece) return;
+
+            var now = Date.now();
+            if (this.isLoading || (now - this.lastLoadTime < 800)) {
+                return; // 防抖，800ms 内禁止重复触发
+            }
+
+            this.isLoading = true;
+            this.lastLoadTime = now;
+            this.trackData = [];
+            this.sliderBtn.style.left = '-1px';
+            this.sliderBar.style.width = '0px';
+            this.sliderBar.style.borderWidth = '0px';
+            this.piece.style.left = '-1px';
+            if (this.refreshBtn) this.refreshBtn.disabled = true;
+            
+            var formData = new FormData();
+            formData.append('action', 'get_captcha');
+            formData.append('lang', '{{todo:current_locale|default}}');
+            
+            var apiUrl = '{{todo:site_url|default}}/api/captcha/slider.php';
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                self.isLoading = false;
+                if (self.refreshBtn) self.refreshBtn.disabled = false;
+                if (data.bg) {
+                    self.bg.src = data.bg;
+                    self.piece.src = data.piece;
+                    self.piece.style.top = data.y + 'px'; 
+                    self.powSeed = data.pow_seed || null;
+                    self.powDifficulty = data.pow_difficulty || 3;
+                } else {
+                    self.hide();
+                    var msg = data.message || '{{todo:t|text=加载验证码失败}}';
+                    if (window.layer) layer.msg(msg, {icon: 2});
+                    else alert(msg);
+                }
+            })
+            .catch(function(err) {
+                self.isLoading = false;
+                if (self.refreshBtn) self.refreshBtn.disabled = false;
+                self.hide();
+                var msg = '{{todo:t|text=加载验证码失败}}';
+                if (window.layer) layer.msg(msg, {icon: 2});
+                else alert(msg);
+            });
+        },
+
+        sha256: function(str) {
+            function rightRotate(value, amount) {
+                return (value >>> amount) | (value << (32 - amount));
+            }
+            var mathPow = Math.pow;
+            var maxWord = mathPow(2, 32);
+            var i, j;
+            var result = "";
+            var bytes = [];
+            var h = [
+                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+                0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+            ];
+            var k = [
+                0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+                0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+                0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+                0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+                0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+                0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+                0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+                0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+            ];
+            var asciiBitLength = str.length * 8;
+            for (i = 0; i < str.length; i++) bytes.push(str.charCodeAt(i));
+            bytes.push(0x80);
+            while ((bytes.length % 64) !== 56) bytes.push(0);
+            var words = [];
+            for (i = 0; i < bytes.length; i += 4) {
+                words.push((bytes[i] << 24) | (bytes[i + 1] << 16) | (bytes[i + 2] << 8) | (bytes[i + 3]));
+            }
+            words.push(Math.floor(asciiBitLength / maxWord));
+            words.push(asciiBitLength & 0xffffffff);
+            for (j = 0; j < words.length;) {
+                var w = words.slice(j, j += 16), oldH = h.slice(0);
+                for (i = 0; i < 64; i++) {
+                    var w15 = w[i - 15], w2 = w[i - 2], a = h[0], e = h[4];
+                    var s0 = (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3));
+                    var s1 = (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10));
+                    if (i >= 16) w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+                    var S1 = (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25));
+                    var ch = ((e & h[5]) ^ ((~e) & h[6]));
+                    var temp1 = (h[7] + S1 + ch + k[i] + w[i]) | 0;
+                    var S0 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22));
+                    var maj = ((a & h[1]) ^ (a & h[2]) ^ (h[1] & h[2]));
+                    var temp2 = (S0 + maj) | 0;
+                    h[7] = h[6]; h[6] = h[5]; h[5] = h[4]; h[4] = (h[3] + temp1) | 0;
+                    h[3] = h[2]; h[2] = h[1]; h[1] = h[0]; h[0] = (temp1 + temp2) | 0;
+                }
+                for (i = 0; i < 8; i++) h[i] = (h[i] + oldH[i]) | 0;
+            }
+            for (i = 0; i < 8; i++) {
+                var hex = (h[i] >>> 0).toString(16);
+                result += ("00000000" + hex).slice(-8);
+            }
+            return result;
+        },
+
+        // 计算符合 difficulty 难度的 PoW Nonce
+        solvePoW: function() {
+            if (!this.powSeed) {
+                console.warn('[Captcha PoW] powSeed is null or empty!');
+                return '0';
+            }
+            var prefix = '0'.repeat(this.powDifficulty || 3);
+            var nonce = 0;
+            while (nonce < 100000) {
+                var hashVal = this.sha256(this.powSeed + nonce);
+                if (hashVal && hashVal.indexOf(prefix) === 0) {
+                    return nonce;
+                }
+                nonce++;
+            }
+            return nonce;
+        },
+        
+        startDrag: function(e) {
+            this.isDragging = true;
+            this.startX = (e.clientX !== undefined) ? e.clientX : (e.touches ? e.touches[0].clientX : 0);
+            var startY = (e.clientY !== undefined) ? e.clientY : (e.touches ? e.touches[0].clientY : 0);
+            this.trackData = [{ x: 0, y: startY, t: Date.now() }];
+        },
+        
+        onDrag: function(e) {
+            if (!this.isDragging) return;
+            var clientX = (e.clientX !== undefined) ? e.clientX : (e.touches ? e.touches[0].clientX : 0);
+            var clientY = (e.clientY !== undefined) ? e.clientY : (e.touches ? e.touches[0].clientY : 0);
+            var moveX = clientX - this.startX;
+            if (moveX < 0) moveX = 0;
+            if (moveX > 260) moveX = 260;
+            
+            this.trackData.push({
+                x: Math.round(moveX),
+                y: Math.round(clientY),
+                t: Date.now()
+            });
+
+            this.sliderBtn.style.left = moveX * 0.98 + 'px';
+            this.sliderBar.style.width = moveX + 20 + 'px';
+            this.sliderBar.style.borderWidth = '1px';
+            this.piece.style.left = moveX * 0.96 + 'px';
+            
+            if (e.cancelable) e.preventDefault();
+        },
+        
+        stopDrag: function(e) {
+            if (!this.isDragging) return;
+            this.isDragging = false;
+            var x = parseInt(this.sliderBtn.style.left);
+            this.verify(x);
+        },
+        
+        verify: function(x) {
+            var self = this;
+            var powNonce = this.solvePoW();
+
+            var formData = new FormData();
+            formData.append('action', 'verify_captcha');
+            formData.append('x', x);
+            formData.append('pow_nonce', powNonce);
+            formData.append('track', JSON.stringify(this.trackData));
+            formData.append('lang', '{{todo:current_locale|default}}');
+            
+            var apiUrl = '{{todo:site_url|default}}/api/captcha/slider.php';
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    self.hide();
+                    if (self.onSuccess) self.onSuccess();
+                } else {
+                    var msg = data.message || '{{todo:t|text=验证失败}}';
+                    if (window.layer) layer.msg(msg, {icon: 2});
+                    else alert(msg);
+                    self.load();
+                }
+            })
+            .catch(function(err) {
+                console.error('[Captcha Verify] Fetch Error:', err);
+                var msg = '{{todo:t|text=验证请求失败}}';
+                if (window.layer) layer.msg(msg, {icon: 2});
+                else alert(msg);
+                self.load();
+            });
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.Captcha.init();
+    });
+}
+</script>

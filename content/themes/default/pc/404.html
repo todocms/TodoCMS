@@ -1,0 +1,201 @@
+{{todo:get_header}}
+    
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+        <div class="container">
+            <div class="error-container">
+                <!-- 404错误内容 -->
+                <div class="error-content">
+                    <div class="error-animation">
+                        <div class="error-number" style="font-size: 100px;">
+                            <span class="four">4</span>
+                            <span class="zero">0</span>
+                            <span class="four">4</span>
+                        </div>
+                        <div class="error-icon">
+                            <i class="icon todofont todo-Search"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="error-text">
+                        <h1>{{todo:t text="页面未找到"}}</h1>
+                        <p class="error-message">{{todo:t text="抱歉，您访问的页面不存在"}}</p>
+                        <p class="error-suggestion">{{todo:t text="可能的原因：页面已删除、链接错误或您没有访问权限"}}</p>
+                    </div>
+                    
+                    <!-- 搜索框 -->
+                    <div class="error-search">
+                        <h3>{{todo:t text="尝试搜索您需要的内容"}}:&nbsp;</h3>
+                        <div class="search-form">
+                            <div class="search-input-group">
+                                <input type="text" id="error-search-input" placeholder="{{todo:t text='输入关键词搜索'}}" class="search-input" onkeypress="if(event.key === 'Enter') document.getElementById('error-search-btn').click();" required>
+                                <button type="button" id="error-search-btn" class="search-btn" style="display: flex;" onclick="var q = document.getElementById('error-search-input').value.trim(); if(q) { window.location.href = window.TODO.join(window.TODO.SITE_URL, '/search') + '?q=' + encodeURIComponent(q); } else { document.getElementById('error-search-input').focus(); }">
+                                    <i class="icon todofont todo-Search"></i>
+                                    <span>{{todo:t text="搜索"}}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 快速导航 -->
+                    <div class="error-navigation">
+                        <h3>{{todo:t text="或者访问以下页面"}}:&nbsp;</h3>
+                        <div class="nav-buttons">
+                            <a href="{{todo:site_url}}" class="nav-btn home-btn">
+                                <i class="icon todofont todo-Home"></i>
+                                <span>{{todo:t text="返回首页"}}</span>
+                            </a>
+                            <a href="{{todo:site_url}}/search" class="nav-btn back-btn">
+                                <i class="icon todofont todo-MallBag"></i>
+                                <span>{{todo:t text="浏览商品"}}</span>
+                            </a>
+                            <a href="{{todo:site_url}}/sitemap.xml" class="nav-btn sitemap-btn">
+                                <i class="icon todofont todo-FolderOpen"></i>
+                                <span>{{todo:t text="网站地图"}}</span>
+                            </a>
+                            <a href="{{todo:site_url}}/contact-us" class="nav-btn contact-btn">
+                                <i class="icon todofont todo-Mail"></i>
+                                <span>{{todo:t text="联系我们"}}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 推荐内容 -->
+                <div class="error-recommendations">
+                    <!-- 热门文章 -->
+                    <div class="recommendation-section">
+                        <h3>
+                            <i class="icon todofont todo-Like"></i>
+                            {{todo:t text="热门文章"}}
+                        </h3>
+                        <div class="recommendation-list">
+                            {{todo:popular_posts limit="5"}}
+                            <article class="recommendation-item">
+                                <div class="item-thumbnail">
+                                    {{todo:if has_thumbnail}}
+                                    <a href="{{todo:post_url}}">
+                                        <img src="{{todo:post_thumbnail}}" class="lazy-load" alt="{{todo:post_title}}" loading="lazy">
+                                    </a>
+                                    {{todo:else}}
+                                    <div class="item-icon">
+                                        <i class="icon todofont todo-FileCodeOne"></i>
+                                    </div>
+                                    {{/todo:if}}
+                                </div>
+                                <div class="item-content">
+                                    <h4><a href="{{todo:post_url}}">{{todo:post_title}}</a></h4>
+                                    <div class="item-meta">
+                                        <span class="item-date">
+                                            <i class="icon todofont todo-Time"></i>
+                                            {{todo:post_date format="m-d"}}
+                                        </span>
+                                        <span class="item-views">
+                                            <i class="icon todofont todo-PreviewOpen"></i>
+                                            {{todo:post_views}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </article>
+                            {{/todo:popular_posts}}
+                        </div>
+                    </div>
+                    
+                    <!-- 最新文章 -->
+                    <div class="recommendation-section">
+                        <h3>
+                            <i class="icon todofont todo-Time"></i>
+                            {{todo:t text="最新文章"}}
+                        </h3>
+                        <div class="recommendation-list">
+                            {{todo:recent_posts limit="5"}}
+                            <article class="recommendation-item">
+                                <div class="item-thumbnail">
+                                    {{todo:if has_thumbnail}}
+                                    <a href="{{todo:post_url}}">
+                                        <img src="{{todo:post_thumbnail}}" alt="{{todo:post_title}}" loading="lazy">
+                                    </a>
+                                    {{todo:else}}
+                                    <div class="item-icon">
+                                        <i class="icon todofont todo-FileCodeOne"></i>
+                                    </div>
+                                    {{/todo:if}}
+                                </div>
+                                <div class="item-content">
+                                    <h4><a href="{{todo:post_url}}">{{todo:post_title}}</a></h4>
+                                    <div class="item-meta">
+                                        <span class="item-date">
+                                            <i class="icon todofont todo-Time"></i>
+                                            {{todo:post_date format="m-d"}}
+                                        </span>
+                                        <span class="item-category">
+                                            <i class="icon todofont todo-FolderClose"></i>
+                                            <a href="{{todo:category_url}}">{{todo:category_name}}</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </article>
+                            {{/todo:recent_posts}}
+                        </div>
+                    </div>
+                    
+                    <!-- 分类导航 -->
+                    <div class="recommendation-section">
+                        <h3>
+                            <i class="icon todofont todo-AppSwitch"></i>
+                            {{todo:t text="分类导航"}}
+                        </h3>
+                        <div class="category-grid">
+                            {{todo:categories limit="8"}}
+                            <a href="{{todo:category_url}}" class="category-card">
+                                <div class="category-icon">
+                                    <i class="{{todo:category_icon}}"></i>
+                                </div>
+                                <div class="category-info">
+                                    <h4>{{todo:category_name}}</h4>
+                                    <span class="category-count">{{todo:category_count}} {{todo:t text="篇文章"}}</span>
+                                </div>
+                            </a>
+                            {{/todo:categories}}
+                        </div>
+                    </div>
+                    
+                    <!-- 标签云 -->
+                    <div class="recommendation-section">
+                        <h3>
+                            <i class="icon todofont todo-Filter"></i>
+                            {{todo:t text="热门标签"}}
+                        </h3>
+                        <div class="tag-cloud">
+                            {{todo:popular_tags limit="20"}}
+                            <a href="{{todo:tag_url/}}" class="tag-item">
+                                {{todo:tag_name}}
+                            </a>
+                            {{/todo:popular_tags}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 404页面专用脚本 -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.$) {
+            $('.error-number span').each(function(index) {
+                $(this).css({ 'animation-delay': (index * 0.2) + 's' });
+            });
+            $('.search-input').focus();
+        }
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'page_view', {
+                'page_title': '404 Error',
+                'page_location': window.location.href
+            });
+        }
+    });
+    </script>
+
+<!-- 底部 -->
+{{todo:get_footer}}

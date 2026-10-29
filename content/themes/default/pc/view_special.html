@@ -1,0 +1,773 @@
+{{todo:include file="header.html"}}
+    
+    <style>
+        .special-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .special-hero {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-banner-content {
+            padding: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .special-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .special-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 18px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .special-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .special-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .badge-item {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(79, 70, 229, 0.3);
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            color: #e0e7ff;
+        }
+
+        /* 布局网格 */
+        .special-layout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 992px) {
+            .special-layout-grid {
+                grid-template-columns: 2.5fr 1fr;
+            }
+        }
+
+        .section-block {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f5f9;
+        }
+
+        .block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f8fafc;
+        }
+
+        .block-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            position: relative;
+            padding-inline-start: 12px;
+            margin: 0;
+        }
+
+        .block-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 4px;
+            background: #4f46e5;
+            border-radius: 2px;
+        }
+
+        .more-link {
+            font-size: 12px;
+        }
+
+        /* 精选卡片网格 */
+        .featured-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .featured-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .featured-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+        }
+
+        .featured-card-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .featured-card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .featured-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .featured-card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .featured-card-title a:hover {
+            color: #4f46e5;
+        }
+
+        .featured-card-excerpt {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .featured-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #94a3b8;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* 列表项 */
+        .article-list-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .article-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .article-list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .article-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .article-item-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .article-item-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-item-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+
+        @media (max-width: 768px) {
+            .special-container { padding: 10px; }
+            .special-title { font-size: 24px; }
+            .hero-banner-content { padding: 20px; }
+        }
+    </style>
+    
+    <!-- 面包屑导航 -->
+    <nav class="breadcrumb">
+        <div class="container">
+            <a href="{{todo:site_url}}">{{todo:t text="首页"}}</a>
+            <span class="separator">></span>
+            <a href="{{todo:category_url}}">{{todo:category_name}}</a>
+            <span class="separator">></span>
+            <span class="current">{{todo:title}}</span>
+        </div>
+    </nav>
+    
+    <div class="special-container">
+        <!-- 1. 专题头部 / 轮播图 Banner -->
+        <div class="special-hero">
+            {{todo:if thumb}}
+            <img src="{{todo:thumb}}" alt="{{todo:title}}" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.3;">
+            {{/todo:if}}
+
+            <div class="hero-banner-content">
+                <h1 class="special-title">{{todo:title}}</h1>
+                {{todo:if subtitle}}
+                <p class="special-subtitle">{{todo:subtitle}}</p>
+                {{/todo:if}}
+
+                <div class="special-meta">
+                    <div class="meta-item">
+                        <span>{{todo:t text="创建于"}} {{todo:post_date format="Y-m-d"}}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="icon todofont todo-PreviewOpen"></i>
+                        <span>{{todo:post_views}}{{todo:t text="次浏览"}}</span>
+                    </div>
+                </div>
+                
+                <!-- 徽章与标签 -->
+                <div class="special-badges">
+                    {{todo:if is_hot}}
+                    <span class="badge-item">🔥 {{todo:t text="热门专题"}}</span>
+                    {{/todo:if}}
+                    {{todo:if is_recommend}}
+                    <span class="badge-item">⭐ {{todo:t text="推荐专题"}}</span>
+                    {{/todo:if}}
+                    {{todo:loop tags}}
+                    <span class="badge-item"># {{todo:name}}</span>
+                    {{/todo:loop}}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 2. 主体网格布局（双栏） -->
+        <div class="special-layout-grid">
+            <!-- 左侧主内容区 -->
+            <div class="special-main-col">
+                
+                <!-- 专题内容/摘要说明 -->
+                {{todo:if description}}
+                <div class="section-block">
+                    <div class="block-header">
+                        <h2 class="block-title">{{todo:t text="专题摘要"}}</h2>
+                    </div>
+                    <div style="font-size: 15px; line-height: 1.8; color: #475569;">
+                        {{todo:description}}
+                    </div>
+                    {{todo:if condition="featured_images.length > 1"}}
+                    <section class="hero-slider" data-autoplay="false" data-show-loading="false" style="width: 400px; height: 360px; background-color: #5c5c5c;">
+                        <div class="slider-container">
+                            <div class="slider-track">
+                            {{todo:loop featured_images}}
+                            {{todo:if condition="type == 'image'"}}
+                            <div class="slide" data-id="{{todo:index}}" data-type="{{todo:type}}" data-url="{{todo:url}}" data-placeholder="{{todo:placeholder}}" data-alt="{{todo:alt}}">
+                                {{todo:img_tag src="url" alt="alt" class="lazy-load" loading="lazy"}}
+                            </div>
+                            {{todo:else}}
+                            <div class="slide" data-id="{{todo:index}}" data-type="{{todo:type}}" data-url="{{todo:url}}" data-alt="{{todo:alt}}"></div>
+                            {{/todo:if}}
+                            {{/todo:loop}}
+                            </div>
+                        </div>
+
+                        <!-- 轮播控制 -->
+                        <div class="slider-controls">
+                            <button class="slider-prev" aria-label="{{todo:t text='上一张'}}" style="inset-inline-start: 0; transform: scale(0.8);">
+                                <i class="icon todofont todo-Right ro180"></i>
+                            </button>
+                            <button class="slider-next" aria-label="{{todo:t text='下一张'}}" style="inset-inline-end: 0; transform: scale(0.8);">
+                                <i class="icon todofont todo-Right"></i>
+                            </button>
+                        </div>
+
+                        <!-- 轮播预览 -->
+                        <div class="slider-preview">
+                        </div>
+
+                        <!-- 轮播指示器 -->
+                        <div class="slider-indicators" style="top: 20px; bottom: unset; inset-inline-end: 10px; inset-inline-start: unset; transform: none; opacity: 0.3; transform: scale(0.8);">
+                            <!-- 指示器将由JavaScript动态生成 -->
+                        </div>
+
+                        <!-- 轮播分页 -->
+                        <div class="slider_pagination" style="top: 10px; bottom: unset;">
+                            <span class="current">01</span>
+                            <span class="total">01</span>
+                        </div>
+
+                        <!-- 加载状态 -->
+                        <div class="slider-loading">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </section>
+                    {{/todo:if}}
+                </div>
+                {{/todo:if}}
+
+                {{todo:if post_content}}
+                <div class="section-block">
+                    <div class="block-header">
+                        <h2 class="block-title">{{todo:t text="专题详情介绍"}}</h2>
+                    </div>
+                    <div style="font-size: 15px; line-height: 1.8; color: #334155;">
+                        {{todo:post_content}}
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                <!-- 3. 专题精选（根据输入ID卡片呈现） -->
+                {{todo:if special_featured_posts}}
+                <div class="section-block">
+                    <div class="block-header">
+                        <h2 class="block-title">{{todo:t text="精选推荐"}}</h2>
+                    </div>
+                    <div class="featured-cards-grid">
+                        {{todo:loop special_featured_posts}}
+                        <article class="featured-card">
+                            {{todo:if thumbnail}}
+                            <a href="{{todo:url}}" style="width: 50px; flex-shrink: 0;">
+                                {{todo:thumbnail class="lazy-load" loading="lazy"}}
+                            </a>
+                            {{/todo:if}}
+                            <div class="featured-card-body">
+                                <h3 class="featured-card-title">
+                                    <a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a>
+                                </h3>
+                                <div class="featured-card-footer">
+                                    <span>{{todo:publish_date}}</span>
+                                    <a href="{{todo:url}}" class="more-link">{{todo:t text="阅读全文"}} &rarr;</a>
+                                </div>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                <!-- 专题时间线区块 (Timeline) -->
+                {{todo:if timeline_events}}
+                <div class="section-block special-timeline-section">
+                    <div class="block-header">
+                        <h2 class="block-title">{{todo:t text="时间线"}}</h2>
+                    </div>
+                    
+                    <!-- 时间线年份/分类筛选 Tab 栏 -->
+                    <div class="timeline-tabs-bar">
+                        <button class="timeline-tab-btn active" onclick="filterTimeline('all', this)">All</button>
+                        {{todo:loop timeline_events}}
+                        {{todo:if event_date}}
+                        <button class="timeline-tab-btn date-tab-btn" data-date="{{todo:event_date}}" onclick="filterTimeline('{{todo:event_date}}', this)">{{todo:event_date}}</button>
+                        {{/todo:if}}
+                        {{/todo:loop}}
+                    </div>
+
+                    <!-- 时间线卡片列表 -->
+                    <div class="timeline-cards-list">
+                        {{todo:loop timeline_events}}
+                        <div class="timeline-card-node" data-date="{{todo:event_date}}">
+                            <div class="timeline-node-header mb-3">
+                                <h4>{{todo:title}}</h4>
+                                {{todo:if excerpt}}
+                                <div class="dec">
+                                    {{todo:excerpt}}
+                                </div>
+                                {{/todo:if}}
+                            </div>
+
+                            <!-- 包含对应ID文章列表 -->
+                            {{todo:if articles}}
+                            <div class="timeline-node-articles">
+                                {{todo:loop articles}}
+                                <div class="timeline-card-item">
+                                    {{todo:if thumbnail}}
+                                    <a href="{{todo:url}}" style="width: 50px; flex-shrink: 0;">
+                                        {{todo:thumbnail class="lazy-load" loading="lazy"}}
+                                    </a>
+                                    {{/todo:if}}
+                                    <div class="timeline-card-content">
+                                        <h4 class="timeline-card-title">
+                                            <a href="{{todo:url}}" target="_blank">{{todo:title}}</a>
+                                        </h4>
+                                        <div class="timeline-card-time">
+                                            {{todo:publish_date}}
+                                        </div>
+                                    </div>
+                                </div>
+                                {{/todo:loop}}
+                            </div>
+                            {{/todo:if}}
+                        </div>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+
+                <style>
+                    /* 时间线样式 */
+                    .special-timeline-section {
+                        margin-bottom: 24px;
+                    }
+                    .timeline-tabs-bar {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        margin-bottom: 16px;
+                        padding-bottom: 12px;
+                        border-bottom: 1px solid #e2e8f0;
+                    }
+                    .timeline-tab-btn {
+                        padding: 6px 16px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        border: 1px solid #e2e8f0;
+                        background: #ffffff;
+                        color: #334155;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    }
+                    .timeline-tab-btn:hover {
+                        border-color: #0f2b5c;
+                        color: #0f2b5c;
+                        background: #f8fafc;
+                    }
+                    .timeline-tab-btn.active {
+                        background: #0f2b5c;
+                        color: #ffffff;
+                        border-color: #0f2b5c;
+                    }
+                    .timeline-cards-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                        max-height: 300px;
+                        overflow-y: auto;
+                        padding-inline-end: 6px;
+                    }
+                    .timeline-cards-list::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    .timeline-cards-list::-webkit-scrollbar-thumb {
+                        background-color: #cbd5e1;
+                        border-radius: 4px;
+                    }
+                    .timeline-cards-list::-webkit-scrollbar-track {
+                        background-color: #f1f5f9;
+                    }
+                    .timeline-card-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        padding: 15px 0;
+                        border-top: 1px solid #e2e8f0;
+                        overflow: hidden;
+                        transition: all 0.2s ease;
+                    }
+                    .timeline-card-content {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                    }
+                    .timeline-card-title {
+                        font-size: 16px;
+                        font-weight: 700;
+                        color: #0f2b5c;
+                        margin: 0 0 6px 0;
+                        line-height: 1.4;
+                    }
+                    .timeline-card-time {
+                        font-size: 13px;
+                        color: #999;
+                    }
+                    .timeline-card-desc {
+                        font-size: 13px;
+                        color: #475569;
+                        line-height: 1.5;
+                    }
+                    @media (max-width: 640px) {
+                        .timeline-card-item {
+                            flex-direction: column;
+                        }
+                    }
+                </style>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // 去重年份按钮
+                        const yearBtns = document.querySelectorAll('.timeline-tab-btn.date-tab-btn');
+                        const seenYears = new Set();
+                        yearBtns.forEach(btn => {
+                            const yr = btn.getAttribute('data-date');
+                            if (!yr || yr === 'All' || seenYears.has(yr)) {
+                                btn.remove();
+                            } else {
+                                seenYears.add(yr);
+                            }
+                        });
+                    });
+
+                    function filterTimeline(year, btnEl) {
+                        const btns = document.querySelectorAll('.timeline-tab-btn');
+                        btns.forEach(b => b.classList.remove('active'));
+                        if (btnEl) btnEl.classList.add('active');
+
+                        const nodes = document.querySelectorAll('.timeline-card-node');
+                        nodes.forEach(node => {
+                            const nodeYear = node.getAttribute('data-date');
+                            if (year === 'all' || nodeYear === year) {
+                                node.style.display = 'block';
+                            } else {
+                                node.style.display = 'none';
+                            }
+                        });
+                    }
+                </script>
+                {{/todo:if}}
+
+                <!-- 4. 聚合分类专题（循环输出对应的分类内部的文章 7篇+查看更多，每个ID独立一个区块显示） -->
+                {{todo:if special_categories}}
+                {{todo:loop special_categories}}
+                <div class="section-block">
+                    <div class="block-header">
+                        <h2 class="block-title">{{todo:category_name}}</h2>
+                        <a href="{{todo:category_url}}" class="more-link">{{todo:t text="查看更多"}} &rarr;</a>
+                    </div>
+                    <div class="article-list-group">
+                        {{todo:loop articles}}
+                        <article class="article-list-item">
+                            <div class="article-item-content">
+                                <h3 class="article-item-title">
+                                    <a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a>
+                                </h3>
+                                <div class="article-item-meta">
+                                    <span>{{todo:publish_date}}</span>
+                                    <span><i class="icon todofont todo-PreviewOpen"></i> {{todo:views}}{{todo:t text="次浏览"}}</span>
+                                </div>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:loop}}
+                {{/todo:if}}
+
+                <!-- 5. 热点话题（聚合标签）（每个标签独立一个区块显示 7篇+查看更多） -->
+                {{todo:if special_tags}}
+                {{todo:loop special_tags}}
+                <div class="section-block">
+                    <div class="block-header">
+                        <h2 class="block-title"># {{todo:tag_name}}</h2>
+                        <a href="{{todo:tag_url}}" class="more-link">{{todo:t text="查看更多"}} &rarr;</a>
+                    </div>
+                    <div class="article-list-group">
+                        {{todo:loop articles}}
+                        <article class="article-list-item">
+                            <div class="article-item-content">
+                                <h3 class="article-item-title">
+                                    <a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a>
+                                </h3>
+                                <div class="article-item-meta">
+                                    <span>{{todo:publish_date}}</span>
+                                    <span><i class="icon todofont todo-PreviewOpen"></i> {{todo:views}}{{todo:t text="次浏览"}}</span>
+                                </div>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:loop}}
+                {{/todo:if}}
+
+                <!-- 专题图集区块 (Gallery) -->
+                {{todo:if gallery_images}}
+                <div class="section-block">
+                    <div class="block-header">
+                        <h2 class="block-title">{{todo:t text="专题图集"}}</h2>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4" id="special-gallery-photos">
+                        {{todo:loop gallery_images}}
+                        <div class="gallery-item">
+                            <a href="javascript:void(0);">
+                                <img src="{{todo:url}}" alt="{{todo:title}}" class="w-100">
+                            </a>
+                            {{todo:if title}}
+                            <div class="text-center dec" style="word-break: break-all;">{{todo:title}}</div>
+                            {{/todo:if}}
+                        </div>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var galleryEl = document.getElementById('special-gallery-photos');
+                        if (galleryEl) {
+                            galleryEl.addEventListener('click', function(e) {
+                                var item = e.target.closest('.gallery-item');
+                                if (!item) return;
+                                e.preventDefault();
+                                
+                                var items = Array.from(galleryEl.querySelectorAll('.gallery-item'));
+                                var startIdx = items.indexOf(item);
+                                var photosData = items.map(function(el) {
+                                    var img = el.querySelector('img');
+                                    var titleEl = el.querySelector('.text-center');
+                                    return {
+                                        alt: (img && img.getAttribute('alt')) || (titleEl ? titleEl.textContent.trim() : ''),
+                                        src: img ? img.getAttribute('src') : ''
+                                    };
+                                }).filter(function(p) { return p.src; });
+
+                                if (typeof layer !== 'undefined' && photosData.length > 0) {
+                                    layer.photos({
+                                        photos: {
+                                            title: '{{todo:t text="专题图集"}}',
+                                            start: startIdx >= 0 ? startIdx : 0,
+                                            data: photosData
+                                        },
+                                        anim: 5
+                                    });
+                                }
+                            });
+                        }
+                    });
+                </script>
+                {{/todo:if}}
+
+            </div>
+
+            <!-- 右侧侧边栏区（热门文章、推荐文章与 sidebar.html 一致） -->
+            <div class="special-sidebar-col">
+                <!-- 热门文章 -->
+                <div class="widget widget-popular-posts">
+                    <h3 class="widget-title font-semibold text-lg border-b pb-2 mb-3">{{todo:t text="热门文章"}}</h3>
+                    <ul class="popular-posts-list pl-0 list-none space-y-3">
+                        {{todo:articles id="7,16" limit="5" orderby="view_count" order="desc"}}
+                        <li class="popular-post-item flex gap-2 items-baseline text-sm pb-2 border-b border-gray-100 last:border-0">
+                            <div class="rank font-bold text-indigo-600 min-w-[20px]">{{todo:index_1}}</div>
+                            <div class="popular-post-content flex-1 min-w-0">
+                                <h4 class="font-medium text-slate-800 hover:text-indigo-600 truncate mb-1">
+                                    <a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a>
+                                </h4>
+                                <div class="dec flex items-center gap-3 text-xs text-slate-400">
+                                    <span class="views">
+                                        <i class="icon todofont todo-PreviewOpen"></i>
+                                        {{todo:views}}
+                                    </span>
+                                    <span class="comments">
+                                        <i class="icon todofont todo-CommentOne"></i>
+                                        {{todo:comments_count}}
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        {{/todo:articles}}
+                    </ul>
+                </div>
+
+                <!-- 推荐文章 -->
+                <div class="widget widget-popular-posts">
+                    <h3 class="widget-title font-semibold text-lg border-b pb-2 mb-3">{{todo:t text="推荐文章"}}</h3>
+                    <ul class="popular-posts-list pl-0 list-none space-y-3">
+                        {{todo:articles noid="6,8" limit="5" doc_properties="2,3"}}
+                        <li class="popular-post-item flex gap-2 items-baseline text-sm pb-2 border-b border-gray-100 last:border-0">
+                            <div class="rank font-bold text-amber-500 min-w-[20px]">{{todo:index_1}}</div>
+                            <div class="popular-post-content flex-1 min-w-0">
+                                <h4 class="font-medium text-slate-800 hover:text-indigo-600 truncate mb-1">
+                                    <a href="{{todo:url}}" title="{{todo:title}}">{{todo:title}}</a>
+                                </h4>
+                                <div class="dec flex items-center gap-3 text-xs text-slate-400">
+                                    <span class="views">
+                                        <i class="icon todofont todo-PreviewOpen"></i>
+                                        {{todo:views}}
+                                    </span>
+                                    <span class="comments">
+                                        <i class="icon todofont todo-CommentOne"></i>
+                                        {{todo:comments_count}}
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        {{/todo:articles}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{{todo:include file="footer.html"}}

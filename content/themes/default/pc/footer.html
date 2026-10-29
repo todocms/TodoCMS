@@ -1,0 +1,259 @@
+    <!-- 底部 -->
+    <footer class="site-footer">
+        <!-- 指定分类为 10 的 FAQ 列表 -->
+        <div class="footer-faq-section container m-b-20">
+            <div class="footer-block-title" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 12px;">{{todo:t|text=常见问题}}</div>
+            <div class="faq-list">
+                {{todo:articles id="10" limit="6" orderby="date" order="desc" visibility="readable"}}
+                <article class="faq-item">
+                    <div class="faq-title" style="font-weight: 500; font-size: 14px; margin-bottom: 4px;">
+                        <a href="{{todo:post_url}}">{{todo:post_title}}</a>
+                    </div>
+                    <div class="faq-summary">
+                        <span>{{todo:post_excerpt}}</span>
+                    </div>
+                </article>
+                {{/todo:articles}}
+            </div>
+        </div>
+
+        <div class="container footer-subscription-section" style="max-width: 600px;margin: 0 auto 30px auto;text-align: center;padding: 25px 20px;background: #fafafa;border-radius: 8px;">
+            <div class="subscription-title" style="margin: 0 0 10px 0; font-size: 18px; color: #333; font-weight: 600;">{{todo:t text="订阅动态"}}</div>
+            <p class="subscription-desc" style="margin: 0 0 18px 0; font-size: 14px; color: #666;">{{todo:t text="订阅随时获取最新资讯"}}</p>
+            <form id="footerSubscribeForm" style="display: flex; gap: 10px; justify-content: center; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
+                <input type="email" name="email" id="footerSubscribeEmail" placeholder="{{todo:t text='请输入您的邮箱地址'}}" required style="flex: 1; min-width: 220px;">
+                <button type="submit" id="footerSubscribeBtn" class="button-secondary">{{todo:t text="立即订阅"}}</button>
+            </form>
+            <div id="footerSubscribeMessage" style="margin-top: 12px; font-size: 14px; display: none;"></div>
+        </div>
+
+        <!-- 跨境电商出海政策与 Google Ads / GMC 合规保障链接 -->
+        <div class="container footer-compliance-nav" style="border-top: 1px solid #eaeaea; padding: 20px 0 10px 0; margin-top: 20px; text-align: center;">
+            <div class="footer-policy-links flex justify-center gap-4 flex-wrap" style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                <a href="{{todo:site_url}}/shipping-policy">{{todo:t text="配送与物流政策"}}</a>
+                <span class="sep" style="color: #ccc;">|</span>
+                <a href="{{todo:site_url}}/return-policy">{{todo:t text="退换货与退款政策"}}</a>
+                <span class="sep" style="color: #ccc;">|</span>
+                <a href="{{todo:site_url}}/privacy-policy">{{todo:t text="隐私保护政策"}}</a>
+                <span class="sep" style="color: #ccc;">|</span>
+                <a href="{{todo:site_url}}/terms-of-service">{{todo:t text="服务条款"}}</a>
+                <span class="sep" style="color: #ccc;">|</span>
+                <a href="{{todo:site_url}}/contact-us">{{todo:t text="联系我们"}}</a>
+            </div>
+
+            <!-- GMC 商家中心与 Google Ads 审核必备：明文商户主体与联系信息（纯语义化 HTML5，消除与 <head> JSON-LD 的微数据冲突） -->
+            <div class="footer-merchant-info flex justify-center gap-4 flex-wrap" style="font-size: 12px; color: #777; margin-bottom: 8px; line-height: 1.6;">
+                {{todo:if option|name=site_contact_address}}
+                <address class="merchant-address" style="font-style: normal; display: inline-flex; align-items: center; gap: 4px;"><i class="icon todofont todo-Location"></i> <span>{{todo:option name="site_contact_address"}}</span></address>
+                {{/todo:if}}
+                {{todo:if option|name=site_contact_email}}
+                <span><i class="icon todofont todo-Mail"></i> <a href="mailto:{{todo:option name='site_contact_email'}}" style="color: #777;">{{todo:option name="site_contact_email"}}</a></span>
+                {{/todo:if}}
+                {{todo:if option|name=site_contact_phone}}
+                <span><i class="icon todofont todo-Phone"></i> <a href="tel:{{todo:option name='site_contact_phone'}}" style="color: #777;">{{todo:option name="site_contact_phone"}}</a></span>
+                {{/todo:if}}
+                <span><i class="icon todofont todo-Time"></i> <span>{{todo:t text="客服支持"}}: Mon - Fri 9:00 AM - 6:00 PM (EST)</span></span>
+            </div>
+
+            <!-- 安全结账与正规支付网关信任徽章（提升 Google Ads 落地页质量分与买家信任） -->
+            <div class="footer-payment-trust flex justify-center items-center gap-1" style="font-size: 12px; color: #888; margin-top: 6px;">
+                <div class="trust-badge-row flex items-center justify-center gap-3 flex-wrap">
+                    <span style="display: inline-flex; align-items: center; gap: 4px; color: #52c41a;"><i class="icon todofont todo-Check"></i> {{todo:t text="SSL 256位安全加密结账"}}</span>
+                    <span class="sep" style="color: #ddd;">|</span>
+                    <span style="display: inline-flex; align-items: center; gap: 4px;"><i class="icon todofont todo-Safety"></i> {{todo:t text="买家保护保障"}}</span>
+                </div>
+                <div class="payment-badges-list flex justify-center gap-2 m-t-8 flex-wrap" style="opacity: 0.85;">
+                    <span class="payment-chip" style="display:inline-block;padding:2px 8px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-weight:600;color:#1a1f36;">VISA</span>
+                    <span class="payment-chip" style="display:inline-block;padding:2px 8px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-weight:600;color:#eb001b;">Mastercard</span>
+                    <span class="payment-chip" style="display:inline-block;padding:2px 8px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-weight:600;color:#003087;">PayPal</span>
+                    <span class="payment-chip" style="display:inline-block;padding:2px 8px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-weight:600;color:#006fcf;">American Express</span>
+                    <span class="payment-chip" style="display:inline-block;padding:2px 8px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:4px;font-size:11px;font-weight:600;color:#000;">Apple Pay</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="container site-info">
+            {{todo:if condition="option name='site_copyright'"}}
+            {{todo:site_copyright}}
+            {{todo:else}}
+            <p>&copy; {{todo:current_year}} by {{todo:site_title}}. {{todo:t text="保留所有权利"}}</p>
+            {{/todo:if}}
+            <p>{{todo:t text="由"}} <a href="https://todocms.com/" target="_blank" rel="noopener noreferrer">TodoCMS</a> {{todo:t text="强力驱动"}}</p>
+            {{todo:if condition="option name='site_icp'"}}
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{{todo:option name='site_icp'}}</a>
+            {{/todo:if}}
+        </div>
+
+        <!-- Google SEO & EEAT: WebSite & Organization Knowledge Graph Schema -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": "{{todo:site_url}}#website",
+              "url": "{{todo:site_url}}",
+              "name": "{{todo:site_title format='json'}}",
+              "description": "{{todo:site_description format='json'}}",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "{{todo:search_url}}?q={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            },
+            {
+              "@type": "Organization",
+              "@id": "{{todo:site_url}}#organization",
+              "name": "{{todo:site_title format='json'}}",
+              "url": "{{todo:site_url}}",
+              "logo": "{{todo:if site_logo}}{{todo:site_logo}}{{todo:else}}{{todo:site_favicon}}{{/todo:if}}"{{todo:if option|name=site_contact_email}},
+              "email": "{{todo:option name='site_contact_email'}}"{{/todo:if}}{{todo:if option|name=site_contact_phone}},
+              "telephone": "{{todo:option name='site_contact_phone'}}"{{/todo:if}}
+            }
+          ]
+        }
+        </script>
+    </footer>
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="back-to-top" title="{{todo:t text='返回顶部'}}" style="display: none;"><i class="icon todofont todo-ToTop"></i></button>
+    
+    <!-- 订阅 AJAX 提交脚本 -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 返回顶部按钮
+        const backToTop = document.getElementById('back-to-top');
+        if (backToTop) {
+            window.addEventListener('scroll', function () {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('show');
+                    if (backToTop.style.display === 'none') {
+                        backToTop.style.display = 'flex';
+                    }
+                } else {
+                    backToTop.classList.remove('show');
+                }
+            });
+            backToTop.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        var subForm = document.getElementById('footerSubscribeForm');
+        if (!subForm) return;
+
+        subForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var emailInput = document.getElementById('footerSubscribeEmail');
+            var btn = document.getElementById('footerSubscribeBtn');
+            var msgBox = document.getElementById('footerSubscribeMessage');
+            var email = emailInput ? emailInput.value.trim() : '';
+
+            if (!email) {
+                msgBox.style.display = 'block';
+                msgBox.style.color = '#e53e3e';
+                msgBox.textContent = '{{todo:t text="请输入有效的邮箱地址"}}';
+                return;
+            }
+
+            var lastSub = subForm.dataset.lastSubmit || 0;
+            var now = Date.now();
+            if (now - lastSub < 5000) {
+                msgBox.style.display = 'block';
+                msgBox.style.color = '#e53e3e';
+                msgBox.textContent = '{{todo:t text="提交过于频繁，请 5 秒后再试"}}';
+                return;
+            }
+            subForm.dataset.lastSubmit = now;
+
+            var submitRequest = function() {
+                btn.disabled = true;
+                var origText = btn.textContent;
+                btn.textContent = '{{todo:t text="提交中"}}';
+                msgBox.style.display = 'none';
+
+                var formData = new FormData();
+                formData.append('action', 'subscribe');
+                // 幂等键：服务端据此识别重复提交
+                formData.append('_submit_key', Date.now().toString(16) + '-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2));
+                formData.append('email', email);
+                formData.append('source', '{{todo:t text="前台底部订阅"}}');
+
+                var defaultAjaxUrl = '{{todo:site_url|default}}/admin/admin-ajax.php';
+                var ajaxUrl = (window.TODO && window.TODO.ADMIN_AJAX) ? window.TODO.ADMIN_AJAX : defaultAjaxUrl;
+                if (ajaxUrl.indexOf('?') === -1) {
+                    ajaxUrl += '?action=subscribe';
+                } else {
+                    ajaxUrl += '&action=subscribe';
+                }
+
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: formData
+                })
+                .then(function(res) {
+                    return res.json().then(function(d){
+                        return { status: res.status, data: d };
+                    });
+                })
+                .then(function(resObj) {
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                    var data = resObj.data;
+
+                    if (resObj.status === 403 && data && data.require_captcha) {
+                        if (window.Captcha && typeof window.Captcha.show === 'function') {
+                            window.Captcha.show(function() {
+                                submitRequest();
+                            });
+                            return;
+                        }
+                    }
+
+                    msgBox.style.display = 'block';
+                    if (data && data.success) {
+                        msgBox.style.color = '#38a169';
+                        msgBox.textContent = data.message || '{{todo:t text="订阅成功"}}';
+                        emailInput.value = '';
+
+                        // Google Ads & GA4: 订阅转化事件
+                        try {
+                            window.dataLayer = window.dataLayer || [];
+                            window.dataLayer.push({
+                                'event': 'sign_up',
+                                'method': 'newsletter'
+                            });
+                        } catch (e) {}
+                    } else {
+                        msgBox.style.color = '#e53e3e';
+                        msgBox.textContent = (data && data.message) ? data.message : '{{todo:t text="订阅失败"}}';
+                    }
+                })
+                .catch(function(err) {
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                    msgBox.style.display = 'block';
+                    msgBox.style.color = '#e53e3e';
+                    msgBox.textContent = '{{todo:t text="网络错误"}}';
+                });
+            };
+
+            submitRequest();
+        });
+    });
+    </script>
+    
+    <!-- JavaScript：已改为通过队列输出（todo_footer 内） -->
+    
+    <!-- 统计代码 -->
+    {{todo:analytics_code}}
+    
+    {{todo:todo_footer}}
+</body>
+</html>

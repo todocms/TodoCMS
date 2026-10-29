@@ -1,0 +1,116 @@
+/* TodoCMS 会员登录页面样式 */
+
+/* 重置和基础样式 */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body.login-page { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* 登录主容器 */
+.login-main-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+.login-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); display: flex; min-height: 420px; width: 100%; max-width: 800px; overflow: hidden; }
+
+/* 左侧：手机扫码登录 */
+.login-left { width: 50%; padding: 40px 40px 60px; border-inline-end: 1px solid #eceef1; display: flex; align-items: center; justify-content: center; }
+.qr-login-section { margin-top: -20px; text-align: center; width: 100%; }
+.qr-login-section a { display: inline-block; transition: all 0.3s; }
+.qr-login-section a img { max-width: 160px; }
+.qr-title { font-size: 18px; font-weight: 500; color: #333; margin-top: 15px; transition: all 0.3s; }
+.qr-login-section a:hover { transform: scale(1.05); filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1)); }
+.qr-login-section a:hover + h2 { margin-top: 30px; transform: scale(1.05); }
+
+/* 右侧：密码登录/短信登录 */
+.login-right { width: 50%; padding: 40px 50px; display: flex; flex-direction: column; }
+
+/* 登录标签 */
+.login-tabs { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; gap: 10px; }
+.tab-btn { background: none; border: none; font-size: 20px; color: #a2a2ab; cursor: pointer; padding: 0; transition: color 0.3s; font-weight: 500; text-align: start; }
+.tab-btn.active { color: #333; font-weight: 500; }
+.tab-btn:hover:not(.active) { color: #333; }
+.tab-separator { color: #ddd; margin: 0 15px; font-size: 16px; height: 23px; }
+
+/* 登录表单 */
+.login-form { display: none; flex: 1; }
+.login-form.active { display: flex; flex-direction: column; }
+.form-group { margin-bottom: 20px; }
+.form-input { width: 100%; padding: 14px 16px; border: none; border-radius: 8px; font-size: 15px; color: #333; background: #f4f4f4; transition: background 0.3s; }
+.form-input:focus { outline: none; background: #ececec; }
+.form-input::placeholder { color: #a0a0aa; }
+
+/* 密码输入框包装器 */
+.password-input-wrapper { position: relative; }
+.password-input-wrapper .form-input { padding-inline-end: 45px; }
+
+/* 验证码输入框 */
+.captcha-input-wrapper { display: flex; gap: 10px; }
+.captcha-input-wrapper .form-input { flex: 1; }
+.captcha-img { height: 48px; width: 120px; border-radius: 8px; cursor: pointer; background: #fff; border: 1px solid #eceef1; object-fit: cover; }
+
+/* 短信验证码输入框 */
+.sms-input-wrapper { display: flex; gap: 10px; }
+.sms-input-wrapper .form-input { flex: 1; }
+.send-sms-btn { padding: 12px 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #666; font-size: 14px; cursor: pointer; white-space: nowrap; transition: all 0.3s; }
+.send-sms-btn:hover { border-color: #FF6600; color: #FF6600; }
+.send-sms-btn:disabled { background: #f5f5f5; border-color: #ddd; color: #999; cursor: not-allowed; }
+
+/* 登录按钮 */
+.login-submit-btn { width: 100%; height: 48px; background: linear-gradient(90deg, #ff8a00, #ff5000); border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight: 500; cursor: pointer; transition: opacity 0.3s; margin-bottom: 20px; }
+.login-submit-btn:hover { opacity: 0.9; }
+.login-submit-btn:active { background: #e55a00; }
+.login-submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+/* 底部链接 */
+.login-footer-links { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 40px; font-size: 13px; }
+.social-login { display: flex; gap: 12px; }
+.other-links { display: flex; gap: 10px; align-items: center; }
+.footer-link { text-align: end; }
+.footer-link:not(:hover) { color: #666; text-decoration: none; transition: color 0.3s; }
+.footer-link:hover { color: #ff5000; }
+.link-separator { color: #eee; }
+
+/* 协议复选框 */
+.agreement-section { margin-top: auto; }
+.agreement-checkbox { display: flex; align-items: flex-start; gap: 5px; cursor: pointer; font-size: 12px; color: #666; line-height: 1.6; }
+.agreement-checkbox input[type="checkbox"] { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+.checkbox-mark { width: 14px; height: 14px; border: 1px solid #ddd; border-radius: 50%; display: inline-block; position: relative; flex-shrink: 0; margin-top: 2px; transition: all 0.3s; }
+.agreement-checkbox input[type="checkbox"]:checked+.checkbox-mark { border-color: #FF6600; background: #FF6600; }
+.agreement-checkbox input[type="checkbox"]:checked+.checkbox-mark::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+.agreement-text { flex: 1; line-height: 1.6; }
+.agreement-text a:not(:hover) { color: #333; text-decoration: none; }
+.agreement-text a:hover { text-decoration: underline; }
+
+/* 响应式设计 */
+@media (max-width: 992px) {
+  .login-card { flex-direction: column; }
+  .login-left, .login-right { width: 100% !important; }
+  .login-left { border-inline-end: none; border-bottom: 1px solid #eceef1; padding: 40px 30px; }
+  .login-right { padding: 40px 30px; }
+}
+@media (max-width: 768px) {
+  .login-main-container { margin: 20px 0; padding: 0 15px; }
+  .login-left { padding: 30px 20px 20px; }
+  .login-right { padding: 20px 20px; }
+  .login-tabs { margin-bottom: 20px; }
+  .qr-login-section { margin-top: 0; }
+  .qr-login-section a img { max-height: 60px; }
+  .login-footer-links { margin-bottom: 20px; }
+  .layui-layer-page { width: 92% !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; }
+}
+@media (max-width: 380px) {
+  .verify-code-wrapper .send-code-btn { width: 50%; min-height: 45px; height: auto !important; word-break: break-word; }
+}
+@media (max-width: 330px) {
+  .tab-btn { font-size: 16px; }
+  .login-main-container { padding: 0; }
+  .verify-code-wrapper .send-code-btn { width: 45%; min-height: 45px; height: auto !important; word-break: break-word; }
+}
+
+/* 错误提示 */
+.error-message { background: #fed7d7; color: #c53030; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; border: 1px solid #feb2b2; }
+.success-message { background: #c6f6d5; color: #2f855a; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; border: 1px solid #9ae6b4; }
+
+/* 加载动画 */
+.loading { position: relative; pointer-events: none; }
+.loading::after { content: ''; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; border: 2px solid transparent; border-top: 2px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

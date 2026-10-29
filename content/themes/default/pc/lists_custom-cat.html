@@ -1,0 +1,401 @@
+{{todo:include file="header.html"}}
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+        <div class="row gap-5">
+            <main class="col">
+                <!-- 栏目信息 -->
+                <header class="category-header">
+                    <a href="{{todo:top_category_url}}" title="{{todo:top_category_slug}}">{{todo:top_category_name}}:{{todo:top_category_id}}</a>
+                    <a href="{{todo:parent_category_url}}" title="{{todo:parent_category_slug}}">{{todo:parent_category_name}}:{{todo:parent_category_id}}</a>
+                    <a href="{{todo:category_url}}" title="{{todo:category_slug}}">{{todo:category_name}}:{{todo:category_id}}</a>
+                    
+                    {{todo:if category_featured_image}}
+                    <div class="category-banner">
+                        <img src="{{todo:category_featured_image}}" alt="{{todo:category_name}}">
+                        <div class="banner-overlay">
+                            <div class="banner-content">
+                                <h1 class="category-title">{{todo:category_name}}</h1>
+                                {{todo:if category_subtitle}}
+                                <p class="category-subtitle">{{todo:category_subtitle}}</p>
+                                {{/todo:if}}
+                            </div>
+                        </div>
+                    </div>
+                    {{todo:else}}
+                        <h1 class="category-title">{{todo:category_name}}</h1>
+                        {{todo:if category_subtitle}}
+                        <p class="category-subtitle">{{todo:category_subtitle}}</p>
+                        {{/todo:if}}
+                    {{/todo:if}}
+
+                    {{todo:if category_description}}
+                    <div class="category-description">
+                        {{todo:category_description}}
+                    </div>
+                    {{/todo:if}}
+                </header>
+
+                <!-- 文章列表：支持模型列表，无需category_id -->
+                <div class="article-container {{todo:view_mode default=" grid"}}-view" id="articleContainer">
+                    {{todo:if posts|per_page=12}}
+
+                    {{todo:loop posts|per_page=12|pager=main|doc_properties="1"}}
+                    <article class="post post-{{todo:index}}">
+                        <header class="entry-header">
+                            {{todo:if post_thumbnail}}
+                            <div class="post-thumbnail">
+                                <a href="{{todo:permalink}}">
+                                    {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                                </a>
+                            </div>
+                            {{/todo:if}}
+
+                            <h2 class="entry-title">
+                                <a href="{{todo:permalink}}">{{todo:title}}</a>
+                            </h2>
+
+                            <div class="dec flex gap-3 items-center">
+                                {{todo:if tags}}
+                                <span class="tags">
+                                    <i class="fa fa-tags"></i>
+                                    {{todo:loop tags}}
+                                    {{todo:if index > 0}},{{/todo:if}}
+                                    <a href="{{todo:url}}" class="tag">{{todo:name}}</a>
+                                    {{/todo:loop}}
+                                </span>
+                                {{/todo:if}}
+                                {{todo:if category}}
+                                <span class="cat-links">
+                                    <i class="far fa-folder"></i>
+                                    <a href="{{todo:category_url}}">{{todo:category}}</a>
+                                </span>
+                                {{/todo:if}}
+                                <span class="byline">
+                                    <i class="far fa-user"></i>
+                                    <a href="{{todo:author_url}}">{{todo:author}}</a>
+                                </span>
+                                {{todo:if comments_enabled && comment_count}}
+                                <span class="comments-link">
+                                    <i class="far fa-comments"></i>
+                                    <a href="{{todo:permalink}}#comments">{{todo:comment_count}} {{todo:t text="评论"}}</a>
+                                </span>
+                                {{/todo:if}}
+                                <span class="views-count">
+                                    <i class="far fa-eye"></i>
+                                    {{todo:views}} {{todo:t text="浏览"}}
+                                </span>
+                            </div>
+                        </header>
+
+                        <div class="entry-content">
+                            <p>{{todo:excerpt}}</p>
+                        </div>
+
+                        <footer class="entry-footer">
+                            <div class="dec">
+                                <i class="far fa-calendar"></i>
+                                <time datetime="{{todo:date_iso}}">{{todo:date}}</time>
+                            </div>
+                        </footer>
+                    </article>
+                    {{/todo:loop}}
+
+                    <!-- 分页导航 -->
+                    {{todo:if pagination}}
+                    <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                        <div class="pagination flex gap-2">
+                            {{todo:if pagination_prev_page > 0}}
+                            <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                                <i class="fa fa-chevron-left"></i>
+                                <span>{{todo:t text="上一页"}}</span>
+                            </a>
+                            {{/todo:if}}
+
+                            <div class="pagination-numbers flex gap-2 items-center">
+                                {{todo:loop pagination_pages}}
+                                {{todo:if page_is_dots}}
+                                <span class="pagination-number dots">...</span>
+                                {{todo:elseif page_is_current}}
+                                <span class="pagination-number current">{{todo:page_number}}</span>
+                                {{todo:else}}
+                                <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                                {{/todo:if}}
+                                {{/todo:loop}}
+                            </div>
+
+                            {{todo:if pagination_next_page > 0}}
+                            <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                                <span>{{todo:t text="下一页"}}</span>
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+                    {{todo:else}}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="icon-article-empty"></i>
+                        </div>
+                        <h3>{{todo:t text="暂无文章"}}</h3>
+                        <p>{{todo:t text="该分类下还没有内容"}}</p>
+                        {{todo:if can_create}}
+                        <a href="{{todo:site_url}}/admin/articles/create?category={{todo:category_id}}"
+                            class="btn btn-primary">
+                            {{todo:t text="发布文章"}}
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                    {{/todo:if}}
+                </div>
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                <!-- 子栏目 / 同级分类 -->
+                {{todo:if subcategories}}
+                <div class="widget subcategories">
+                    <h3 class="widget-title">{{todo:if is_showing_siblings}}{{todo:parent_category_name}}{{todo:else}}{{todo:category_name}}{{/todo:if}}</h3>
+                    <ul class="subcategory-list">
+                        <li class="{{todo:if !current_subcategory}}current{{/todo:if}}">
+                            <a href="{{todo:if parent_category_url}}{{todo:parent_category_url}}{{todo:else}}{{todo:category_url}}{{/todo:if}}">{{todo:t text="全部"}}<span>({{todo:total_count}})</span></a>
+                        </li>
+                        {{todo:loop subcategories}}
+                        <li class="{{todo:if current_subcategory == sub_id}}current{{/todo:if}}">
+                            <a href="{{todo:sub_url}}">
+                                {{todo:sub_name}}<span>({{todo:sub_count}})</span>
+                            </a>
+                        </li>
+                        {{/todo:loop}}
+                    </ul>
+                </div>
+                {{/todo:if}}
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</main>
+
+<!-- 分享模态框 -->
+<div id="shareModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{todo:t text="分享文章"}}</h3>
+            <button class="modal-close" onclick="closeShareModal()">
+                <i class="icon-close"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="share-options">
+                <a href="javascript:void(0);" class="share-btn weibo" data-platform="weibo">
+                    <i class="icon-weibo"></i>
+                    {{todo:t text="微博"}}
+                </a>
+                <a href="javascript:void(0);" class="share-btn wechat" data-platform="wechat">
+                    <i class="icon-wechat"></i>
+                    {{todo:t text="微信"}}
+                </a>
+                <a href="javascript:void(0);" class="share-btn qq" data-platform="qq">
+                    <i class="icon-qq"></i>
+                    QQ
+                </a>
+                <a href="javascript:void(0);" class="share-btn qzone" data-platform="qzone">
+                    <i class="icon-qzone"></i>
+                    QQ{{todo:t text="空间"}}
+                </a>
+            </div>
+            <div class="share-url">
+                <input type="text" id="shareUrl" readonly>
+                <button onclick="copyShareUrl()">{{todo:t text="复制链接"}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 文章列表交互功能
+    let currentShareUrl = '';
+
+    // 视图切换
+    function switchView(viewMode) {
+        const container = document.getElementById('articleContainer');
+        const buttons = document.querySelectorAll('.view-btn');
+        container.className = 'article-container ' + viewMode + '-view';
+        buttons.forEach(btn => btn.classList.remove('active'));
+        const targetBtn = document.querySelector('[onclick="switchView(\'' + viewMode + '\')"]');
+        if (targetBtn) { targetBtn.classList.add('active'); }
+
+        // 保存用户偏好
+        localStorage.setItem('article_view_mode', viewMode);
+
+        // 发送AJAX请求更新URL参数
+        const url = new URL(window.location);
+        url.searchParams.set('view', viewMode);
+        window.history.replaceState({}, '', url);
+    }
+
+    // 筛选功能
+    function filterByCategory(categoryId) {
+        const url = new URL(window.location);
+        if (categoryId) {
+            url.searchParams.set('subcategory', categoryId);
+        } else {
+            url.searchParams.delete('subcategory');
+        }
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    }
+
+    function filterByAttribute(attribute) {
+        const url = new URL(window.location);
+        if (attribute) {
+            url.searchParams.set('attribute', attribute);
+        } else {
+            url.searchParams.delete('attribute');
+        }
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    }
+
+    function sortArticles(sortOrder) {
+        const url = new URL(window.location);
+        url.searchParams.set('sort', sortOrder);
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    }
+
+    function changePerPage(perPage) {
+        const url = new URL(window.location);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    }
+
+    // 点赞功能
+    function toggleLike(articleId, event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        fetch(`{{todo:site_url}}/api/articles/${articleId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const likeBtn = event.target.closest('.btn-like');
+                    const likeSpan = likeBtn.querySelector('span');
+
+                    likeBtn.classList.toggle('liked', data.liked);
+                    if (likeSpan) {
+                        likeSpan.textContent = data.likes;
+                    }
+                }
+            })
+            .catch(error => console.error('Failed to like:', error));
+    }
+
+    // 收藏功能
+    function toggleBookmark(articleId, event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        fetch(`{{todo:site_url}}/api/articles/${articleId}/bookmark`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const bookmarkBtn = event.target.closest('.btn-bookmark');
+                    bookmarkBtn.classList.toggle('bookmarked', data.bookmarked);
+                }
+            })
+            .catch(error => console.error('Failed to save to favorites:', error));
+    }
+
+    // 分享功能
+    function shareArticle(articleId, event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        fetch(`{{todo:site_url}}/api/articles/${articleId}/info`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentShareUrl = data.url;
+                    document.getElementById('shareUrl').value = currentShareUrl;
+                    document.getElementById('shareModal').style.display = 'flex';
+                }
+            })
+            .catch(error => console.error('Failed to retrieve sharing information:', error));
+    }
+
+    // 分享到各平台
+    function shareToWechat() {
+        // 微信分享逻辑
+    }
+
+    function shareToWeibo() {
+        const url = encodeURIComponent(currentShareUrl);
+        const title = encodeURIComponent(document.title);
+        window.open(`https://service.weibo.com/share/share.php?url=${url}&title=${title}`);
+    }
+
+    function shareToQQ() {
+        const url = encodeURIComponent(currentShareUrl);
+        const title = encodeURIComponent(document.title);
+        window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${url}&title=${title}`);
+    }
+
+    function copyShareUrl() {
+        const shareUrl = document.getElementById('shareUrl');
+        shareUrl.select();
+        document.execCommand('copy');
+        alert('{{todo:t text="链接已复制到剪贴板"}}');
+    }
+
+    function closeShareModal() {
+        document.getElementById('shareModal').style.display = 'none';
+    }
+
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', function () {
+        // 恢复用户偏好的视图模式
+        const savedViewMode = localStorage.getItem('article_view_mode');
+        if (savedViewMode) {
+            const viewBtn = document.querySelector(`[onclick="switchView('${savedViewMode}')"]`);
+            if (viewBtn && !viewBtn.classList.contains('active')) {
+                switchView(savedViewMode);
+            }
+        }
+
+        // 模态框点击外部关闭
+        document.getElementById('shareModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeShareModal();
+            }
+        });
+
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeShareModal();
+            }
+        });
+        var tags = document.querySelectorAll('.tag[data-size]');
+        for (var i = 0; i < tags.length; i++) {
+            var s = parseFloat(tags[i].getAttribute('data-size'));
+            if (!isNaN(s) && s > 0) { tags[i].style.fontSize = s + 'px'; }
+        }
+    });
+</script>
+{{todo:include file="footer.html"}}

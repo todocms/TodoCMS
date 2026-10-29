@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html {{todo:html_attributes}}>
+
+<head>
+    <meta charset="{{todo:charset}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="generator" content="TodoCMS">
+    <title>{{todo:page_title}}</title>
+    <!-- SEO: 优先使用页面级描述，若为空则自动回退站点描述，避免输出空 description 标签 -->
+    {{todo:if meta_description}}
+    <meta name="description" content="{{todo:meta_description}}">
+    {{/todo:if}}
+
+    <!-- 站点URL与登录状态（用于前端AJAX与登录拦截） -->
+    <meta name="site-url" content="{{todo:site_url}}">
+    <meta name="site-root" content="{{todo:site_url|default}}">
+    {{todo:if user_logged_in}}
+    <meta name="todo-user-logged-in" content="1">
+    {{todo:else}}
+    <meta name="todo-user-logged-in" content="0">
+    <meta name="todo-login-url" content="{{todo:login_url}}">
+    {{/todo:if}}
+    <!-- 是否强制登录后才能加入购物车/立即购买：依据服务设置的“游客结账”开关 -->
+    {{todo:if option|name=guest_checkout}}
+    <meta name="todo-force-login" content="0">
+    {{todo:else}}
+    <meta name="todo-force-login" content="1">
+    {{/todo:if}}
+
+    <!-- TodoCMS头部钩子 -->
+    <link rel="shortcut icon" href="{{todo:site_favicon}}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{todo:site_favicon}}">
+    {{todo:todo_head}}
+    <script>
+        (function () {
+            function join(base, path) { return String(base || '').replace(/\/+$/, '') + '/' + String(path || '').replace(/^\/+/, ''); }
+            var siteUrl = '{{todo:site_url}}';
+            var siteRoot = '{{todo:site_url|default}}';
+            window.LAYUI_GLOBAL = window.LAYUI_GLOBAL || {};
+            window.LAYUI_GLOBAL.layer_dir = '{{todo:public_url}}/plugins/layer-v3.5.1/';
+            window.TODO = window.TODO || {};
+            window.TODO.SITE_URL = siteUrl;
+            window.TODO.SITE_ROOT = siteRoot;
+            window.TODO.join = window.TODO.join || join;
+            window.TODO.ADMIN_BASE = join(siteRoot, '/admin');
+            window.TODO.ADMIN_AJAX = join(window.TODO.ADMIN_BASE, 'admin-ajax.php');
+            window.TODO.INCLUDES_AJAX = join(siteRoot, '/includes/ajax');
+            window.TODO.API_BASE = join(siteRoot, '/api');
+            window.TODO.CONTENT_BASE = join(siteRoot, '/content');
+            window.TODO.PUBLIC_BASE = '{{todo:public_url}}';
+            window.TODO.CURRENCY_SYMBOL = '{{todo:currency_code}}';
+            window.TODO.CURRENCY_CODE = '{{todo:currency_iso}}';
+        })();
+    </script>
+    <!-- CSRF 管理器已通过队列输出 -->
+</head>
+
+<body {{todo:body_class}}>
+    {{todo:todo_body_open}}
+
+    <!-- 头部 -->
+    <header class="site-header">
+        <div class="container flex items-center justify-between" style="padding-top: 10px; padding-bottom: 10px;">
+            <div class="flex-1">
+                {{todo:if has_custom_logo}}
+                {{todo:the_custom_logo}}
+                {{/todo:if}}
+                {{todo:if is_home}}
+                <h1 class="site-title">
+                    <a href="{{todo:site_url}}" rel="home">{{todo:site_title}}</a>
+                    {{todo:if site_description}}
+                    <span class="screen-reader-text" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;"> - {{todo:site_description}}</span>
+                    {{/todo:if}}
+                </h1>
+                {{todo:else}}
+                <div class="site-title"><a href="{{todo:site_url}}" rel="home">{{todo:site_title}}</a></div>
+                {{/todo:if}}
+                <p class="site-description">{{todo:site_description}}</p>
+            </div>
+            {{todo:site_switcher type="dropdown"}}
+            <form class="flex items-center justify-between gap-2 m-l-20 m-r-20" role="search" method="get" action="{{todo:search_url}}" onsubmit="event.preventDefault(); window.TODO.doSafeSearch(document.getElementById('search').value, document.getElementById('search'));">
+                <label for="search" class="screen-reader-text" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">{{todo:t text="搜索"}}</label>
+                <input type="text" id="search" name="q" class="form-input" style="width: 260px;" placeholder="{{todo:t text='搜索商品或文章...'}}" aria-label="{{todo:t text='搜索商品或文章'}}">
+                <button type="submit" id="search-btn" class="button-secondary" style="display: flex;" aria-label="{{todo:t text='提交搜索'}}">
+                    <i class="icon todofont todo-Search"></i>
+                </button>
+            </form>
+            {{todo:language_switcher type="dropdown"}}
+        </div>
+
+        <!-- 导航菜单 -->
+        <div class="main-navigation">
+            <div class="container navigation">
+                {{todo:nav_menu theme_location="primary" menu_id="1" container_class="nav-container" menu_class="nav-menu"}}
+                <div class="user-center-nav">
+                    <!-- 全静态缓存模式下的用户登录态占位容器：默认空占位，全由 JS 异步填充，避免闪烁 -->
+                    <div id="todo-user-nav-item" style="height: 100%; min-width: 72px; display: inline-flex; align-items: center;"></div>
+                    <!-- 购物车入口与数量徽章 (初始隐藏，由 JS 获取数据后动态显示) -->
+                    <a href="{{todo:user_page_url page='cart'}}" class="cart-link" style="min-width: 70px; justify-content: center;" title="{{todo:t text='购物车'}}" aria-label="{{todo:t text='购物车'}}">
+                        <i class="icon todofont todo-MallBag"></i>
+                        <span id="todo-cart-count" class="cart-count-badge" style="display: none;"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 购物车数量与全静态缓存下的登录态动态更新脚本 -->
+        <script>
+            // 静态缓存架构下的用户登录态客户端动态打补丁 (Hydration)
+            (async function updateNavUserStatus() {
+                try {
+                    var apiBase = (window.TODO && window.TODO.API_BASE) ? window.TODO.API_BASE : '';
+                    var infoUrl = '';
+                    if (apiBase) {
+                        infoUrl = window.TODO.join(apiBase, '/user/info.php');
+                    } else if (window.TODO && window.TODO.SITE_URL) {
+                        var cleanSiteUrl = window.TODO.SITE_URL.replace(/\/(?:[a-z]{2}(?:-[A-Z]{2})?)\/?$/i, '');
+                        infoUrl = window.TODO.join(cleanSiteUrl, '/api/user/info.php');
+                    } else {
+                        infoUrl = '/api/user/info.php';
+                    }
+                    const resp = await fetch(infoUrl, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const res = await resp.json();
+                    const container = document.getElementById('todo-user-nav-item');
+                    if (!container) return;
+
+                    if (res && res.success && res.logged_in && res.user) {
+                        const user = res.user;
+                        container.innerHTML = `
+                            <a href="{{todo:user_url}}" class="user-center-btn">
+                                ${user.display_name}
+                            </a>
+                            <div class="user-dropdown">
+                                <a href="{{todo:user_url}}" class="dropdown-item">{{todo:t text="个人中心"}}</a>
+                                <a href="{{todo:user_page_url page="orders"}}" class="dropdown-item">{{todo:t text="我的订单"}}</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{todo:logout_url}}" class="dropdown-item">{{todo:t text="退出登录"}}</a>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <a href="{{todo:login_url}}" class="login-btn">
+                                <span>{{todo:t text="登录"}}</span>
+                            </a>
+                        `;
+                    }
+                } catch (e) {
+                    const container = document.getElementById('todo-user-nav-item');
+                    if (container && !container.innerHTML) {
+                        container.innerHTML = `<a href="{{todo:login_url}}" class="login-btn"><span>{{todo:t text="登录"}}</span></a>`;
+                    }
+                }
+            })();
+
+            window.updateCartCount = async function () {
+                try {
+                    const ajaxUrl = (window.TODO && window.TODO.join && window.TODO.INCLUDES_AJAX) ? window.TODO.join(window.TODO.INCLUDES_AJAX, '/cart-handler.php') : window.TODO.join(window.TODO.SITE_URL, '/includes/ajax/cart-handler.php');
+                    const resp = await fetch(ajaxUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: 'cart_action=' + encodeURIComponent('get')
+                    });
+                    const data = await resp.json();
+                    const cart = data && data.success ? (data.cart || (data.data && data.data.cart)) : null;
+                    if (cart) {
+                        const countEl = document.getElementById('todo-cart-count');
+                        const countVal = (typeof cart.count !== 'undefined') ? cart.count : (Array.isArray(cart.items) ? cart.items.length : 0);
+                        if (countEl) {
+                            countEl.textContent = countVal;
+                            if (countVal > 0) {
+                                countEl.style.display = 'inline-block';
+                            } else {
+                                countEl.style.display = 'none';
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // 静默失败
+                    console && console.warn && console.warn('updateCartCount failed', e);
+                }
+            };
+            window.TODO = window.TODO || {};
+            window.TODO.doSafeSearch = function(val, inputEl) {
+                var q = (val || '').trim();
+                if (!q) {
+                    if (inputEl) inputEl.focus();
+                    return;
+                }
+                if (q.length > 60) {
+                    q = q.substring(0, 60);
+                }
+                var now = Date.now();
+                if (window.TODO._lastSearchTime && (now - window.TODO._lastSearchTime < 2000)) {
+                    if (window.layer) layer.msg('{{todo:t text="搜索过于频繁，请稍后再试"}}', {icon: 2});
+                    return;
+                }
+                window.TODO._lastSearchTime = now;
+                var baseSearchUrl = '{{todo:search_url}}';
+                var targetUrl = baseSearchUrl + (baseSearchUrl.indexOf('?') !== -1 ? '&' : '?') + 'q=' + encodeURIComponent(q);
+                window.location.href = targetUrl;
+            };
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof window.updateCartCount === 'function') {
+                    window.updateCartCount();
+                }
+            });
+        </script>
+    </header>

@@ -1,0 +1,354 @@
+{{todo:include file="header.html"}}
+
+<style>
+/* 图集详情页专用样式 */
+.gallery-detail-header {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.gallery-detail-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.35;
+    margin-bottom: 12px;
+}
+.gallery-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+    color: #6b7280;
+}
+.gallery-detail-meta .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.gallery-detail-meta a {
+    color: #0073aa;
+    text-decoration: none;
+}
+.gallery-detail-meta a:hover {
+    text-decoration: underline;
+}
+
+/* 扩展参数条 (摄影师/拍摄地/相机) */
+.gallery-extra-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #4b5563;
+}
+.gallery-extra-info .info-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 图集主视图流 (垂直大图展示) */
+.gallery-photos-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin-bottom: 36px;
+}
+.photo-card {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    transition: box-shadow 0.3s ease;
+}
+.photo-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.photo-card-wrapper {
+    position: relative;
+    width: 100%;
+    background-color: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    max-height: 800px;
+    overflow: hidden;
+}
+.photo-card-wrapper img {
+    max-width: 100%;
+    max-height: 800px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+.photo-card-num {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}
+.photo-card-caption {
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.6;
+    background: #ffffff;
+    border-top: 1px solid #f9fafb;
+}
+
+/* 图集文字描述与扩展属性 */
+.gallery-body-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #374151;
+    margin-bottom: 30px;
+}
+
+/* 上一张 / 下一张导航 */
+.gallery-post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+.gallery-post-nav .nav-item {
+    flex: 1;
+    max-width: 50%;
+}
+.gallery-post-nav a {
+    display: block;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 6px;
+    color: #374151;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 14px;
+}
+.gallery-post-nav a:hover {
+    background: #0073aa;
+    color: #ffffff;
+}
+.gallery-post-nav .nav-label {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 4px;
+    display: block;
+}
+.gallery-post-nav .nav-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 标签列 */
+.gallery-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.gallery-tags .tag {
+    padding: 4px 12px;
+    background: #f3f4f6;
+    color: #4b5563;
+    border-radius: 4px;
+    font-size: 13px;
+    text-decoration: none;
+}
+.gallery-tags .tag:hover {
+    background: #0073aa;
+    color: #ffffff;
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+
+        <div class="row gap-5">
+            <main class="col">
+                <article class="gallery-detail">
+                    <!-- 图集头部 -->
+                    <header class="gallery-detail-header">
+                        <h1 class="gallery-detail-title">
+                            {{todo:if custom_field|name="is_featured"}}
+                            <span class="gallery-badge-featured" style="background: #e11d48; color: #fff; font-size: 13px; padding: 2px 8px; border-radius: 4px; font-weight: 500; vertical-align: middle; margin-inline-end: 8px;">
+                                <i class="fa fa-star"></i> {{todo:t text="推荐"}}
+                            </span>
+                            {{/todo:if}}
+                            {{todo:post_title}}
+                        </h1>
+
+                        <div class="gallery-detail-meta">
+                            <span class="meta-item">
+                                <i class="far fa-user"></i>
+                                <span>{{todo:author_name}}</span>
+                            </span>
+
+                            <span class="meta-item">
+                                <i class="far fa-calendar"></i>
+                                <time datetime="{{todo:post_date}}">{{todo:post_date}}</time>
+                            </span>
+
+                            {{todo:if category_name}}
+                            <span class="meta-item">
+                                <i class="far fa-folder"></i>
+                                <a href="{{todo:category_url}}">{{todo:category_name}}</a>
+                            </span>
+                            {{/todo:if}}
+
+                            <span class="meta-item">
+                                <i class="far fa-eye"></i>
+                                <span>{{todo:views}} {{todo:t text="浏览"}}</span>
+                            </span>
+
+                            {{todo:if custom_field|name="image_count"}}
+                            <span class="meta-item">
+                                <i class="far fa-images"></i>
+                                <span>{{todo:custom_field name="image_count"}} {{todo:t text="张图片"}}</span>
+                            </span>
+                            {{/todo:if}}
+                        </div>
+
+                        <!-- 扩展拍摄属性 (摄影师 / 拍摄时间 / 拍摄地点) -->
+                        {{todo:if custom_field|name="photographer" || custom_field|name="shoot_date" || custom_field|name="location" || custom_field|name="camera_info"}}
+                        <div class="gallery-extra-info">
+                            {{todo:if custom_field|name="photographer"}}
+                            <span class="info-tag">
+                                <i class="fa fa-camera"></i>
+                                <span>{{todo:t text="摄影师"}}:&nbsp;{{todo:custom_field name="photographer"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="shoot_date"}}
+                            <span class="info-tag">
+                                <i class="fa fa-calendar-alt"></i>
+                                <span>{{todo:t text="拍摄时间"}}:&nbsp;{{todo:custom_field name="shoot_date"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="location"}}
+                            <span class="info-tag">
+                                <i class="fa fa-map-marker-alt"></i>
+                                <span>{{todo:t text="拍摄地点"}}:&nbsp;{{todo:custom_field name="location"}}</span>
+                            </span>
+                            {{/todo:if}}
+
+                            {{todo:if custom_field|name="camera_info"}}
+                            <span class="info-tag">
+                                <i class="fa fa-cog"></i>
+                                <span>{{todo:t text="器材"}}:&nbsp;{{todo:custom_field name="camera_info"}}</span>
+                            </span>
+                            {{/todo:if}}
+                        </div>
+                        {{/todo:if}}
+                    </header>
+
+                    <!-- 图集大图连续展示流 -->
+                    {{todo:if post_images}}
+                    <div class="gallery-photos-stream">
+                        {{todo:loop post_images}}
+                        <div class="photo-card" id="photo-{{todo:index}}">
+                            <div class="photo-card-wrapper">
+                                <img src="{{todo:url}}" alt="{{todo:alt|default:post_title}}" loading="lazy">
+                                <span class="photo-card-num">{{todo:index + 1}}</span>
+                            </div>
+                            {{todo:if alt}}
+                            <div class="photo-card-caption">
+                                <i class="far fa-comment-alt m-r-05"></i> {{todo:alt}}
+                            </div>
+                            {{/todo:if}}
+                        </div>
+                        {{/todo:loop}}
+                    </div>
+                    {{todo:elseif custom_field|name="cover_image"}}
+                    <div class="gallery-photos-stream">
+                        <div class="photo-card">
+                            <div class="photo-card-wrapper">
+                                <img src="{{todo:custom_field name='cover_image'}}" alt="{{todo:post_title}}" loading="lazy">
+                            </div>
+                        </div>
+                    </div>
+                    {{todo:elseif condition="post_featured_image"}}
+                    <div class="gallery-photos-stream">
+                        <div class="photo-card">
+                            <div class="photo-card-wrapper">
+                                <img src="{{todo:post_featured_image}}" alt="{{todo:post_title}}" loading="lazy">
+                            </div>
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 图集正文/描述说明 -->
+                    {{todo:if post_content}}
+                    <div class="gallery-body-content article-content">
+                        {{todo:post_content}}
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 图集标签 -->
+                    {{todo:if post_tags}}
+                    <div class="gallery-tags">
+                        {{todo:post_tags|limit=10}}
+                        <a href="{{todo:tag_url}}" class="tag"><i class="fa fa-tag m-r-05"></i>{{todo:tag_name}}</a>
+                        {{/todo:post_tags}}
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 上一张 / 下一张导航 -->
+                    {{todo:if condition="prev_post_url || next_post_url"}}
+                    <div class="gallery-post-nav">
+                        <div class="nav-item">
+                            {{todo:if prev_post_url}}
+                            <a href="{{todo:prev_post_url}}" title="{{todo:prev_post_title}}">
+                                <span class="nav-label"><i class="fa fa-chevron-left"></i> {{todo:t text="上一图集"}}</span>
+                                <div class="nav-title">{{todo:prev_post_title}}</div>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                        <div class="nav-item text-right">
+                            {{todo:if next_post_url}}
+                            <a href="{{todo:next_post_url}}" title="{{todo:next_post_title}}">
+                                <span class="nav-label">{{todo:t text="下一图集"}} <i class="fa fa-chevron-right"></i></span>
+                                <div class="nav-title">{{todo:next_post_title}}</div>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 评论区 -->
+                    {{todo:include file="comment_section.html"}}
+                </article>
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}

@@ -1,0 +1,244 @@
+@font-face {
+  font-family: "todofont"; /* Project id 5203992 */
+  src: url('iconfont.woff2?t=1783316542005') format('woff2'),
+       url('iconfont.woff?t=1783316542005') format('woff'),
+       url('iconfont.ttf?t=1783316542005') format('truetype');
+  font-display: swap;
+}
+
+.todofont {
+  font-family: "todofont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.todo-Schedule:before {
+  content: "\e640";
+}
+
+.todo-Filter:before {
+  content: "\e641";
+}
+
+.todo-MallBag:before {
+  content: "\e642";
+}
+
+.todo-PrinterLgn0i7db:before {
+  content: "\e643";
+}
+
+.todo-Edit:before {
+  content: "\e644";
+}
+
+.todo-Mail:before {
+  content: "\e645";
+}
+
+.todo-LevelLgi443g5:before {
+  content: "\e646";
+}
+
+.todo-AfferentThree:before {
+  content: "\e639";
+}
+
+.todo-Download:before {
+  content: "\e63a";
+}
+
+.todo-CommentOne:before {
+  content: "\e63b";
+}
+
+.todo-AppSwitch:before {
+  content: "\e63c";
+}
+
+.todo-CloseSmall:before {
+  content: "\e63d";
+}
+
+.todo-ArrowRight:before {
+  content: "\e63e";
+}
+
+.todo-Attention:before {
+  content: "\e63f";
+}
+
+.todo-Redo:before {
+  content: "\e623";
+}
+
+.todo-Planet:before {
+  content: "\e624";
+}
+
+.todo-Share:before {
+  content: "\e625";
+}
+
+.todo-International:before {
+  content: "\e626";
+}
+
+.todo-Pic:before {
+  content: "\e627";
+}
+
+.todo-DataUser:before {
+  content: "\e628";
+}
+
+.todo-ScanCode:before {
+  content: "\e629";
+}
+
+.todo-Save:before {
+  content: "\e62a";
+}
+
+.todo-Local:before {
+  content: "\e62b";
+}
+
+.todo-Search:before {
+  content: "\e62c";
+}
+
+.todo-Magic:before {
+  content: "\e62d";
+}
+
+.todo-Install:before {
+  content: "\e62e";
+}
+
+.todo-Delete:before {
+  content: "\e62f";
+}
+
+.todo-Clear:before {
+  content: "\e60e";
+}
+
+.todo-BankCard:before {
+  content: "\e630";
+}
+
+.todo-FolderClose:before {
+  content: "\e631";
+}
+
+.todo-DataOne:before {
+  content: "\e632";
+}
+
+.todo-Home:before {
+  content: "\e633";
+}
+
+.todo-Plus:before {
+  content: "\e634";
+}
+
+.todo-AdProduct:before {
+  content: "\e635";
+}
+
+.todo-FolderOpen:before {
+  content: "\e636";
+}
+
+.todo-AudioFile:before {
+  content: "\e637";
+}
+
+.todo-Copy:before {
+  content: "\e638";
+}
+
+.todo-User:before {
+  content: "\e612";
+}
+
+.todo-Right:before {
+  content: "\e610";
+}
+
+.todo-Send:before {
+  content: "\e611";
+}
+
+.todo-Wallet:before {
+  content: "\e613";
+}
+
+.todo-Like:before {
+  content: "\e614";
+}
+
+.todo-PhoneTelephone:before {
+  content: "\e615";
+}
+
+.todo-Sphere:before {
+  content: "\e616";
+}
+
+.todo-Time:before {
+  content: "\e617";
+}
+
+.todo-Shopping:before {
+  content: "\e618";
+}
+
+.todo-FileCodeOne:before {
+  content: "\e60f";
+}
+
+.todo-PreviewOpen:before {
+  content: "\e619";
+}
+
+.todo-SettingTwo:before {
+  content: "\e61a";
+}
+
+.todo-PreviewClose:before {
+  content: "\e61b";
+}
+
+.todo-Upload:before {
+  content: "\e61c";
+}
+
+.todo-ToTop:before {
+  content: "\e61d";
+}
+
+.todo-Return:before {
+  content: "\e61e";
+}
+
+.todo-Workbench:before {
+  content: "\e61f";
+}
+
+.todo-FullScreenTwo:before {
+  content: "\e620";
+}
+
+.todo-EfferentThree:before {
+  content: "\e621";
+}
+
+.todo-OffScreenTwo:before {
+  content: "\e622";
+}
+

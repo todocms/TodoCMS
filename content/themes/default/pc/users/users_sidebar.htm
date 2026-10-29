@@ -1,0 +1,523 @@
+<div class="user-drawer-overlay" id="userDrawerOverlay"></div>
+<div class="user-sidebar" id="userSidebar">
+    <button type="button" class="user-drawer-close" id="userDrawerClose" aria-label="Close">&times;</button>
+    <!-- 用户信息卡片 -->
+    <div class="user-info-card">
+        <div class="user-avatar">
+            {{todo:if condition="user.avatar"}}
+                <img src="{{todo:user.avatar}}" alt="{{todo:user.display_name}}">
+            {{todo:else}}
+                <div class="avatar-placeholder">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+            {{/todo:if}}
+        </div>
+        <div class="user-info">
+            <h3 class="user-name">
+                {{todo:if user.display_name}}
+                    {{todo:user.display_name}}
+                {{todo:else}}
+                    {{todo:t text="您好, 世界"}}!
+                {{/todo:if}}
+            </h3>
+            <p class="user-email">{{todo:user.user_email}}</p>
+            <div class="user-level">
+                <span class="level-badge">
+                {{todo:if user.level_name}}
+                    {{todo:user.level_name}}
+                {{todo:else}}
+                    {{todo:t text="游客"}}
+                {{/todo:if}}
+                </span>
+                {{todo:if user.points}}
+                <span class="level-badge" style="background-color: #ada79a;">{{todo:t text="积分"}}:&nbsp;{{todo:user.points}}</span>
+                {{/todo:if}}
+            </div>
+            <a href="{{todo:user_page_url page='addresses'}}" class="address-link">
+                <i class="icon todofont todo-Local" style="opacity: 0.5;"></i>
+                <span>
+                {{todo:if condition="user_default_address_text"}}
+                    {{todo:user_default_address_text}}
+                {{todo:else}}
+                    {{todo:t text="收货地址"}}
+                {{/todo:if}}
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 订单状态统计 -->
+    <div class="order-stats-card">
+        <div class="stats-header">
+            <h4>{{todo:t text="我的订单"}}</h4>
+            <a href="{{todo:user_page_url page='orders'}}" class="view-all">{{todo:t text="查看全部"}}</a>
+        </div>
+        <div class="quick-stats">
+            <a href="{{todo:user_page_url page='orders'}}&status=pending" class="stat-item">
+                <div class="stat-number"{{todo:if condition="user_orders_count status='pending' > 0"}} style="color: #df8e19;"{{/todo:if}}>{{todo:user_orders_count status='pending'}}</div>
+                <div class="stat-label">{{todo:t text="待付款"}}</div>
+            </a>
+            <a href="{{todo:user_page_url page='orders'}}&status=processing" class="stat-item">
+                <div class="stat-number"{{todo:if condition="user_orders_count status='processing' > 0"}} style="color: #df8e19;"{{/todo:if}}>{{todo:user_orders_count status='processing'}}</div>
+                <div class="stat-label">{{todo:t text="待发货"}}</div>
+            </a>
+            <a href="{{todo:user_page_url page='orders'}}&status=shipped" class="stat-item">
+                <div class="stat-number"{{todo:if condition="user_orders_count status='shipped' > 0"}} style="color: #df8e19;"{{/todo:if}}>{{todo:user_orders_count status='shipped'}}</div>
+                <div class="stat-label">{{todo:t text="待收货"}}</div>
+            </a>
+            <a href="{{todo:user_page_url page='orders'}}&status=completed" class="stat-item">
+                <div class="stat-number"{{todo:if condition="user_orders_count status='completed' > 0"}} style="color: #df8e19;"{{/todo:if}}>{{todo:user_orders_count status='completed'}}</div>
+                <div class="stat-label">{{todo:t text="待评价"}}</div>
+            </a>
+            <a href="{{todo:user_page_url page='orders'}}&status=refund" class="stat-item">
+                <div class="stat-number"{{todo:if condition="user_orders_count status='refund' > 0"}} style="color: #df8e19;"{{/todo:if}}>{{todo:user_orders_count status='refund'}}</div>
+                <div class="stat-label">{{todo:t text="售后"}}</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 账户余额 -->
+    <div class="balance-card">
+        <div class="balance-info">
+            <div class="balance-label">{{todo:t text="账户余额"}}</div>
+            {{todo:if user.balance_format > 0}}
+            <div class="balance-amount">{{todo:currency_code}}{{todo:user.balance_format}}</div>
+            {{todo:else}}
+            <div class="balance-amount">{{todo:currency_code}}0.00</div>
+            {{/todo:if}}
+        </div>
+        <a href="{{todo:user_page_url page='wallet'}}" class="balance-link">{{todo:t text="充值"}}</a>
+    </div>
+    <!-- 导航菜单 -->
+    <nav class="user-nav">
+        <ul class="nav-list">
+            <li class="nav-item {{todo:if condition='current_page == 'coupons''}}active{{/todo:if}}">
+                <a href="{{todo:user_page_url page='coupons'}}" class="nav-link">
+                    <div class="nav-icon"></div>
+                    <span class="nav-text">{{todo:t text="我的卡券"}}</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 退出登录 -->
+    <div class="logout-section">
+        {{todo:if condition="user_logged_in"}}
+        <a href="{{todo:logout_url}}" class="logout-link">
+            <div class="nav-icon"></div>
+            <span>{{todo:t text="退出登录"}}</span>
+        </a>
+        {{todo:else}}
+        <a href="{{todo:login_url}}" class="logout-link">
+            <div class="nav-icon"></div>
+            <span>{{todo:t text="登录"}}</span>
+        </a>
+        {{/todo:if}}
+    </div>
+
+</div>
+
+<style>
+.user-info-card {
+    padding: 20px 20px 0;
+    text-align: center;
+}
+
+.user-info-card .address-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    margin: 20px 0 30px;
+    color: #999;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.3s;
+    line-height: 18px;
+}
+
+.user-info-card .address-link:hover {
+    color: #df8e19;
+}
+
+.user-info-card .address-link i {
+    font-size: 14px;
+}
+
+.user-info-card .address-link span {
+    display: inline-block;
+    text-align: start;
+}
+
+.user-avatar {
+    margin-bottom: 15px;
+}
+
+.user-avatar img {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: #999;
+}
+
+.user-name {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.user-email {
+    margin: 5px 0 10px 0;
+    color: #999;
+    font-size: 14px;
+}
+
+.level-badge {
+    display: inline-block;
+    background: #7c8874;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* 订单状态统计卡片 */
+.order-stats-card {
+    padding: 15px;
+}
+
+.order-stats-card .stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-stats-card .stats-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.order-stats-card .stats-header .view-all {
+    color: #666;
+    text-decoration: none;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s;
+}
+
+.order-stats-card .stats-header .view-all:hover {
+    color: #FF6600;
+}
+
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.stat-item {
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 10px 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    display: block;
+}
+
+.stat-item:hover {
+    background-color: #f4f4f5;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #dadae1;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    line-height: normal;
+    word-break: break-all;
+    display: block;
+}
+
+.stat-item:hover .stat-label  {
+    color: #333;
+}
+
+.balance-card {
+    --grad-angle: 135deg;
+    background: linear-gradient(var(--grad-angle), #9e7a5e 0%, #d3c49c 100%);
+    padding: 18px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+[dir="rtl"] .balance-card {
+    --grad-angle: -135deg;
+}
+
+.balance-info {
+    flex: 1;
+}
+
+.balance-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 10px;
+    line-height: normal;
+}
+
+.balance-amount {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.balance-link {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.balance-link:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.user-nav {
+    margin: 15px 0 0;
+    overflow: hidden;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.user-sidebar .nav-item {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.user-sidebar .nav-item.active .nav-link {
+    color: #df8e19;
+    font-weight: 500;
+}
+
+.user-sidebar .nav-item.active .nav-icon {
+    color: #df8e19;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    background: #f4f4f5;
+    color: #FF6600;
+}
+
+.nav-icon {
+    margin-inline-end: 12px;
+    color: #666;
+    transition: color 0.3s ease;
+    width: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-icon {
+    opacity: 0.5;
+}
+
+.nav-icon i {
+    font-size: 16px;
+}
+
+.nav-link:hover .nav-icon  {
+    opacity: 1;
+    color: #FF6600;
+}
+
+.nav-text {
+    flex: 1;
+}
+
+.nav-badge {
+    background: #e74c3c;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1.2;
+    margin-inline-start: auto;
+}
+
+.nav-badge.price-drop {
+    background: #FF6600;
+}
+
+.logout-section {
+    overflow: hidden;
+}
+
+.logout-link {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.logout-link .nav-icon {
+    opacity: 0.5;
+    margin-inline-end: 12px;
+}
+
+.logout-link:hover {
+    color: #df8e19;
+    background: #f4f4f5;
+}
+
+.logout-link:hover .nav-icon {
+    opacity: 1;
+    color: #df8e19;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .user-sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .user-avatar {
+        margin-inline-end: 15px;
+        margin-bottom: 0;
+    }
+    
+    .quick-stats {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .balance-card {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-info-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-avatar {
+        margin-inline-end: 0;
+        margin-bottom: 15px;
+    }
+    
+    .quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .balance-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .balance-link {
+        align-self: center;
+    }
+}
+/* 移动端抽屉 */
+.user-drawer-overlay, .user-drawer-close { display: none; }
+@media (max-width: 991.98px) {
+    .user-drawer-overlay {
+        display: block; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+        opacity: 0; visibility: hidden; transition: opacity .3s; z-index: 1999;
+    }
+    .user-drawer-overlay.show { opacity: 1; visibility: visible; }
+    .user-sidebar {
+        position: fixed !important; top: 0; bottom: 0; left: 0;
+        width: 300px !important; max-width: 86vw; height: 100% !important;
+        margin: 0 !important; border-radius: 0 !important; overflow-y: auto !important;
+        transform: translateX(-105%); transition: transform .3s ease;
+        z-index: 2000; box-shadow: 4px 0 24px rgba(0,0,0,.15);
+    }
+    [dir="rtl"] .user-sidebar { left: auto; right: 0; transform: translateX(105%); }
+    .user-sidebar.open { transform: translateX(0) !important; }
+    .user-drawer-close {
+        display: block; position: absolute; top: 12px; height: 28px; width: 28px; inset-inline-end: 12px;
+        background: none; border: 0; font-size: 28px; line-height: 1; color: #78716c; cursor: pointer; z-index: 1;
+    }
+    .user-info-card { flex-direction: column !important; text-align: center !important; }
+    .quick-stats { grid-template-columns: repeat(3, 1fr) !important; }
+    .balance-card { flex-direction: row !important; }
+}
+</style>
+<script>
+(function () {
+    var sb = document.getElementById('userSidebar'),
+        ov = document.getElementById('userDrawerOverlay'),
+        tg = document.getElementById('userDrawerToggle'),
+        cl = document.getElementById('userDrawerClose');
+    if (!sb || !tg) return;
+    document.body.classList.add('has-user-drawer');
+    function set(open) {
+        sb.classList.toggle('open', open);
+        ov.classList.toggle('show', open);
+        tg.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.style.overflow = open ? 'hidden' : '';
+    }
+    tg.addEventListener('click', function () { set(true); });
+    ov.addEventListener('click', function () { set(false); });
+    cl.addEventListener('click', function () { set(false); });
+    sb.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+    window.addEventListener('resize', function () { if (window.innerWidth > 991) set(false); });
+})();
+</script>

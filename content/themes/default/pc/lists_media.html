@@ -1,0 +1,333 @@
+{{todo:include file="header.html"}}
+
+<style>
+/* 视频列表核心样式 */
+.media-list-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.media-list-header .category-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 6px;
+}
+.media-list-header .category-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+.media-list-header .category-description {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* 视频网格 */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+@media (max-width: 992px) {
+    .media-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 576px) {
+    .media-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.media-card {
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+.media-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+.media-thumb-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #111827;
+    overflow: hidden;
+}
+.media-thumb-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.media-card:hover .media-thumb-wrapper img {
+    transform: scale(1.05);
+}
+.media-play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.media-card:hover .media-play-overlay {
+    opacity: 1;
+}
+.media-play-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(0, 115, 170, 0.9);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    padding-inline-start: 3px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.media-duration-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+.media-tag-badges {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: flex;
+    gap: 6px;
+}
+.badge-hd {
+    background: #e11d48;
+    color: #ffffff;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.badge-vip {
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.media-card-body {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.media-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.media-card-title a {
+    color: #111827;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.media-card-title a:hover {
+    color: #0073aa;
+}
+.media-card-meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #9ca3af;
+}
+.media-card-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 空状态 */
+.media-empty {
+    padding: 60px 0;
+    text-align: center;
+    color: #9ca3af;
+}
+.media-empty i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #d1d5db;
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+
+        <div class="row gap-5">
+            <main class="col">
+                <!-- 栏目信息 header -->
+                <header class="media-list-header">
+                    <h1 class="category-title">{{todo:category_name}}</h1>
+                    {{todo:if category_subtitle}}
+                    <p class="category-subtitle">{{todo:category_subtitle}}</p>
+                    {{/todo:if}}
+                    {{todo:if category_description}}
+                    <div class="category-description">
+                        {{todo:category_description}}
+                    </div>
+                    {{/todo:if}}
+                </header>
+
+                <!-- 视频列表网格 -->
+                {{todo:if posts|per_page=12}}
+                <div class="media-grid">
+                    {{todo:loop posts|per_page=12|pager=main|doc_properties="1"}}
+                    <article class="media-card">
+                        <div class="media-thumb-wrapper">
+                            <a href="{{todo:permalink}}" title="{{todo:title}}">
+                                {{todo:if custom_field|name="poster_url"}}
+                                <img src="{{todo:custom_field name="poster_url"}}" alt="{{todo:title}}" loading="lazy" class="lazy-load">
+                                {{todo:elseif post_thumbnail}}
+                                {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                                {{todo:else}}
+                                <div style="width:100%;height:100%;background:#1f2937;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:36px;">
+                                    <i class="fa fa-film"></i>
+                                </div>
+                                {{/todo:if}}
+
+                                <div class="media-play-overlay">
+                                    <div class="media-play-icon">
+                                        <i class="fa fa-play"></i>
+                                    </div>
+                                </div>
+
+                                <div class="media-tag-badges">
+                                    {{todo:if custom_field|name="is_hd"}}
+                                    <span class="badge-hd">HD</span>
+                                    {{/todo:if}}
+                                    {{todo:if custom_field|name="is_vip"}}
+                                    <span class="badge-vip">VIP</span>
+                                    {{/todo:if}}
+                                </div>
+
+                                {{todo:if custom_field|name="media_duration"}}
+                                <span class="media-duration-badge">{{todo:custom_field name="media_duration"}}</span>
+                                {{/todo:if}}
+                            </a>
+                        </div>
+
+                        <div class="media-card-body">
+                            <h2 class="media-card-title">
+                                <a href="{{todo:permalink}}" title="{{todo:title}}">{{todo:title}}</a>
+                            </h2>
+                            <div class="media-card-meta">
+                                <span class="meta-item">
+                                    <i class="far fa-calendar"></i>
+                                    <span>{{todo:date}}</span>
+                                </span>
+                                <span class="meta-item">
+                                    <i class="far fa-play-circle"></i>
+                                    <span>{{todo:views}} {{todo:t text="次播放"}}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                    {{/todo:loop}}
+                </div>
+
+                <!-- 分页导航 -->
+                {{todo:if pagination}}
+                <div class="pagination-nav m-t-40" aria-label="{{todo:t text='视频分页'}}">
+                    <div class="pagination flex gap-2 justify-center">
+                        {{todo:if pagination_prev_page > 0}}
+                        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                            <i class="fa fa-chevron-left"></i>
+                            <span>{{todo:t text="上一页"}}</span>
+                        </a>
+                        {{/todo:if}}
+
+                        <div class="pagination-numbers flex gap-2 items-center">
+                            {{todo:loop pagination_pages}}
+                            {{todo:if page_is_dots}}
+                            <span class="pagination-number dots">...</span>
+                            {{todo:elseif page_is_current}}
+                            <span class="pagination-number current">{{todo:page_number}}</span>
+                            {{todo:else}}
+                            <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                            {{/todo:if}}
+                            {{/todo:loop}}
+                        </div>
+
+                        {{todo:if pagination_next_page > 0}}
+                        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                            <span>{{todo:t text="下一页"}}</span>
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                {{todo:else}}
+                <!-- 空状态 -->
+                <div class="media-empty">
+                    <i class="fa fa-video"></i>
+                    <h3>{{todo:t text="暂无视频内容"}}</h3>
+                    <p>{{todo:t text="该分类下还没有发布视频"}}</p>
+                </div>
+                {{/todo:if}}
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:if subcategories}}
+                <div class="widget subcategories">
+                    <h3 class="widget-title">{{todo:if is_showing_siblings}}{{todo:parent_category_name}}{{todo:else}}{{todo:category_name}}{{/todo:if}}</h3>
+                    <ul class="subcategory-list">
+                        <li class="{{todo:if !current_subcategory}}current{{/todo:if}}">
+                            <a href="{{todo:if parent_category_url}}{{todo:parent_category_url}}{{todo:else}}{{todo:category_url}}{{/todo:if}}">{{todo:t text="全部"}}<span>({{todo:total_count}})</span></a>
+                        </li>
+                        {{todo:loop subcategories}}
+                        <li class="{{todo:if current_subcategory == sub_id}}current{{/todo:if}}">
+                            <a href="{{todo:sub_url}}">
+                                {{todo:sub_name}}<span>({{todo:sub_count}})</span>
+                            </a>
+                        </li>
+                        {{/todo:loop}}
+                    </ul>
+                </div>
+                {{/todo:if}}
+
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}

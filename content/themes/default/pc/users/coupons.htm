@@ -1,0 +1,423 @@
+{{todo:include file="users/users_header.htm"}}
+    
+    <div class="user-center-container">
+        <div class="container">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-3">
+                    {{todo:include file="users/users_sidebar.htm"}}
+                </div>
+                
+                <!-- 主内容区 -->
+                <div style="flex: 1;">
+                    <div class="user-main-content">
+                        {{todo:if condition="message"}}
+                        <div class="alert alert-success" role="alert">
+                            {{todo:message}}
+                        </div>
+                        {{/todo:if}}
+
+                        {{todo:if condition="error"}}
+                        <div class="alert alert-danger" role="alert">
+                            {{todo:error}}
+                        </div>
+                        {{/todo:if}}
+                        <!-- 页面标题 -->
+                        <div class="page-header">
+                            <h2>{{todo:t text="我的优惠券"}}</h2>
+                            <div class="page-actions">
+                                <button class="btn btn-outline" data-toggle="modal" data-target="#exchangeModal">
+                                    <i class="icon-gift"></i> {{todo:t text="兑换优惠券"}}
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 筛选工具栏 -->
+                        <div class="filter-toolbar">
+                            <div class="filter-tabs">
+                                <ul class="nav-tabs" id="couponTabs">
+                                    <li>
+                                        <a class="active" data-toggle="pill" href="#available">
+                                            {{todo:t text="可用优惠券"}} <span class="badge">{{todo:user_coupons_count status="available"}}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a data-toggle="pill" href="#used">
+                                            {{todo:t text="已使用"}} <span class="badge">{{todo:user_coupons_count status="used"}}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a data-toggle="pill" href="#expired">
+                                            {{todo:t text="已过期"}} <span class="badge">{{todo:user_coupons_count status="expired"}}</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                        
+                        <!-- 优惠券列表 -->
+                        <div class="tab-content" id="couponContent">
+                            <!-- 可用优惠券 -->
+                            <div class="tab-pane fade show active" id="available">
+                                <div class="coupons-list">
+                                    {{todo:user_coupons status="available"}}
+                                    <div class="coupon-card available" data-id="{{todo:coupon.id}}">
+                                        <div class="coupon-left">
+                                            <div class="coupon-amount">
+                                                {{todo:if condition="coupon.type=='amount'"}}
+                                                <span class="amount-symbol">{{todo:currency_code}}</span>
+                                                <span class="amount-value">{{todo:coupon.value}}</span>
+                                                {{todo:else}}
+                                                <span class="discount-value">{{todo:coupon.value}}{{todo:t text="折"}}</span>
+                                                {{/todo:if}}
+                                            </div>
+                                            <div class="coupon-condition">
+                                                {{todo:if condition="coupon.min_amount"}}
+                                                {{todo:t text="满"}}{{todo:currency_code}}{{todo:coupon.min_amount}}{{todo:t text="可用"}}
+                                                {{todo:else}}
+                                                {{todo:t text="无门槛"}}
+                                                {{/todo:if}}
+                                            </div>
+                                        </div>
+                                        <div class="coupon-right">
+                                            <div class="coupon-info">
+                                                <h3 class="coupon-name">{{todo:coupon.name}}</h3>
+                                                <p class="coupon-desc">{{todo:coupon.description}}</p>
+                                                <div class="coupon-meta">
+                                                    <span class="coupon-code">{{todo:t text="券码"}}:&nbsp;{{todo:coupon.code}}</span>
+                                                    <span class="coupon-expire">
+                                                        {{todo:t text="有效期至"}}:&nbsp;{{todo:coupon.expire_time}}
+                                                    </span>
+                                                </div>
+                                                {{todo:if condition="coupon.applicable_products"}}
+                                                <div class="coupon-scope">
+                                                    <span class="scope-label">{{todo:t text="适用商品"}}:&nbsp;</span>
+                                                    <span class="scope-value">{{todo:coupon.applicable_products}}</span>
+                                                </div>
+                                                {{/todo:if}}
+                                            </div>
+                                            <div class="coupon-actions">
+                                                <button class="btn btn-primary btn-sm" onclick="useCoupon('{{todo:coupon.code}}')">
+                                                    {{todo:t text="立即使用"}}
+                                                </button>
+                                                {{todo:if condition="coupon.is_transferable"}}
+                                                <button class="btn btn-outline-primary btn-sm" style="margin-inline-start: auto;" onclick="openTransferModal({{todo:coupon.user_coupon_id}}, '{{todo:coupon.name}}')">
+                                                    {{todo:t text="转赠"}}
+                                                </button>
+                                                {{/todo:if}}
+                                            </div>
+                                        </div>
+                                        {{todo:if condition="coupon.is_expiring"}}
+                                        <div class="coupon-badge expiring">
+                                            {{todo:t text="即将过期"}}
+                                        </div>
+                                        {{/todo:if}}
+                                    </div>
+                                    {{/todo:user_coupons}}
+                                </div>
+                                {{todo:if condition="user_coupons_count status='available' == 0"}}
+                                <div class="empty-info">
+                                    <h3>{{todo:t text="暂无可用优惠券"}}</h3>
+                                    <p>{{todo:t text="您目前没有可用的优惠券，快去商城逛逛吧"}}</p>
+                                    <a href="{{todo:shop_url}}" class="btn btn-primary">
+                                        {{todo:t text="去购物"}}
+                                    </a>
+                                </div>
+                                {{/todo:if}}
+                            </div>
+                            
+                            <!-- 已使用优惠券 -->
+                            <div class="tab-pane fade" id="used">
+                                <div class="coupons-list">
+                                    {{todo:user_coupons status="used"}}
+                                    <div class="coupon-card used" data-id="{{todo:coupon.id}}">
+                                        <div class="coupon-left">
+                                            <div class="coupon-amount">
+                                                {{todo:if condition="coupon.type=='amount'"}}
+                                                <span class="amount-symbol">{{todo:currency_code}}{{todo:coupon.value}}</span>
+                                                {{todo:else}}
+                                                <span class="discount-value">{{todo:coupon.value}}{{todo:t text="折"}}</span>
+                                                {{/todo:if}}
+                                            </div>
+                                            <div class="coupon-condition">
+                                                {{todo:if condition="coupon.min_amount"}}
+                                                {{todo:t text="满"}}{{todo:currency_code}}{{todo:coupon.min_amount}}{{todo:t text="可用"}}
+                                                {{todo:else}}
+                                                {{todo:t text="无门槛"}}
+                                                {{/todo:if}}
+                                            </div>
+                                        </div>
+                                        <div class="coupon-right">
+                                            <div class="coupon-info">
+                                                <h3 class="coupon-name">{{todo:coupon.name}}</h3>
+                                                <p class="coupon-desc">{{todo:coupon.description}}</p>
+                                                <div class="coupon-meta">
+                                                    <span class="coupon-code">{{todo:t text="券码"}}:&nbsp;{{todo:coupon.code}}</span>
+                                                    <span class="coupon-used-time">
+                                                        {{todo:t text="使用时间"}}:&nbsp;{{todo:coupon.used_time}}
+                                                    </span>
+                                                </div>
+                                                {{todo:if condition="coupon.order_no"}}
+                                                <div class="coupon-order">
+                                                    <span class="order-label">{{todo:t text="使用订单"}}:&nbsp;</span>
+                                                    <a href="{{todo:user_page_url page='order-detail'}}&id={{todo:coupon.order_no}}" class="order-link">
+                                                        {{todo:coupon.order_no}}
+                                                    </a>
+                                                </div>
+                                                {{/todo:if}}
+                                            </div>
+                                        </div>
+                                        <div class="coupon-badge used">
+                                            {{todo:t text="已使用"}}
+                                        </div>
+                                    </div>
+                                    {{/todo:user_coupons}}
+                                </div>
+                                {{todo:if condition="user_coupons_count status='used' == 0"}}
+                                <div class="empty-info">
+                                    <h3>{{todo:t text="暂无已使用优惠券"}}</h3>
+                                    <p>{{todo:t text="您还没有使用过任何优惠券"}}</p>
+                                </div>
+                                {{/todo:if}}
+                            </div>
+                            
+                            <!-- 已过期优惠券 -->
+                            <div class="tab-pane fade" id="expired">
+                                <div class="coupons-list">
+                                    {{todo:user_coupons status="expired"}}
+                                    <div class="coupon-card expired" data-id="{{todo:coupon.id}}">
+                                        <div class="coupon-left">
+                                            <div class="coupon-amount">
+                                                {{todo:if condition="coupon.type=='amount'"}}
+                                                <span class="amount-symbol">{{todo:currency_code}}</span>
+                                                <span class="amount-value">{{todo:coupon.value}}</span>
+                                                {{todo:else}}
+                                                <span class="discount-value">{{todo:coupon.value}}{{todo:t text="折"}}</span>
+                                                {{/todo:if}}
+                                            </div>
+                                            <div class="coupon-condition">
+                                                {{todo:if condition="coupon.min_amount"}}
+                                                {{todo:t text="满"}}{{todo:currency_code}}{{todo:coupon.min_amount}}{{todo:t text="可用"}}
+                                                {{todo:else}}
+                                                {{todo:t text="无门槛"}}
+                                                {{/todo:if}}
+                                            </div>
+                                        </div>
+                                        <div class="coupon-right">
+                                            <div class="coupon-info">
+                                                <h3 class="coupon-name">{{todo:coupon.name}}</h3>
+                                                <p class="coupon-desc">{{todo:coupon.description}}</p>
+                                                <div class="coupon-meta">
+                                                    <span class="coupon-code">{{todo:t text="券码"}}:&nbsp;{{todo:coupon.code}}</span>
+                                                    <span class="coupon-expired-time">
+                                                        {{todo:t text="过期时间"}}:&nbsp;{{todo:coupon.expire_time}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="coupon-actions">
+                                                <button class="btn btn-outline-danger btn-sm" data-coupon-id="{{todo:coupon.id}}" onclick="deleteCoupon(this.dataset.couponId)">
+                                                    {{todo:t text="删除"}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="coupon-badge expired">
+                                            {{todo:t text="已过期"}}
+                                        </div>
+                                    </div>
+                                    {{/todo:user_coupons}}
+                                </div>
+                                {{todo:if condition="user_coupons_count status='expired' == 0"}}
+                                <div class="empty-info">
+                                    <h3>{{todo:t text="暂无过期优惠券"}}</h3>
+                                    <p>{{todo:t text="您没有过期的优惠券"}}</p>
+                                </div>
+                                {{/todo:if}}
+                            </div>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="pagination-wrapper">
+                            {{todo:pagination}}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 兑换优惠券模态框 -->
+    <div class="modal fade" id="exchangeModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{todo:t text="兑换优惠券"}}</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form id="exchangeForm" method="post" action="{{todo:user_page_url page='coupons'}}">
+                    <div class="modal-body">
+                        <input type="hidden" name="_csrf_token" value="{{todo:csrf_token action='exchange_coupon'}}">
+                        <input type="hidden" name="action" value="exchange_coupon">
+                        
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="coupon_code" name="coupon_code" required maxlength="50">
+                            <small class="form-text text-muted">{{todo:t text="请输入您获得的优惠券兑换码"}}</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{todo:t text="取消"}}</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon-gift"></i>
+                            {{todo:t text="立即兑换"}}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 转赠优惠券模态框 -->
+    <div class="modal fade" id="transferModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{todo:t text="转赠优惠券"}}</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form id="transferForm" method="post" action="{{todo:user_page_url page='coupons'}}">
+                    <div class="modal-body">
+                        <input type="hidden" name="_csrf_token" value="{{todo:csrf_token action='transfer_coupon'}}">
+                        <input type="hidden" name="action" value="transfer_coupon">
+                        <input type="hidden" name="user_coupon_id" id="transfer_user_coupon_id" value="">
+                        
+                        <div class="form-group">
+                            <b id="transfer_coupon_title" class="mb-2"></b>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="to_user_login" class="form-label required">{{todo:t text="接收方账号"}} / {{todo:t text="邮箱"}}</label>
+                            <input type="text" class="form-control" id="to_user_login" name="to_user_login" required 
+                                   placeholder="{{todo:t text='请输入目标用户的登录用户名或邮箱'}}" maxlength="100">
+                            <small class="form-text text-muted">{{todo:t text="转赠成功后，该优惠券将直接划转至对方账户"}}</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{todo:t text="取消"}}</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon-share"></i>
+                            {{todo:t text="确认转赠"}}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 引入底部 -->
+    {{todo:include file="users/users_footer.htm"}}
+
+    <style>
+    .coupon-list { margin: 0 40px; }
+    .coupon-list { display: flex; flex-direction: column; gap: 32px; }
+    .coupon-card { display: flex; background: #ffffff; border-radius: 20px; overflow: hidden; margin: 0 30px 40px; box-shadow: 0 8px 24px rgba(0, 54, 34, 0.04); position: relative; }
+    .coupon-left { width: 200px; --grad-angle: 45deg; background: linear-gradient(var(--grad-angle), #c2d9c5, #ffffff); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 20px; color: #1D8E52; border-inline-end: 4px dashed #fff; }
+    .coupon-right { flex: 1; padding: 30px 40px; padding-inline-end: 30px; display: flex; flex-direction: column; justify-content: space-between; --grad-angle: 316deg; background: linear-gradient(var(--grad-angle), #f5edd5, transparent); }
+    [dir="rtl"] .coupon-left { --grad-angle: -45deg; }
+    [dir="rtl"] .coupon-right { --grad-angle: -316deg; }
+    .coupon-actions { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-top: 10px; }
+    .coupon-desc { color: #999; }
+    .coupon-code { margin-inline-end: 20px; word-break: break-all; }
+    .coupon-badge { position: absolute; top: 10px; inset-inline-end: 20px; color: rgba(107, 101, 56, 0.36); }
+    .coupon-name { margin-bottom: 10px; }
+    .coupon-amount { font-size: 30px; line-height: normal; }
+    </style>
+    
+    <!-- JavaScript -->
+    <script>
+    function openTransferModal(userCouponId, couponName) {
+        document.getElementById('transfer_user_coupon_id').value = userCouponId;
+        document.getElementById('transfer_coupon_title').innerText = couponName || '{{todo:t text="优惠券"}}';
+        jQuery('#transferModal').modal('show');
+    }
+    function fallbackCopy(code) {
+        var textArea = document.createElement("textarea");
+        textArea.value = code;
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            if (window.layer) { layer.msg('{{todo:t text="券码复制成功"}}'); } else { alert('{{todo:t text="券码复制成功"}} ' + code); }
+        } catch (err) {
+            if (window.layer) { layer.msg('{{todo:t text="复制失败，请手动复制"}} ' + code); } else { alert('{{todo:t text="复制失败，请手动复制"}} ' + code); }
+        }
+        document.body.removeChild(textArea);
+    }
+    function useCoupon(code) {
+        window.location.href = "{{todo:shop_url}}";
+    }
+    function deleteCoupon(couponId) {
+        const doDelete = function() {
+            jQuery.post("{{todo:user_page_url page='coupons'}}", {
+                action: 'delete_coupon',
+                coupon_id: couponId,
+                _csrf_token: "{{todo:csrf_token}}"
+            }, function(res) {
+                if (window.layer) { layer.msg('{{todo:t text="删除成功"}}', {icon: 1}); }
+                location.reload();
+            });
+        };
+
+        if (window.layer) {
+            layer.confirm('{{todo:t text="确定删除该优惠券"}}', {
+                icon: 3,
+                title: '{{todo:t text="确认删除"}}',
+                btn: [__t('确定'), __t('取消')]
+            }, function(index) {
+                layer.close(index);
+                doDelete();
+            });
+        }
+    }
+
+    // URL Hash 锚点 Tab 自动激活与搜索过滤
+    jQuery(document).ready(function($) {
+        function activateTabFromHash() {
+            var hash = window.location.hash;
+            if (hash && (hash === '#available' || hash === '#used' || hash === '#expired')) {
+                var $targetTab = $('#couponTabs a[href="' + hash + '"]');
+                if ($targetTab.length) {
+                    $('#couponTabs a').removeClass('active');
+                    $targetTab.addClass('active');
+                    
+                    $('.tab-pane').removeClass('show active');
+                    $(hash).addClass('show active');
+
+                    if (typeof $targetTab.tab === 'function') {
+                        $targetTab.tab('show');
+                    }
+                }
+            }
+        }
+
+        activateTabFromHash();
+        $(window).on('hashchange', activateTabFromHash);
+
+        $('#couponTabs a[data-toggle="pill"]').on('shown.bs.tab', function(e) {
+            var newHash = $(e.target).attr('href');
+            if (history.pushState) {
+                history.pushState(null, null, newHash);
+            } else {
+                location.hash = newHash;
+            }
+        });
+
+    });
+    </script>
+</body>
+</html>

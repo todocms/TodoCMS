@@ -1,0 +1,820 @@
+{{todo:include file="header.html"}}
+    
+    <div class="container">
+        <div class="content-wrapper">
+            <main class="main-content">
+                <!-- 面包屑导航 -->
+                <div class="breadcrumb">
+                    <a href="{{todo:site_url}}">{{todo:t text="首页"}}</a>
+                    <span class="separator">></span>
+                    {{todo:if parent_category}}
+                    <a href="{{todo:parent_category_url}}">{{todo:parent_category_name}}</a>
+                    <span class="separator">></span>
+                    {{/todo:if}}
+                    <span class="current">{{todo:category_name}}</span>
+                </div>
+                
+                <div class="special-header">
+                    <h1 class="special-title">{{todo:category_name}}</h1>
+                    {{todo:if category_description}}
+                    <div class="special-description">
+                        {{todo:category_description}}
+                    </div>
+                    {{/todo:if}}
+                </div>
+                
+                {{todo:if special_list}}
+                <div class="special-list" id="specialList">
+                    {{todo:loop special_list}}
+                    <article class="special-item" data-type="{{todo:special_type}}" data-date="{{todo:publish_date}}">
+                        <div class="special-cover">
+                            <a href="{{todo:special_url}}">
+                                {{todo:thumb}}00
+                                {{todo:if cover_image}}
+                                <img src="{{todo:cover_image}}" alt="{{todo:title}}" loading="lazy">
+                                {{todo:else}}
+                                <div class="cover-placeholder">
+                                    <i class="fa fa-image"></i>
+                                </div>
+                                {{/todo:if}}
+                                
+                                <div class="cover-overlay">
+                                    <div class="overlay-content">
+                                        <i class="fa fa-play-circle"></i>
+                                        <span>{{todo:t text="查看专题"}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                            
+                            <!-- 专题标签 -->
+                            <div class="special-badges">
+                                {{todo:if is_featured}}
+                                <span class="badge badge-featured">{{todo:t text="精选"}}</span>
+                                {{/todo:if}}
+                                {{todo:if is_hot}}
+                                <span class="badge badge-hot">{{todo:t text="热门"}}</span>
+                                {{/todo:if}}
+                                {{todo:if is_new}}
+                                <span class="badge badge-new">{{todo:t text="最新"}}</span>
+                                {{/todo:if}}
+                            </div>
+                            
+                            <!-- 内容数量 -->
+                            <div class="content-count">
+                                <span class="count-badge">
+                                    <i class="fa fa-file-text"></i>
+                                    {{todo:content_count}}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="special-info">
+                            <div class="special-meta">
+                                <span class="meta-type">{{todo:special_type_name}}</span>
+                                <span class="meta-date">{{todo:publish_date}}</span>
+                            </div>
+                            
+                            <h3 class="special-title">
+                                <a href="{{todo:special_url}}">{{todo:title}}</a>
+                            </h3>
+                            
+                            {{todo:if summary}}
+                            <div class="special-summary">
+                                {{todo:summary}}
+                            </div>
+                            {{/todo:if}}
+                            
+                            <div class="special-stats">
+                                <span class="stat-views">
+                                    <i class="fa fa-eye"></i>
+                                    {{todo:views}}{{todo:t text="次浏览"}}
+                                </span>
+                                
+                                {{todo:if comments_count}}
+                                <span class="stat-comments">
+                                    <i class="fa fa-comment"></i>
+                                    {{todo:comments_count}}{{todo:t text="条评论"}}
+                                </span>
+                                {{/todo:if}}
+
+                            </div>
+                            
+                            {{todo:if tags}}
+                            <div class="special-tags">
+                                {{todo:loop tags}}
+                                <a href="{{todo:tag_url}}" class="tag">{{todo:tag_name}}</a>
+                                {{/todo:loop}}
+                            </div>
+                            {{/todo:if}}
+                            
+                            <div class="special-actions">
+                                <a href="{{todo:special_url}}" class="btn btn-primary">{{todo:t text="进入专题"}}</a>
+                            </div>
+                        </div>
+                        
+                        <!-- 专题预览内容 -->
+                        {{todo:if preview_contents}}
+                        <div class="special-preview">
+                            <h4>{{todo:t text="专题内容预览"}}</h4>
+                            <div class="preview-list">
+                                {{todo:loop preview_contents}}
+                                <div class="preview-item">
+                                    {{todo:if thumbnail}}
+                                    <div class="preview-thumb">
+                                        <img src="{{todo:thumbnail}}" alt="{{todo:title}}">
+                                    </div>
+                                    {{/todo:if}}
+                                    <div class="preview-info">
+                                        <h5><a href="{{todo:content_url}}">{{todo:title}}</a></h5>
+                                        <span class="preview-type">{{todo:content_type_name}}</span>
+                                    </div>
+                                </div>
+                                {{/todo:loop}}
+                            </div>
+                            
+                            {{todo:if has_more_contents}}
+                            <div class="preview-more">
+                                <a href="{{todo:special_url}}" class="more-link">
+                                    {{todo:t text="查看全部"}} {{todo:total_contents}} {{todo:t text="篇内容"}} <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </div>
+                            {{/todo:if}}
+                        </div>
+                        {{/todo:if}}
+                    </article>
+                    {{/todo:loop}}
+                </div>
+                
+                {{todo:if pagination}}
+                <div class="pagination">
+                    {{todo:if prev_page}}
+                    <a href="{{todo:prev_page_url}}" class="page-prev">{{todo:t text="上一页"}}</a>
+                    {{/todo:if}}
+                    
+                    {{todo:loop page_numbers}}
+                    {{todo:if is_current}}
+                    <span class="page-current">{{todo:page_number}}</span>
+                    {{todo:else}}
+                    <a href="{{todo:page_url}}" class="page-number">{{todo:page_number}}</a>
+                    {{/todo:if}}
+                    {{/todo:loop}}
+                    
+                    {{todo:if next_page}}
+                    <a href="{{todo:next_page_url}}" class="page-next">{{todo:t text="下一页"}}</a>
+                    {{/todo:if}}
+                </div>
+                {{/todo:if}}
+                
+                {{todo:else}}
+                <div class="no-specials">
+                    <div class="no-content-icon">
+                        <i class="fa fa-folder-open"></i>
+                    </div>
+                    <h3>{{todo:t text="暂无专题内容"}}</h3>
+                    <p>{{todo:t text="该分类下还没有专题，请稍后再来查看"}}</p>
+                </div>
+                {{/todo:if}}
+                
+                <!-- 热门专题推荐 -->
+                {{todo:if hot_specials}}
+                <div class="hot-specials">
+                    <h3>{{todo:t text="热门专题推荐"}}</h3>
+                    <div class="hot-list">
+                        {{todo:loop hot_specials}}
+                        <div class="hot-item">
+                            <div class="hot-cover">
+                                <a href="{{todo:special_url}}">
+                                    <img src="{{todo:cover_image}}" alt="{{todo:title}}">
+                                </a>
+                            </div>
+                            <div class="hot-info">
+                                <h4><a href="{{todo:special_url}}">{{todo:title}}</a></h4>
+                                <div class="hot-stats">
+                                    <span><i class="fa fa-eye"></i> {{todo:views}}</span>
+                                    <span><i class="fa fa-file-text"></i> {{todo:content_count}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:if}}
+            </main>
+            
+            {{todo:include file="sidebar.html"}}
+        </div>
+    </div>
+
+    <style>
+    .breadcrumb {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .breadcrumb a {
+        color: #007cba;
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+    
+    .separator {
+        margin: 0 8px;
+        color: #999;
+    }
+    
+    .current {
+        color: #333;
+        font-weight: 500;
+    }
+    
+    .special-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+    }
+    
+    .special-title {
+        margin: 0 0 15px 0;
+        font-size: 32px;
+        font-weight: 500;
+    }
+    
+    .special-description {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 20px;
+        max-width: 600px;
+        margin-inline-start: auto;
+        margin-inline-end: auto;
+        line-height: 1.6;
+    }
+    
+    .special-stats {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        font-size: 14px;
+    }
+    
+    .special-filters {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .filter-group label {
+        font-weight: 500;
+        color: #333;
+        white-space: nowrap;
+    }
+    
+    .filter-group select {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        min-width: 120px;
+    }
+    
+    .view-toggle {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .view-btn {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        font-size: 13px;
+    }
+    
+    .view-btn.active {
+        background: #007cba;
+        color: white;
+        border-color: #007cba;
+    }
+    
+    .special-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    
+    .special-list.list-view {
+        grid-template-columns: 1fr;
+    }
+    
+    .special-item {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .special-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .special-cover {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .special-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .special-cover:hover img {
+        transform: scale(1.05);
+    }
+    
+    .cover-placeholder {
+        width: 100%;
+        height: 100%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 48px;
+    }
+    
+    .cover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .special-cover:hover .cover-overlay {
+        opacity: 1;
+    }
+    
+    .overlay-content {
+        text-align: center;
+        color: white;
+    }
+    
+    .overlay-content i {
+        font-size: 48px;
+        margin-bottom: 10px;
+        display: block;
+    }
+    
+    .overlay-content span {
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .special-badges {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        color: white;
+    }
+    
+    .badge-featured {background: #ff6b6b; }
+    .badge-hot {background: #ff9f43; }
+    .badge-new {background: #26de81; }
+    
+    .content-count {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .count-badge {
+        padding: 6px 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        border-radius: 15px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .special-info {
+        padding: 20px;
+    }
+    
+    .special-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: #999;
+    }
+    
+    .meta-type {
+        padding: 2px 8px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        color: #666;
+    }
+    
+    .special-title {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+        line-height: 1.4;
+    }
+    
+    .special-title a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .special-title a:hover {
+        color: #007cba;
+    }
+    
+    .special-summary {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .special-stats {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-size: 12px;
+        color: #999;
+    }
+    
+    .special-stats span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .special-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 15px;
+    }
+    
+    .tag {
+        padding: 3px 8px;
+        background: #f0f0f0;
+        color: #666;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 11px;
+        transition: all 0.3s ease;
+    }
+    
+    .tag:hover {
+        background: #007cba;
+        color: white;
+    }
+    
+    .special-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: #007cba;
+        color: white;
+        border-color: #007cba;
+    }
+    
+    .btn-primary:hover {
+        background: #006ba1;
+        border-color: #006ba1;
+    }
+
+    .special-preview {
+        padding: 15px 20px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .special-preview h4 {
+        margin: 0 0 15px 0;
+        font-size: 14px;
+        color: #333;
+    }
+    
+    .preview-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .preview-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .preview-thumb {
+        width: 40px;
+        height: 30px;
+        overflow: hidden;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+    
+    .preview-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .preview-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .preview-info h5 {
+        margin: 0 0 2px 0;
+        font-size: 12px;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .preview-info h5 a {
+        color: #333;
+        text-decoration: none;
+    }
+    
+    .preview-info h5 a:hover {
+        color: #007cba;
+    }
+    
+    .preview-type {
+        font-size: 10px;
+        color: #999;
+    }
+    
+    .preview-more {
+        margin-top: 10px;
+        text-align: center;
+    }
+    
+    .more-link {
+        color: #007cba;
+        text-decoration: none;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .more-link:hover {
+        text-decoration: underline;
+    }
+    
+    .no-specials {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .no-content-icon {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .no-specials h3 {
+        margin: 0 0 10px 0;
+        font-size: 24px;
+        color: #333;
+    }
+    
+    .no-specials p {
+        font-size: 16px;
+        color: #666;
+    }
+    
+    .hot-specials {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        margin-top: 40px;
+    }
+    
+    .hot-specials h3 {
+        margin: 0 0 20px 0;
+        font-size: 20px;
+        color: #333;
+    }
+    
+    .hot-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .hot-item {
+        display: flex;
+        gap: 10px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        transition: transform 0.3s ease;
+    }
+    
+    .hot-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .hot-cover {
+        width: 60px;
+        height: 45px;
+        overflow: hidden;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+    
+    .hot-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .hot-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .hot-info h4 {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        line-height: 1.3;
+    }
+    
+    .hot-info h4 a {
+        color: #333;
+        text-decoration: none;
+    }
+    
+    .hot-info h4 a:hover {
+        color: #007cba;
+    }
+    
+    .hot-stats {
+        display: flex;
+        gap: 10px;
+        font-size: 11px;
+        color: #999;
+    }
+    
+    .hot-stats span {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+    
+    @media (max-width: 768px) {
+        .special-header {
+            padding: 30px 15px;
+        }
+        
+        .special-title {
+            font-size: 24px;
+        }
+        
+        .special-stats {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .special-filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filter-group {
+            justify-content: space-between;
+        }
+        
+        .view-toggle {
+            justify-content: center;
+        }
+        
+        .special-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .special-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .hot-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .hot-item {
+            flex-direction: column;
+        }
+        
+        .hot-cover {
+            width: 100%;
+            height: 120px;
+        }
+    }
+    </style>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 视图切换
+        const viewBtns = document.querySelectorAll('.view-btn');
+        const specialList = document.getElementById('specialList');
+        
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                viewBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const view = this.dataset.view;
+                if (view === 'list') {
+                    specialList.classList.add('list-view');
+                } else {
+                    specialList.classList.remove('list-view');
+                }
+            });
+        });
+    
+    });
+</script>
+
+{{todo:include file="footer.html"}}

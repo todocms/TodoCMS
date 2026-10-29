@@ -1,0 +1,72 @@
+{{todo:get_header}}
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+        <div class="row gap-5">
+            <main class="col">
+                <header class="page-header">
+                    <h1 class="page-title">{{todo:get_page_title}}</h1>
+                    {{todo:if get_the_archive_description}}
+                        <div class="archive-description">
+                            {{todo:get_the_archive_description}}
+                        </div>
+                    {{/todo:if}}
+                </header>
+
+                <ul class="archives-list">
+                    {{todo:archives|per_page=12}}
+                    <li class="archive-item">
+                        <a href="{{todo:archives_url}}" class="archive-link inline-flex items-center gap-1">
+                            <span class="archive-date inline-flex items-center gap-1">
+                                <i class="icon todofont todo-FolderClose"></i>
+                                {{todo:year}}/{{todo:month}}
+                            </span>
+                            <span class="archive-count">({{todo:articles_count}})</span>
+                        </a>
+                    </li>
+                    {{/todo:archives}}
+                </ul>
+                <!-- 分页导航 -->
+                {{todo:if pagination}}
+                <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                    <div class="pagination flex gap-2">
+                        {{todo:if pagination_prev_page > 0}}
+                        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                            <i class="fa fa-chevron-left"></i>
+                            <span>{{todo:t text="上一页"}}</span>
+                        </a>
+                        {{/todo:if}}
+
+                        <div class="pagination-numbers flex gap-2 items-center">
+                            {{todo:loop pagination_pages}}
+                            {{todo:if page_is_dots}}
+                            <span class="pagination-number dots">...</span>
+                            {{todo:elseif page_is_current}}
+                            <span class="pagination-number current">{{todo:page_number}}</span>
+                            {{todo:else}}
+                            <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                            {{/todo:if}}
+                            {{/todo:loop}}
+                        </div>
+
+                        {{todo:if pagination_next_page > 0}}
+                        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                            <span>{{todo:t text="下一页"}}</span>
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                </div>
+                {{/todo:if}}
+            </main>
+            
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:get_footer}}

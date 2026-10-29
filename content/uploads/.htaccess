@@ -1,0 +1,29 @@
+# 保护上传目录 - 禁止目录浏览
+Options -Indexes
+
+# 禁止执行任何服务端脚本（全面覆盖各类变种）
+<FilesMatch "(?i)\.(php\d*|phtml|phar|pl|py|jsp|asp|aspx|sh|cgi|shtml|shtm|cfm|htaccess|htpasswd)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 禁止上传 .htaccess 文件（防止覆盖本保护规则）
+<Files ".htaccess">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</Files>
+
+# 防止 MIME 类型嗅探
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>

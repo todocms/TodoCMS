@@ -1,0 +1,241 @@
+{{todo:get_header}}
+
+<!-- 首页首屏轮播：采用纯原生高效 fade 过渡，首图 fetchpriority="high" 直出，杜绝 Canvas 滤镜造成的 LCP 严重延迟 -->
+{{todo:if single_ads|id=1}}
+<section class="hero-slider" data-autoplay="false" data-interval="5000" data-transition="fade" data-show-loading="false">
+    <div class="slider-container">
+        <div class="slider-track">
+        {{todo:loop show_ads|limit=5}}
+        <div class="slide" data-id="{{todo:item.index}}" data-white-text="{{todo:item.white_text}}">
+            <a href="{{todo:item.link}}" target="{{todo:item.target}}">
+                {{todo:if item.index == 0}}
+                <img src="{{todo:item.image}}" alt="{{todo:item.title}}" class="slider-lcp-img" loading="eager" fetchpriority="high" width="1200" height="500" style="width:100%;height:100%;object-fit:cover;">
+                {{todo:else}}
+                {{todo:img_tag src="item.image" alt="item.title"}}
+                {{/todo:if}}
+            </a>
+            <div class="info{{todo:class_if var=item.white_text true=whitecolor}}">
+                <h2>{{todo:item.title}}</h2>
+                <p>{{todo:item.content}}</p>
+                <a href="{{todo:item.link}}" target="{{todo:item.target}}" class="btn btn-primary">
+                    {{todo:t text="了解更多"}}
+                    <i class="icon todofont todo-Right"></i>
+                </a>
+            </div>
+        </div>
+        {{/todo:loop}}
+        </div>
+    </div>
+
+    <!-- 轮播控制 -->
+    <div class="slider-controls">
+        <button class="slider-prev" aria-label="{{todo:t text='上一张'}}">
+            <i class="icon todofont todo-Right ro180"></i>
+        </button>
+        <button class="slider-next" aria-label="{{todo:t text='下一张'}}">
+            <i class="icon todofont todo-Right"></i>
+        </button>
+    </div>
+
+    <!-- 轮播预览 -->
+    <div class="slider-preview"></div>
+
+    <!-- 轮播指示器 -->
+    <div class="slider-indicators"></div>
+
+    <!-- 轮播分页 -->
+    <div class="slider_pagination">
+        <span class="current">01</span>
+        <span class="total">01</span>
+    </div>
+
+    <!-- 加载状态 -->
+    <div class="slider-loading">
+        <div class="loading-spinner"></div>
+    </div>
+</section>
+{{/todo:if}}
+
+<!-- 跨境电商出海服务与买家保障信赖条（强化 Google Ads 落地页可信度与品牌权威感） -->
+<section class="trust-features-bar" style="background: #f8f9fa; border-bottom: 1px solid #ebebeb; padding: 22px 0;">
+    <div class="container">
+        <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+            <div class="feature-item flex items-center gap-3">
+                <i class="icon todofont todo-Send" style="font-size: 28px; color: #1890ff;"></i>
+                <div>
+                    <h3 style="font-size: 15px; margin: 0 0 2px; font-weight: 600; color: #333;">{{todo:t text="全球免运与快速配送"}}</h3>
+                    <p style="margin: 0; font-size: 13px; color: #666;">{{todo:t text="满额即可尊享标准快递包邮"}}</p>
+                </div>
+            </div>
+            <div class="feature-item flex items-center gap-3">
+                <i class="icon todofont todo-Safety" style="font-size: 28px; color: #52c41a;"></i>
+                <div>
+                    <h3 style="font-size: 15px; margin: 0 0 2px; font-weight: 600; color: #333;">{{todo:t text="安全加密支付"}}</h3>
+                    <p style="margin: 0; font-size: 13px; color: #666;">{{todo:t text="SSL 256位多重风控保障"}}</p>
+                </div>
+            </div>
+            <div class="feature-item flex items-center gap-3">
+                <i class="icon todofont todo-Refresh" style="font-size: 28px; color: #fa8c16;"></i>
+                <div>
+                    <h3 style="font-size: 15px; margin: 0 0 2px; font-weight: 600; color: #333;">{{todo:t text="30天售后退换"}}</h3>
+                    <p style="margin: 0; font-size: 13px; color: #666;">{{todo:t text="便捷高效的退款退货保障"}}</p>
+                </div>
+            </div>
+            <div class="feature-item flex items-center gap-3">
+                <i class="icon todofont todo-Service" style="font-size: 28px; color: #722ed1;"></i>
+                <div>
+                    <h3 style="font-size: 15px; margin: 0 0 2px; font-weight: 600; color: #333;">{{todo:t text="24/7 客户支持"}}</h3>
+                    <p style="margin: 0; font-size: 13px; color: #666;">{{todo:t text="专业多语言团队随时解答"}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 主要内容区域 -->
+<div class="main-content">
+    <div class="container">
+        <div class="row gap-5 m-t-40">
+            <!-- 内容主区域 -->
+            <main class="col">
+
+                <!-- 1. 精选商品网格 / Featured Products（跨境电商独立站首页核心转化阵地，向核心商品传递首页 PageRank） -->
+                <section class="featured-products-section m-b-50">
+                    <div class="section-header flex items-center justify-between m-b-24" style="border-bottom: 2px solid #222; padding-bottom: 12px;">
+                        <h2 class="section-title" style="margin: 0; font-size: 22px; font-weight: 700; color: #222;">{{todo:t text="热销精选商品"}}</h2>
+                        <a href="{{todo:site_url}}/search" style="font-size: 14px; color: #555; text-decoration: none;">{{todo:t text="浏览全店商品"}} &raquo;</a>
+                    </div>
+                    <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 24px;">
+                        {{todo:products limit="8" orderby="rand"}}
+                        <article class="product-item" style="border: 1px solid #ebebeb; border-radius: 8px; overflow: hidden; background: #fff; display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                            <div class="product-image" style="aspect-ratio: 1 / 1; overflow: hidden; background-color: #f7f7f7; display: flex; align-items: center; justify-content: center; position: relative;">
+                                <a href="{{todo:url}}" title="{{todo:title}}" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    {{todo:if post_thumbnail}}
+                                    {{todo:if index < 4}}
+                                    {{todo:post_thumbnail class="product-thumb" loading="eager" style="width: 100%; height: 100%; object-fit: cover;"}}
+                                    {{todo:else}}
+                                    {{todo:post_thumbnail class="product-thumb lazy-load" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover;"}}
+                                    {{/todo:if}}
+                                    {{todo:else}}
+                                    <div class="no-image" style="color: #999; font-size: 13px;">{{todo:t text="无图片"}}</div>
+                                    {{/todo:if}}
+                                </a>
+                            </div>
+
+                            <div class="product-info" style="padding: 14px; display: flex; flex-direction: column; flex: 1;">
+                                <h3 class="product-title" style="font-size: 15px; line-height: 1.4; margin: 0 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <a href="{{todo:url}}" style="color: #222; text-decoration: none;">{{todo:title}}</a>
+                                </h3>
+
+                                <div class="product-price flex items-baseline gap-2" style="margin-top: auto; padding-top: 8px;">
+                                    <span class="price-current" style="color: #e74c3c; font-size: 18px; font-weight: 700;">{{todo:current_price}}</span>
+                                    <span class="currency-iso-code" style="font-size: 11px; color: #888;">{{todo:currency_iso}}</span>
+                                    {{todo:if original_price > current_price}}
+                                    <span class="price-original" style="font-size: 13px; color: #999; text-decoration: line-through;">{{todo:original_price}}</span>
+                                    {{/todo:if}}
+                                </div>
+                            </div>
+                        </article>
+                        {{/todo:products}}
+                    </div>
+                </section>
+
+                <!-- 2. 最新资讯与动态 / Latest Articles -->
+                <section class="latest-posts m-b-40">
+                    <div class="section-header flex items-center justify-between m-b-24" style="border-bottom: 2px solid #222; padding-bottom: 12px;">
+                        <h2 class="section-title" style="margin: 0; font-size: 22px; font-weight: 700; color: #222;">{{todo:t text="最新资讯与选购指南"}}</h2>
+                    </div>
+
+                    {{todo:if posts|per_page=6}}
+                    <div class="posts-list-wrap">
+                        {{todo:loop posts|per_page=6|pager=main|doc_properties="1"}}
+                        <article class="post post-{{todo:index}}" style="padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid #eee;">
+                            <header class="entry-header">
+                                {{todo:if post_thumbnail}}
+                                <div class="post-thumbnail" style="margin-bottom: 12px; max-height: 280px; overflow: hidden; border-radius: 6px;">
+                                    <a href="{{todo:permalink}}">
+                                        {{todo:post_thumbnail class="lazy-load" loading="lazy" style="width: 100%; height: auto; object-fit: cover;"}}
+                                    </a>
+                                </div>
+                                {{/todo:if}}
+
+                                <h3 class="entry-title" style="font-size: 18px; margin: 0 0 10px;">
+                                    <a href="{{todo:permalink}}" style="color: #222;">{{todo:title}}</a>
+                                </h3>
+
+                                <div class="dec flex gap-3 items-center flex-wrap" style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                                    {{todo:if category}}
+                                    <span class="cat-links">
+                                        <i class="icon todofont todo-FolderClose"></i>
+                                        <a href="{{todo:category_url}}" style="color: #666;">{{todo:category}}</a>
+                                    </span>
+                                    {{/todo:if}}
+                                    <span class="byline">
+                                        <i class="icon todofont todo-User"></i>
+                                        <a href="{{todo:author_url}}" style="color: #666;">{{todo:author}}</a>
+                                    </span>
+                                    <span class="dec">
+                                        <i class="icon todofont todo-Time"></i>
+                                        <time datetime="{{todo:date_iso}}">{{todo:date}}</time>
+                                    </span>
+                                </div>
+                            </header>
+
+                            <div class="entry-content" style="font-size: 14px; line-height: 1.6; color: #555;">
+                                <p>{{todo:excerpt}}</p>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    </div>
+
+                    <!-- 规范单套分页导航 -->
+                    {{todo:if pagination}}
+                    <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                        <div class="pagination flex gap-2 justify-center">
+                            {{todo:if pagination_prev_page > 0}}
+                            <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                                <i class="icon todofont todo-Right ro180"></i>
+                                <span>{{todo:t text="上一页"}}</span>
+                            </a>
+                            {{/todo:if}}
+
+                            <div class="pagination-numbers flex gap-2 items-center">
+                                {{todo:loop pagination_pages}}
+                                {{todo:if page_is_dots}}
+                                <span class="pagination-number dots">...</span>
+                                {{todo:elseif page_is_current}}
+                                <span class="pagination-number current">{{todo:page_number}}</span>
+                                {{todo:else}}
+                                <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                                {{/todo:if}}
+                                {{/todo:loop}}
+                            </div>
+
+                            {{todo:if pagination_next_page > 0}}
+                            <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                                <span>{{todo:t text="下一页"}}</span>
+                                <i class="icon todofont todo-Right"></i>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    {{todo:else}}
+                    <div class="no-posts" style="padding: 30px; text-align: center; background: #fafafa; border-radius: 8px;">
+                        <h3 style="font-size: 16px; color: #444;">{{todo:t text="暂无文章"}}</h3>
+                        <p style="font-size: 14px; color: #777;">{{todo:t text="还没有发布任何文章，请稍后再来查看"}}</p>
+                    </div>
+                    {{/todo:if}}
+                </section>
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside style="width: 300px;">
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:get_footer}}

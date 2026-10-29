@@ -1,0 +1,799 @@
+{{todo:include file="header.html"}}
+{{todo:include file="captcha_modal.html"}}
+    <div class="main-content">
+        <div class="container">
+            <div class="row gap-5 m-t-40">
+                <main class="col">
+                    <div class="category-header">
+                        <h1 class="category-title">{{todo:category_name}}</h1>
+                        {{todo:if category_description}}
+                        <p class="category-description">{{todo:category_description}}</p>
+                        {{/todo:if}}
+                    </div>
+                    
+                    <!-- 留言表单 -->
+                    <div class="guestbook-form m-t-20">
+                        <form id="guestbook-form" enctype="multipart/form-data">
+                            <input type="hidden" name="category_id" value="{{todo:category_id}}">
+                            
+                            <div class="form-group">
+                                <label for="guest_name">{{todo:t text="姓名"}} *</label>
+                                <input type="text" id="guest_name" name="guest_name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="guest_email">{{todo:t text="邮箱"}}</label>
+                                <input type="email" id="guest_email" name="guest_email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="guest_subject">{{todo:t text="主题"}}</label>
+                                <input type="text" id="guest_subject" name="guest_subject">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="guest_message">{{todo:t text="留言内容"}} *</label>
+                                <textarea id="guest_message" name="guest_message" rows="5" required></textarea>
+                            </div>
+
+                            <!-- 动态表单字段 -->
+                            {{todo:loop guestbook_form_fields}}
+                            <div class="form-group">
+                                <label for="{{todo:field_name}}">
+                                    {{todo:field_title}}
+                                    {{todo:if field_required}}<span class="required">*</span>{{/todo:if}}
+                                </label>
+                                
+                                {{todo:if condition="field_type == 'text'"}}
+                                <input type="text" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       placeholder="{{todo:field_placeholder}}"
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'email'"}}
+                                <input type="email" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       placeholder="{{todo:field_placeholder}}"
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'tel'"}}
+                                <input type="tel" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       placeholder="{{todo:field_placeholder}}"
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'url'"}}
+                                <input type="url" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       placeholder="{{todo:field_placeholder}}"
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'number'"}}
+                                <input type="number" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       placeholder="{{todo:field_placeholder}}"
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'textarea'"}}
+                                <textarea id="{{todo:field_name}}" name="{{todo:field_name}}" rows="5" 
+                                          placeholder="{{todo:field_placeholder}}"
+                                          {{todo:if field_required}}required{{/todo:if}}></textarea>
+                                
+                                {{todo:elseif condition="field_type == 'select'"}}
+                                <select id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                        {{todo:if field_required}}required{{/todo:if}}>
+                                    <option value="">{{todo:t text="请选择"}}</option>
+                                    {{todo:loop field_options}}
+                                    <option value="{{todo:option_value}}">{{todo:option_label}}</option>
+                                    {{/todo:loop}}
+                                </select>
+                                
+                                {{todo:elseif condition="field_type == 'radio'"}}
+                                <div class="radio-group">
+                                    {{todo:loop field_options}}
+                                    <label class="radio-label">
+                                        <input type="radio" name="{{todo:field_name}}" value="{{todo:option_value}}"
+                                               {{todo:if field_required}}required{{/todo:if}}>
+                                        <span>{{todo:option_label}}</span>
+                                    </label>
+                                    {{/todo:loop}}
+                                </div>
+                                
+                                {{todo:elseif condition="field_type == 'checkbox'"}}
+                                <div class="checkbox-group">
+                                    {{todo:loop field_options}}
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="{{todo:field_name}}[]" value="{{todo:option_value}}">
+                                        <span>{{todo:option_label}}</span>
+                                    </label>
+                                    {{/todo:loop}}
+                                </div>
+                                
+                                {{todo:elseif condition="field_type == 'date'"}}
+                                <input type="date" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'datetime'"}}
+                                <input type="datetime-local" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                
+                                {{todo:elseif condition="field_type == 'editor'"}}
+                                <textarea id="{{todo:field_name}}" name="{{todo:field_name}}" rows="15" 
+                                          placeholder="{{todo:field_placeholder}}"
+                                          {{todo:if field_required}}required{{/todo:if}}></textarea>
+                                
+                                {{todo:elseif condition="field_type == 'html'"}}
+                                <textarea id="{{todo:field_name}}" name="{{todo:field_name}}" rows="5" 
+                                          placeholder="{{todo:field_placeholder}}"
+                                          {{todo:if field_required}}required{{/todo:if}}></textarea>
+                                
+                                {{todo:elseif condition="field_type == 'switch'"}}
+                                <label class="switch-label">
+                                    <input type="checkbox" id="{{todo:field_name}}" name="{{todo:field_name}}" value="1">
+                                    <span class="switch-toggle"></span>
+                                </label>
+                                
+                                {{todo:elseif condition="field_type == 'region'"}}
+                                <div class="region-selector flex items-center gap-2 flex-wrap" data-field="{{todo:field_name}}" data-level="5">
+                                    <select class="region-province" name="{{todo:field_name}}_province">
+                                        <option value="">{{todo:t text="省份"}}</option>
+                                    </select>
+                                    <select class="region-city" name="{{todo:field_name}}_city">
+                                        <option value="">{{todo:t text="城市"}}</option>
+                                    </select>
+                                    <select class="region-district" name="{{todo:field_name}}_district">
+                                        <option value="">{{todo:t text="区/县"}}</option>
+                                    </select>
+                                    <select class="region-town" name="{{todo:field_name}}_town">
+                                        <option value="">{{todo:t text="乡镇/街道"}}</option>
+                                    </select>
+                                    <input type="text" style="min-width: 300px;" class="region-detail" name="{{todo:field_name}}_detail" placeholder="{{todo:t text='详细地址'}}">
+                                    <input type="hidden" name="{{todo:field_name}}" id="field-{{todo:field_name}}" value="">
+                                </div>
+                                
+                                {{todo:elseif condition="field_type == 'multi_file'"}}
+                                <div class="multi-file-upload" data-field="{{todo:field_name}}" data-max-files="{{todo:field_max_files|default:'10'}}" data-allowed-exts="{{todo:field_allowed_exts}}">
+                                    <div class="file-input-wrap">
+                                        <button type="button" class="file-picker-btn">{{todo:t text="选择文件"}}</button>
+                                        <span class="file-hint">{{todo:field_placeholder|default:''}}</span>
+                                        <input type="file" id="{{todo:field_name}}" name="{{todo:field_name}}[]" multiple
+                                               class="multi-file-input"
+                                               {{todo:if field_accept}}accept="{{todo:field_accept}}"{{/todo:if}}
+                                               {{todo:if field_required}}required{{/todo:if}}>
+                                    </div>
+                                    <ul class="file-preview-list"></ul>
+                                </div>
+                                {{todo:else}}
+                                <input type="text" id="{{todo:field_name}}" name="{{todo:field_name}}" 
+                                       placeholder="{{todo:field_placeholder}}"
+                                       {{todo:if field_required}}required{{/todo:if}}>
+                                {{/todo:if}}
+                                
+                                {{todo:if field_description}}
+                                <small class="dec">{{todo:field_description}}</small>
+                                {{/todo:if}}
+                            </div>
+                            {{/todo:loop}}
+                            
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-submit">{{todo:t text="提交留言"}}</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- 留言列表 -->
+                    <div class="guestbook-list">
+                        <h3 class="m-b-20">{{todo:t text="留言列表"}}</h3>
+                        
+                        {{todo:guestbooks|per_page=3}}
+                        <div class="guestbook-item flex gap-4">
+                            <div class="guest-avatar">
+                                <div class="default-avatar">{{todo:guest_avatar}}</div>
+                            </div>
+                            <div class="guest-info flex flex-col gap-1 flex-1">
+                                <div class="guest-details flex items-center gap-4 justify-between">
+                                    <span class="guest-name">{{todo:guest_name}}</span>
+                                    <span class="dec m-0">{{todo:guest_date}}</span>
+                                </div>
+                                {{todo:if guest_subject}}
+                                <div class="guest-subject">
+                                    <strong>{{todo:t text="主题"}}:&nbsp;</strong>{{todo:guest_subject}}
+                                </div>
+                                {{/todo:if}}
+                                <div class="guest-message">
+                                    {{todo:guest_message}}
+                                </div>
+                                {{todo:if sub_total > 0}}
+                                <div class="guestbook-replies" id="guestbook-replies-{{todo:id}}" data-all-replies="{{todo:replies_json}}">
+                                    {{todo:loop replies}}
+                                    <div class="guestbook-reply-item">
+                                        <div class="reply-avatar">
+                                            <div class="default-avatar-sm">{{todo:author_avatar}}</div>
+                                        </div>
+                                        <div class="reply-body">
+                                            <div class="reply-header">
+                                                <span class="reply-author">{{todo:author_name}}</span>
+                                                {{todo:if reply_to_name}}
+                                                <span class="reply-to-text">{{todo:t text="回复"}} <span class="reply-to-tag">@{{todo:reply_to_name}}</span></span>
+                                                {{/todo:if}}
+                                                <span class="reply-date">{{todo:comment_date}}</span>
+                                            </div>
+                                            <div class="reply-content">{{todo:comment_content}}</div>
+                                        </div>
+                                    </div>
+                                    {{/todo:loop}}
+
+                                    {{todo:if has_more_replies}}
+                                    <a href="javascript:void(0);" class="more-replies-tip nohover" onclick="toggleExpandGuestbookReplies({{todo:id}}, this)">
+                                        {{todo:t text="展开"}} ({{todo:more_replies_count}})
+                                    </a>
+                                    {{/todo:if}}
+                                </div>
+                                {{/todo:if}}
+                            </div>
+                        </div>
+                        {{/todo:guestbooks}}
+                    </div>
+                    
+                    <!-- 分页导航 -->
+                    {{todo:if pagination}}
+                    <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                        <div class="pagination flex gap-2">
+                            {{todo:if pagination_prev_page > 0}}
+                            <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                                <i class="fa fa-chevron-left"></i>
+                                <span>{{todo:t text="上一页"}}</span>
+                            </a>
+                            {{/todo:if}}
+
+                            <div class="pagination-numbers flex gap-2 items-center">
+                                {{todo:loop pagination_pages}}
+                                {{todo:if page_is_dots}}
+                                <span class="pagination-number dots">...</span>
+                                {{todo:elseif page_is_current}}
+                                <span class="pagination-number current">{{todo:page_number}}</span>
+                                {{todo:else}}
+                                <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                                {{/todo:if}}
+                                {{/todo:loop}}
+                            </div>
+
+                            {{todo:if pagination_next_page > 0}}
+                            <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                                <span>{{todo:t text="下一页"}}</span>
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+                </main>
+
+                <!-- 右侧边栏 -->
+                <aside class="sidebar" style="width: 300px;">
+                    {{todo:include file="sidebar.html"}}
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{todo:public_url}}/static/common/js/jquery.min.js"></script>
+    <script src="{{todo:public_url}}/plugins/layer-v3.5.1/layer.js"></script>
+    
+    <style>
+    .guestbook-form {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .btn-submit {
+        background: #007cba;
+        color: #fff;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+    
+    .btn-submit:hover {
+        background: #005a87;
+    }
+    
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .guestbook-item {
+        border-top: 1px solid #eee;
+        padding: 20px;
+    }
+    
+    .guest-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .guest-avatar img,
+    .default-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .default-avatar {
+        background: #c5cbce;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        font-weight: 500;
+    }
+
+    .guest-name { color: #999; }
+    
+    .guestbook-replies {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-top: 12px;
+        margin-inline-end: -15px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .guestbook-reply-item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    .default-avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #9b9b9b;
+        background-color: #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+    .reply-body {
+        flex: 1;
+        font-size: 13px;
+    }
+    .reply-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+    .reply-author {
+        font-weight: 600;
+        color: #333;
+    }
+    .reply-to-text {
+        color: #8a8b91;
+        font-size: 12px;
+    }
+    .reply-to-tag {
+        font-weight: 500;
+    }
+    .reply-date {
+        color: #999;
+        font-size: 12px;
+        margin-inline-start: auto;
+    }
+    .reply-content {
+        color: #444;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+    .more-replies-tip {
+        align-self: baseline;
+        font-size: 13px;
+    }
+
+    .multi-file-upload {
+        position: relative;
+    }
+    .multi-file-upload .file-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .multi-file-upload .multi-file-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .multi-file-upload .file-picker-btn {
+        display: inline-block;
+        padding: 8px 18px;
+        background: #f0f0f0;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+    .multi-file-upload .file-picker-btn:hover {
+        background: #e0e0e0;
+    }
+    .multi-file-upload .file-hint {
+        color: #999;
+        font-size: 13px;
+    }
+    .multi-file-upload .file-preview-list {
+        list-style: none;
+        margin: 8px 0 0;
+        padding: 0;
+    }
+    .multi-file-upload .file-preview-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 5px 5px 10px;
+        margin-bottom: 4px;
+        background: #f5f5f5;
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+    .multi-file-upload .file-preview-item .file-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-inline-end: 10px;
+    }
+    .multi-file-upload .file-preview-item .file-size {
+        color: #999;
+        margin-inline-end: 8px;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+    .multi-file-upload .file-remove-btn {
+        background: none;
+        border: none;
+        color: #c00;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 0 4px;
+    }
+    .multi-file-upload .file-remove-btn:hover {
+        color: #900;
+    }
+    </style>
+    
+    <script>
+
+    // 多文件上传组件：预览选定文件并支持移除
+    (function() {
+        var containers = document.querySelectorAll('.multi-file-upload');
+        containers.forEach(function(container) {
+            var fileInput = container.querySelector('.multi-file-input');
+            var pickerBtn = container.querySelector('.file-picker-btn');
+            var listEl = container.querySelector('.file-preview-list');
+
+            // 点击按钮触发文件选择
+            if (pickerBtn) {
+                pickerBtn.addEventListener('click', function() {
+                    fileInput.click();
+                });
+            }
+
+            // 维护文件列表（使用 DataTransfer 支持增删）
+            var dt = new DataTransfer();
+
+            function renderList() {
+                listEl.innerHTML = '';
+                for (var i = 0; i < dt.files.length; i++) {
+                    var f = dt.files[i];
+                    var sizeStr = '';
+                    if (f.size < 1024) {
+                        sizeStr = f.size + ' B';
+                    } else if (f.size < 1024 * 1024) {
+                        sizeStr = (f.size / 1024).toFixed(1) + ' KB';
+                    } else {
+                        sizeStr = (f.size / (1024 * 1024)).toFixed(1) + ' MB';
+                    }
+                    var li = document.createElement('li');
+                    li.className = 'file-preview-item';
+                    li.innerHTML =
+                        '<span class="file-name">' + escapeHtml(f.name) + '</span>' +
+                        '<span class="file-size">' + sizeStr + '</span>' +
+                        '<button type="button" class="file-remove-btn" data-index="' + i + '">&times;</button>';
+                    listEl.appendChild(li);
+                }
+            }
+
+            listEl.addEventListener('click', function(e) {
+                var btn = e.target.closest('.file-remove-btn');
+                if (!btn) return;
+                var idx = parseInt(btn.dataset.index, 10);
+                if (isNaN(idx)) return;
+                // 从 DataTransfer 中移除该文件
+                var newDt = new DataTransfer();
+                for (var i = 0; i < dt.files.length; i++) {
+                    if (i !== idx) newDt.items.add(dt.files[i]);
+                }
+                dt = newDt;
+                fileInput.files = dt.files;
+                renderList();
+            });
+
+            fileInput.addEventListener('change', function() {
+                var maxFiles = parseInt(container.getAttribute('data-max-files') || '10', 10);
+                var allowedExtsAttr = container.getAttribute('data-allowed-exts') || '';
+                var allowedExts = allowedExtsAttr ? allowedExtsAttr.toLowerCase().split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+                // 追加新选文件到现有列表
+                for (var i = 0; i < fileInput.files.length; i++) {
+                    var f = fileInput.files[i];
+                    if (dt.files.length >= maxFiles) {
+                        if (window.layer) layer.msg('{{todo:t text="最多只能选择"}} ' + maxFiles + ' {{todo:t text="个文件"}}', {icon: 2});
+                        else alert('{{todo:t text="最多只能选择"}} ' + maxFiles + ' {{todo:t text="个文件"}}');
+                        break;
+                    }
+                    var ext = f.name.split('.').pop().toLowerCase();
+                    if (allowedExts.length > 0 && allowedExts.indexOf(ext) === -1) {
+                        var errMsg = '{{todo:t text="不支持的文件格式: "}}' + ext;
+                        if (window.layer) layer.msg(errMsg, {icon: 2});
+                        else alert(errMsg);
+                        continue;
+                    }
+                    if (f.size > 10 * 1024 * 1024) {
+                        var sizeMsg = '{{todo:t text="单文件大小不能超过 10MB: "}}' + f.name;
+                        if (window.layer) layer.msg(sizeMsg, {icon: 2});
+                        else alert(sizeMsg);
+                        continue;
+                    }
+                    // 去重：按 name+size 判断
+                    var dup = false;
+                    for (var j = 0; j < dt.files.length; j++) {
+                        if (dt.files[j].name === f.name &&
+                            dt.files[j].size === f.size) {
+                            dup = true;
+                            break;
+                        }
+                    }
+                    if (!dup) dt.items.add(f);
+                }
+                fileInput.files = dt.files;
+                renderList();
+            });
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+        });
+    })();
+
+    // 留言表单提交
+    document.getElementById('guestbook-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = this;
+        
+        var guestName = form.querySelector('#guest_name').value.trim();
+        var guestMessage = form.querySelector('#guest_message').value.trim();
+        
+        if (!guestName) {
+            layer.msg('{{todo:t text="请输入姓名"}}', {icon: 2});
+            return;
+        }
+        if (!guestMessage) {
+            layer.msg('{{todo:t text="请输入留言内容"}}', {icon: 2});
+            return;
+        }
+        
+        // 弹出滑块验证码
+        Captcha.show(function() {
+            var submitBtn = form.querySelector('.btn-submit');
+            var originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = '{{todo:t text="提交中"}}';
+            
+            var formData = new FormData(form);
+            formData.append('_submit_key', Date.now().toString(16) + '-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2));
+            
+            fetch('{{todo:site_url|default}}/api/guestbook/submit.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    layer.msg('{{todo:t text="提交成功"}}' + (data.need_approval ? '{{todo:t text="审核通过后将显示"}}' : ''), {icon: 1}, function() {
+                        if (!data.need_approval) {
+                            window.location.reload();
+                        } else {
+                            form.reset();
+                        }
+                    });
+                } else {
+                    layer.msg(data.message || '{{todo:t text="提交失败"}}', {icon: 2});
+                }
+            })
+            .catch(function() {
+                layer.msg('{{todo:t text="提交失败"}}', {icon: 2});
+            })
+            .finally(function() {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            });
+        });
+    });
+
+    function toggleExpandGuestbookReplies(guestbookId, tipBtn) {
+        var box = document.getElementById('guestbook-replies-' + guestbookId);
+        if (!box || !tipBtn) return;
+
+        var isExpanded = box.getAttribute('data-expanded') === 'true';
+        var rawB64 = box.getAttribute('data-all-replies');
+        if (!rawB64) return;
+
+        try {
+            var rawJson = decodeURIComponent(escape(window.atob(rawB64)));
+            var allReplies = JSON.parse(rawJson);
+            if (!Array.isArray(allReplies)) return;
+
+            if (!isExpanded) {
+                // 展开全部
+                var html = allReplies.map(function(sub) {
+                    var replyToHtml = sub.reply_to_name ? '<span class="reply-to-text">{{todo:t text="回复"}} <span class="reply-to-tag">@' + sub.reply_to_name + '</span></span>' : '';
+                    return '<div class="guestbook-reply-item">' +
+                                '<div class="reply-avatar"><div class="default-avatar-sm">' + sub.author_avatar + '</div></div>' +
+                                '<div class="reply-body">' +
+                                    '<div class="reply-header">' +
+                                        '<span class="reply-author">' + sub.author_name + '</span>' +
+                                        replyToHtml +
+                                        '<span class="reply-date">' + sub.comment_date + '</span>' +
+                                    '</div>' +
+                                    '<div class="reply-content">' + sub.comment_content + '</div>' +
+                                '</div>' +
+                            '</div>';
+                }).join('');
+
+                var foldBtn = '<a href="javascript:void(0);" class="more-replies-tip nohover" onclick="toggleExpandGuestbookReplies(' + guestbookId + ', this)">' +
+                                '{{todo:t text="收起"}}' +
+                              '</a>';
+
+                box.innerHTML = html + foldBtn;
+                box.setAttribute('data-expanded', 'true');
+            } else {
+                // 收起，只展示前 2 条
+                var initialReplies = allReplies.slice(0, 2);
+                var html = initialReplies.map(function(sub) {
+                    var replyToHtml = sub.reply_to_name ? '<span class="reply-to-text">{{todo:t text="回复"}} <span class="reply-to-tag">@' + sub.reply_to_name + '</span></span>' : '';
+                    return '<div class="guestbook-reply-item">' +
+                                '<div class="reply-avatar"><div class="default-avatar-sm">' + sub.author_avatar + '</div></div>' +
+                                '<div class="reply-body">' +
+                                    '<div class="reply-header">' +
+                                        '<span class="reply-author">' + sub.author_name + '</span>' +
+                                        replyToHtml +
+                                        '<span class="reply-date">' + sub.comment_date + '</span>' +
+                                    '</div>' +
+                                    '<div class="reply-content">' + sub.comment_content + '</div>' +
+                                '</div>' +
+                            '</div>';
+                }).join('');
+
+                var moreBtn = '<a href="javascript:void(0);" class="more-replies-tip nohover" onclick="toggleExpandGuestbookReplies(' + guestbookId + ', this)">' +
+                                '{{todo:t text="展开"}} (' + (allReplies.length - 2) + ')' +
+                              '</a>';
+
+                box.innerHTML = html + moreBtn;
+                box.setAttribute('data-expanded', 'false');
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // 区域选择器联动
+    (function() {
+        var containers = document.querySelectorAll('.region-selector');
+        if (!containers.length) return;
+
+        var regionBase = '{{todo:public_url}}/static/json/';
+        var regionFiles = [
+            regionBase + '01-province.json',
+            regionBase + '02-city.json',
+            regionBase + '03-district.json',
+            regionBase + '04-street.json'
+        ];
+        var regionCache = {}; // parent_code -> [{code, name}]
+
+        // 预加载所有区域数据到内存
+        var loadPromise = Promise.all(regionFiles.map(function(url) {
+            return fetch(url).then(function(r) { return r.json(); });
+        })).then(function(results) {
+            results.forEach(function(items) {
+                items.forEach(function(item) {
+                    var parent = item.parent_code || '0';
+                    if (!regionCache[parent]) regionCache[parent] = [];
+                    regionCache[parent].push({ code: item.code, name: item.name });
+                });
+            });
+        });
+
+        containers.forEach(function(container) {
+            if (container.dataset.regionInited) return;
+            container.dataset.regionInited = '1';
+
+            var fieldName = container.dataset.field;
+            var level = parseInt(container.dataset.level) || 5;
+            var provinceEl = container.querySelector('.region-province');
+            var cityEl = container.querySelector('.region-city');
+            var districtEl = container.querySelector('.region-district');
+            var townEl = container.querySelector('.region-town');
+            var detailEl = container.querySelector('.region-detail');
+            var hiddenEl = document.getElementById('field-' + fieldName);
+
+            function updateHidden() {
+                var parts = [];
+                if (provinceEl) parts.push(provinceEl.value || '');
+                if (cityEl) parts.push(cityEl.value || '');
+                if (districtEl) parts.push(districtEl.value || '');
+                if (townEl) parts.push(townEl.value || '');
+                if (level >= 5 && detailEl) parts.push(detailEl.value || '');
+                while (parts.length > 0 && parts[parts.length - 1] === '') parts.pop();
+                if (hiddenEl) hiddenEl.value = parts.join('|');
+            }
+
+            function fillOptions(targetEl, parentCode, placeholder) {
+                if (!targetEl) return;
+                targetEl.innerHTML = '<option value="">' + placeholder + '</option>';
+                var children = regionCache[parentCode] || [];
+                children.forEach(function(item) {
+                    targetEl.appendChild(new Option(item.name, item.code));
+                });
+                updateHidden();
+            }
+
+            // 数据加载完成后初始化省份
+            loadPromise.then(function() {
+                fillOptions(provinceEl, '0', '{{todo:t text="省份"}}');
+            });
+
+            if (provinceEl) provinceEl.addEventListener('change', function() {
+                fillOptions(cityEl, this.value || '', '{{todo:t text="城市"}}');
+                if (districtEl) districtEl.innerHTML = '<option value="">{{todo:t text="区/县"}}</option>';
+                if (townEl) townEl.innerHTML = '<option value="">{{todo:t text="乡镇/街道"}}</option>';
+            });
+            if (cityEl) cityEl.addEventListener('change', function() {
+                fillOptions(districtEl, this.value || '', '{{todo:t text="区/县"}}');
+                if (townEl) townEl.innerHTML = '<option value="">{{todo:t text="乡镇/街道"}}</option>';
+            });
+            if (districtEl) districtEl.addEventListener('change', function() {
+                fillOptions(townEl, this.value || '', '{{todo:t text="乡镇/街道"}}');
+            });
+            if (townEl) townEl.addEventListener('change', updateHidden);
+            if (detailEl) detailEl.addEventListener('input', updateHidden);
+        });
+    })();
+    </script>
+
+{{todo:include file="footer.html"}}

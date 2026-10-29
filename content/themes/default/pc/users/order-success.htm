@@ -1,0 +1,269 @@
+{{todo:include file="users/users_header.htm"}}
+    
+    <div class="order-success-page">
+        <div class="container">
+            <div class="success-header">
+                <div class="success-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill="#10B981"/>
+                        <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1>{{todo:t text="提交成功"}}</h1>
+                <p class="order-no">{{todo:t text="订单号"}} {{todo:order.order_no}}</p>
+            </div>
+
+            <div class="order-details">
+                <div class="order-info-section">
+                    <h3>{{todo:t text="订单信息"}}</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>{{todo:t text="订单状态"}}</label>
+                            <span class="status status-{{todo:order.status}}">
+                                {{todo:order.status_text}}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="支付状态"}}</label>
+                            <span class="payment-status payment-{{todo:order.payment_status}}">
+                                {{todo:order.payment_status_text}}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="支付方式"}}</label>
+                            <span>{{todo:order.payment_method_text}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="下单时间"}}</label>
+                            <span>{{todo:order.created_at_format}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{todo:if condition="order.payment_status == 'pending'"}}
+                <div class="payment-section">
+                    <h3>{{todo:t text="支付信息"}}</h3>
+                    <div class="payment-notice">
+                        <p>{{todo:t text="您的订单还未支付，请尽快完成支付"}}</p>
+                        <div class="payment-actions">
+                            <button type="button" class="btn btn-primary" onclick="continuePayment()">{{todo:t text="继续支付"}}</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelOrder()">{{todo:t text="取消订单"}}</button>
+                        </div>
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                {{todo:if condition="order.payment_info"}}
+                <div class="payment-info-section">
+                    <h3>{{todo:t text="支付详情"}}</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>{{todo:t text="支付时间"}}:&nbsp;</label>
+                            <span>{{todo:order.payment_info.paid_at_format}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="支付金额"}}:&nbsp;</label>
+                            <span class="amount">{{todo:currency_code}}{{todo:order.payment_info.amount_format}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="交易号"}}:&nbsp;</label>
+                            <span>{{todo:order.payment_info.transaction_id}}</span>
+                        </div>
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                <div class="order-items-section">
+                    <h3>{{todo:t text="商品清单"}}</h3>
+                    <div class="items-list">
+                        {{todo:order.items}}
+                        <div class="order-item align-items-center" data-product-id="{{todo:product_id}}">
+                            <div class="item-image">
+                                {{todo:if condition="product_image"}}
+                                    <img src="{{todo:product_image}}" alt="{{todo:product_title}}">
+                                {{todo:else}}
+                                    <div class="no-image">{{todo:t text="无图片"}}</div>
+                                {{/todo:if}}
+                            </div>
+                            <div class="item-info">
+                                <h3>{{todo:product_title}}</h3>
+                                 {{todo:if condition="spec_name"}}
+                                     <div class="specs">
+                                         {{todo:spec_name}}
+                                     </div>
+                                 {{/todo:if}}
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="item-total">
+                                    {{todo:currency_code}}{{todo:total_price_format}}
+                                </div>
+                                <div class="item-price" style="opacity: 0.5;">
+                                    <span class="unit-price">{{todo:currency_code}}{{todo:unit_price_format}}</span>
+                                    <span class="quantity">×{{todo:quantity}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {{/todo:order.items}}
+                    </div>
+                </div>
+
+                {{todo:if condition="order.shipping_address"}}
+                <div class="shipping-section mb-2">
+                    <h3>{{todo:t text="收货信息"}}</h3>
+                    <div class="address-info">
+                        <p><strong>{{todo:t text="收货人"}}:&nbsp;</strong>{{todo:order.shipping_address.name}}</p>
+                        <p><strong>{{todo:t text="联系电话"}}:&nbsp;</strong>{{todo:order.shipping_address.phone}}</p>
+                        <p><strong>{{todo:t text="收货地址"}}:&nbsp;</strong>
+                            {{todo:order.shipping_address.province}} {{todo:order.shipping_address.city}} {{todo:order.shipping_address.district}} {{todo:order.shipping_address.detail}}
+                        </p>
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                <div class="order-summary">
+                    <h3>{{todo:t text="费用明细"}}</h3>
+                    <div class="summary-list">
+                        <div class="summary-item">
+                            <span>{{todo:t text="商品小计"}}:&nbsp;</span>
+                            <span>{{todo:currency_code}}{{todo:order.subtotal_amount_format}}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>{{todo:t text="运费"}}:&nbsp;</span>
+                            <span>{{todo:currency_code}}{{todo:order.shipping_fee_format}}</span>
+                        </div>
+                        {{todo:if condition="order.discount_amount > 0"}}
+                        <div class="summary-item">
+                            <span>{{todo:t text="优惠金额"}}:&nbsp;</span>
+                            <span>-{{todo:currency_code}}{{todo:order.discount_amount_format}}</span>
+                        </div>
+                        {{/todo:if}}
+                        <div class="summary-item total">
+                            <span>{{todo:t text="订单总计"}}:&nbsp;</span>
+                            <b class="total-amount">{{todo:currency_code}}{{todo:order.total_amount_format}}</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3 mb-5">
+                <a href="{{todo:site_url}}" class="btn btn-secondary">{{todo:t text="继续购物"}}</a>
+                {{todo:if condition="user.is_logged_in"}}
+                    <a href="{{todo:user_page_url page='orders'}}" class="btn btn-primary">{{todo:t text="查看我的订单"}}</a>
+                {{/todo:if}}
+            </div>
+        </div>
+    </div>
+
+    {{todo:include file="users/users_footer.htm"}}
+    
+    <script>
+    function continuePayment() {
+        // 跳转到支付页面
+        window.location.href = "{{todo:user_page_url page='payment'}}&order_id={{todo:order.id}}";
+    }
+
+    function cancelOrder() {
+        const doCancel = function() {
+            // 发送取消订单请求
+            fetch('{{todo:admin_url}}/admin-ajax.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    action: 'cancel_order',
+                    order_id: '{{todo:order.id}}',
+                    _nonce: '{{todo:csrf_token action="cancel_order"}}'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (window.layer) { layer.msg('{{todo:t text="订单已取消"}}', {icon: 1}); } else { alert('{{todo:t text="订单已取消"}}'); }
+                    location.reload();
+                } else {
+                    if (window.layer) { layer.msg(data.message || '{{todo:t text="取消失败"}}', {icon: 2}); } else { alert(data.message || '{{todo:t text="取消失败"}}'); }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (window.layer) { layer.msg('{{todo:t text="取消失败"}}', {icon: 2}); } else { alert('{{todo:t text="取消失败"}}'); }
+            });
+        };
+
+        if (window.layer) {
+            layer.confirm('{{todo:t text="确定取消该订单"}}', {
+                icon: 3,
+                title: '{{todo:t text="确认取消"}}',
+                btn: [__t('确定'), __t('取消')]
+            }, function(index) {
+                layer.close(index);
+                doCancel();
+            });
+        }
+    </script>
+
+    <!-- Google Ads & GA4: E-Commerce purchase Conversion Tracking (Enhanced) -->
+    <script>
+    (function() {
+        var txId = '{{todo:order.order_no}}';
+        if (!txId) return;
+
+        // 防刷新与重复访问导致转化虚增去重逻辑
+        var storageKey = 'ga4_purchase_reported_' + txId;
+        if (window.sessionStorage && window.sessionStorage.getItem(storageKey)) {
+            return;
+        }
+
+        window.dataLayer = window.dataLayer || [];
+        var purchaseItems = [];
+        var itemNodes = document.querySelectorAll('.order-items-section .order-item');
+        if (itemNodes.length > 0) {
+            itemNodes.forEach(function(el) {
+                var titleEl = el.querySelector('.item-info h3');
+                var specEl = el.querySelector('.item-info .specs');
+                var qtyEl = el.querySelector('.quantity');
+                var priceEl = el.querySelector('.unit-price');
+                var pId = el.getAttribute('data-product-id') || '';
+
+                var title = titleEl ? titleEl.textContent.trim() : '';
+                var spec = specEl ? specEl.textContent.trim() : '';
+                var qty = qtyEl ? (parseInt(qtyEl.textContent.replace(/[^0-9]/g, '')) || 1) : 1;
+                var price = priceEl ? (parseFloat(priceEl.textContent.replace(/[^0-9.]/g, '')) || 0) : 0;
+
+                purchaseItems.push({
+                    'item_id': String(pId),
+                    'item_name': title,
+                    'item_variant': spec,
+                    'price': price,
+                    'quantity': qty
+                });
+            });
+        }
+
+        var orderVal = parseFloat('{{todo:order.payment_info.amount_format}}');
+        if (!orderVal || isNaN(orderVal)) {
+            orderVal = parseFloat('{{todo:order.total_amount_format}}') || 0;
+        }
+
+        window.dataLayer.push({
+            'event': 'purchase',
+            'ecommerce': {
+                'transaction_id': txId,
+                'value': orderVal,
+                'shipping': parseFloat('{{todo:order.shipping_fee_format}}') || 0,
+                'currency': '{{todo:currency_iso|default="USD"}}',
+                'items': purchaseItems
+            }
+        });
+
+        if (window.sessionStorage) {
+            try {
+                window.sessionStorage.setItem(storageKey, '1');
+            } catch (e) {}
+        }
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1610 @@
+{{todo:include file="header.html"}}
+<div class="main-content" style="position: relative;">
+    <!-- 目录 -->
+    {{todo:if custom_field|name=show_toc}}
+    <div class="table-of-contents">
+        <div class="toc-box">
+            <h3>{{todo:t text="目录"}}</h3>
+            <div id="toc-content">
+                <!-- 目录将通过JavaScript生成 -->
+            </div>
+        </div>
+    </div>
+    {{/todo:if}}
+
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:breadcrumb}}
+        <div class="row gap-5">
+            <main class="col">
+                <article class="article-detail">
+                    <!-- 文章头部 -->
+                    <header class="article-header">
+                        {{todo:if condition="featured_images.length > 1"}}
+                        <section class="hero-slider" data-autoplay="false" data-show-loading="false" style="width: 400px; height: 360px; background-color: #5c5c5c;">
+                            <div class="slider-container">
+                                <div class="slider-track">
+                                {{todo:loop featured_images}}
+                                {{todo:if condition="type == 'image'"}}
+                                <div class="slide" data-id="{{todo:index}}" data-type="{{todo:type}}" data-url="{{todo:url}}" data-placeholder="{{todo:placeholder}}" data-alt="{{todo:alt}}">
+                                    {{todo:if index == 0}}
+                                    <img src="{{todo:url}}" alt="{{todo:alt}}" class="article-lcp-img" loading="eager" fetchpriority="high" style="width: 100%; height: 100%; object-fit: contain;">
+                                    {{todo:else}}
+                                    {{todo:img_tag src="url" alt="alt" class="lazy-load" loading="lazy"}}
+                                    {{/todo:if}}
+                                </div>
+                                {{todo:else}}
+                                <div class="slide" data-id="{{todo:index}}" data-type="{{todo:type}}" data-url="{{todo:url}}" data-alt="{{todo:alt}}"></div>
+                                {{/todo:if}}
+                                {{/todo:loop}}
+                                </div>
+                            </div>
+
+                            <!-- 轮播控制 -->
+                            <div class="slider-controls">
+                                <button class="slider-prev" aria-label="{{todo:t text='上一张'}}" style="inset-inline-start: 0; transform: scale(0.8);">
+                                    <i class="icon todofont todo-Right ro180"></i>
+                                </button>
+                                <button class="slider-next" aria-label="{{todo:t text='下一张'}}" style="inset-inline-end: 0; transform: scale(0.8);">
+                                    <i class="icon todofont todo-Right"></i>
+                                </button>
+                            </div>
+
+                            <!-- 轮播预览 -->
+                            <div class="slider-preview">
+                            </div>
+
+                            <!-- 轮播指示器 -->
+                            <div class="slider-indicators" style="top: 20px; bottom: unset; inset-inline-end: 10px; inset-inline-start: unset; transform: none; opacity: 0.3; transform: scale(0.8);">
+                                <!-- 指示器将由JavaScript动态生成 -->
+                            </div>
+
+                            <!-- 轮播分页 -->
+                            <div class="slider_pagination" style="top: 10px; bottom: unset;">
+                                <span class="current">01</span>
+                                <span class="total">01</span>
+                            </div>
+
+                            <!-- 加载状态 -->
+                            <div class="slider-loading">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </section>
+                        {{/todo:if}}
+                        
+                        <h1 class="article-title">{{todo:post_title}}</h1>
+                        <!-- 文档属性 -->
+                        {{todo:if post_property}}
+                        <div class="document-attributes">
+                            {{todo:post_property}}
+                            <span>{{todo:property_name}}</span>
+                            {{/todo:post_property}}
+                        </div>
+                        {{/todo:if}}
+
+                        {{todo:if custom_field|name=fu_biao_ti}}
+                        <h2 class="article-subtitle">{{todo:custom_field name="fu_biao_ti"}}</h2>
+                        {{/todo:if}}
+
+                        <div class="article-meta dec">
+                            <div class="meta-left">
+                                {{todo:t text="由"}}
+                                <span class="meta-item author">
+                                    <a href="{{todo:author_url}}"><span>{{todo:author_name}}</span></a>
+                                </span>
+                                {{todo:t text="发布于"}}
+                                <span class="meta-item m-r-10">
+                                    <time datetime="{{todo:post_date format=c}}">{{todo:post_date}}</time>
+                                </span>
+
+                                {{todo:if condition="post_modified != post_date"}}
+                                {{todo:t text="最后更新"}}
+                                <span class="meta-item m-r-10">
+                                    <time datetime="{{todo:post_modified format=c}}">{{todo:post_modified}}</time>
+                                </span>
+                                {{/todo:if}}
+
+                                {{todo:t text="来自"}}
+                                <span class="meta-item">
+                                    {{todo:post_categories}}<a href="{{todo:category_url}}">{{todo:category_name}}</a> {{/todo:post_categories}}
+                                </span>
+                            </div>
+
+                            <div class="meta-right">
+                                <span class="meta-item">
+                                    <i class="icon todofont todo-PreviewOpen"></i>
+                                    {{todo:views}}
+                                </span>
+
+                                {{todo:if comments_enabled && comment_count}}
+                                <span class="meta-item">
+                                    <i class="icon todofont todo-CommentOne"></i>
+                                    <a href="#comments">{{todo:comment_count}} {{todo:t text="评论"}}</a>
+                                </span>
+                                {{/todo:if}}
+
+                                {{todo:if likes}}
+                                <span class="meta-item">
+                                    <i class="icon todofont todo-Like"></i>
+                                    {{todo:likes}}
+                                </span>
+                                {{/todo:if}}
+
+                                <span class="meta-item" id="articleFavoriteBtn" data-article-id="{{todo:post_id}}" style="cursor: pointer;">
+                                    <span id="articleFavoriteText">{{todo:t text="收藏"}}</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        {{todo:if post_tags}}
+                        <!-- 标签 -->
+                        <div class="article-tags">
+                            {{todo:post_tags|limit=10}}
+                            <a href="{{todo:tag_url}}" class="tag">{{todo:tag_name}}</a>
+                            {{/todo:post_tags}}
+                        </div>
+                        {{/todo:if}}
+                    </header>
+
+                    <!-- 文章摘要 -->
+                    <div class="article-summary">
+                        <div class="summary-content">
+                            {{todo:post_excerpt}}
+                        </div>
+                    </div>
+
+                    <!-- 特色图片 -->
+                    <div style="max-width: 50%;">
+                        {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                    </div>
+
+                    <!-- 文章内容 -->
+                    <div class="article-content" id="articleContent">
+                        {{todo:post_content}}
+                    </div>
+
+                    <!-- 自定义字段 -->
+                    {{todo:if custom_fields}}
+                    <div class="custom-fields">
+                        <h3>{{todo:t|text=扩展信息}}</h3>
+                        <div class="fields-grid">
+                            {{todo:loop custom_fields}}
+                            {{todo:if|condition=field_value && is_visible}}
+                            <div class="field-item field-type-{{todo:field_type}}">
+                                <label class="field-label">{{todo:field_title}}:</label>
+                                <div class="field-value">
+                                    {{todo:if condition="field_type == 'image'"}}
+                                    <img src="{{todo:field_value}}" alt="{{todo:field_title}}" loading="lazy">
+                                    {{todo:elseif field_type == 'file'}}
+                                    <a href="{{todo:field_value}}" target="_blank" class="file-link">
+                                        <i class="icon todofont todo-Download"></i> {{todo:t|text=下载文件}}
+                                    </a>
+                                    {{todo:elseif field_type == 'url'}}
+                                    <a href="{{todo:field_value}}" target="_blank" rel="noopener">{{todo:field_value}}</a>
+                                    {{todo:elseif field_type == 'email'}}
+                                    <a href="mailto:{{todo:field_value}}">{{todo:field_value}}</a>
+                                    {{todo:elseif field_type == 'phone'}}
+                                    <a href="tel:{{todo:field_value}}">{{todo:field_value}}</a>
+                                    {{todo:elseif field_type == 'date'}}
+                                    <time datetime="{{todo:field_value}}">{{todo:field_value_formatted}}</time>
+                                    {{todo:elseif field_type == 'switch'}}
+                                    <span
+                                        class="switch-value {{todo:if field_value}}switch-on{{todo:else}}switch-off{{/todo:if}}">
+                                        {{todo:if field_value}}{{todo:t|text=是}}{{todo:else}}{{todo:t|text=否}}{{/todo:if}}
+                                    </span>
+                                    {{todo:else}}
+                                    {{todo:field_value}}
+                                    {{/todo:if}}
+                                </div>
+                                {{todo:if field_description}}
+                                <div class="field-description">{{todo:field_description}}</div>
+                                {{/todo:if}}
+                            </div>
+                            {{/todo:if}}
+                            {{/todo:loop}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 附件下载 -->
+                    {{todo:if attachments}}
+                    <div class="article-attachments">
+                        <h3>{{todo:t|text=附件下载}}</h3>
+                        <div class="attachments-list">
+                            {{todo:loop attachments}}
+                            <div class="attachment-item">
+                                <div class="attachment-icon">
+                                    <i class="fa fa-{{todo:file_icon}}"></i>
+                                </div>
+                                <div class="attachment-info">
+                                    <h4 class="attachment-name">{{todo:file_name}}</h4>
+                                    <div class="attachment-meta">
+                                        <span class="file-size">{{todo:file_size}}</span>
+                                        <span class="file-type">{{todo:file_type}}</span>
+                                        <span class="download-count">{{todo:t|text=下载}} {{todo:download_count}} {{todo:t|text=次
+                                        }}</span>
+                                    </div>
+                                    {{todo:if file_description}}
+                                    <div class="attachment-description">{{todo:file_description}}</div>
+                                    {{/todo:if}}
+                                </div>
+                                <div class="attachment-actions">
+                                    <a href="{{todo:download_url}}" class="btn btn-primary" target="_blank">
+                                        <i class="icon todofont todo-Download"></i> {{todo:t|text=下载}}
+                                    </a>
+                                </div>
+                            </div>
+                            {{/todo:loop}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+
+                    <!-- 文章操作 -->
+                    <div class="article-actions">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="toggleLike({{todo:post_id}})" id="likeBtn">
+                                <i class="icon todofont todo-Like"></i>
+                                {{todo:if condition="likes > 0"}}
+                                <span id="likeCount">{{todo:likes}}</span>
+                                {{/todo:if}}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 版权信息 -->
+                    {{todo:if show_copyright}}
+                    <div class="article-copyright">
+                        <div class="copyright-content">
+                            <h4>{{todo:t|text=版权声明}}</h4>
+                            <p>
+                                {{todo:t|text=本文由}} <strong>{{todo:author_name}}</strong> {{todo:t|text=发表于}}
+                                <strong>{{todo:site_title}}</strong>，
+                                {{todo:t|text=转载请注明出处}} <a href="{{todo:current_url}}">{{todo:current_url}}</a>
+                            </p>
+                            {{todo:if license}}
+                            <p>{{todo:t|text=本文采用}} <a href="{{todo:license_url}}" target="_blank">{{todo:license_name}}</a>
+                                {{todo:t|text=许可协议}}</p>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+                </article>
+
+                <!-- 作者信息 -->
+                {{todo:if show_author_info}}
+                <div class="author-info">
+                    <div class="author-avatar">
+                        {{todo:author_avatar|size=96}}
+                    </div>
+                    <div class="author-details">
+                        <h3 class="author-name">
+                            <a href="{{todo:author_url}}">{{todo:author_name}}</a>
+                        </h3>
+                        {{todo:if author_title}}
+                        <div class="author-title">{{todo:author_title}}</div>
+                        {{/todo:if}}
+                        {{todo:if author_description}}
+                        <div class="author_description">{{todo:author_description}}</div>
+                        {{/todo:if}}
+                        <div class="author-stats">
+                            <span>{{todo:t|text=发表文章}} {{todo:author_posts_count}} {{todo:t|text=篇}}</span>
+                            {{todo:if author_followers_count}}
+                            <span>{{todo:t|text=粉丝}} {{todo:author_followers_count}} {{todo:t|text=人}}</span>
+                            {{/todo:if}}
+                        </div>
+                        <div class="author-social">
+                            {{todo:if author_url}}
+                            <a href="{{todo:author_url}}" target="_blank" title="{{todo:t|text=个人网站}}">
+                                <i class="fa fa-globe"></i>
+                            </a>
+                            {{/todo:if}}
+                            {{todo:if author_email}}
+                            <a href="mailto:{{todo:author_email}}" title="{{todo:t|text=邮箱}}">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                {{todo:if related_posts_by_tags}}
+                <div class="related-articles">
+                    <h3>{{todo:t|text=相关文章}}</h3>
+                    <div class="related-list">
+                        {{todo:loop related_posts_by_tags|limit=6}}
+                        <article class="related-item">
+                            <div class="related-thumb">
+                                <a href="{{todo:post_url}}">
+                                    {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                                </a>
+                            </div>
+                            <div class="related-content">
+                                <h4 class="related-title">
+                                    <a href="{{todo:post_url}}">{{todo:post_title}}</a>
+                                </h4>
+                                <div class="related-meta">
+                                    <span class="related-date">{{todo:post_date}}</span>
+                                    <span class="related-views">{{todo:views}} {{todo:t|text=次阅读}}</span>
+                                </div>
+                                <div class="related-summary">{{todo:post_excerpt}}</div>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                <!-- 指定推荐文章（后台自定义字段输入的ID组，字段别名必须是related_posts） -->
+                {{todo:if related_posts}}
+                <div class="related-articles hand-picked-articles">
+                    <h3>{{todo:t|text=推荐阅读}}</h3>
+                    <div class="related-list">
+                        {{todo:loop special_featured_posts}}
+                        <article class="related-item">
+                            <div class="related-thumb">
+                                <a href="{{todo:post_url}}">
+                                    {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                                </a>
+                            </div>
+                            <div class="related-content">
+                                <h4 class="related-title">
+                                    <a href="{{todo:post_url}}">{{todo:post_title}}</a>
+                                </h4>
+                                <div class="related-meta">
+                                    <span class="related-date">{{todo:post_date}}</span>
+                                    <span class="related-views">{{todo:views}} {{todo:t|text=次阅读}}</span>
+                                </div>
+                                <div class="related-summary">{{todo:post_excerpt}}</div>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:if}}
+
+                <!-- 上一篇/下一篇 -->
+                {{todo:if condition="prev_post_url || next_post_url"}}
+                <div class="article-navigation">
+                    {{todo:if prev_post_url}}
+                    <div class="nav-item nav-prev">
+                        <a href="{{todo:prev_post_url}}" class="nav-link">
+                            <i class="icon todofont todo-ArrowRight ro180"></i>
+                            <div style="max-width: 100px;">
+                                {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                            </div>
+                            {{todo:prev_post_title}}
+                        </a>
+                        <span class="nav-label">{{todo:t|text=上一篇}}</span>
+                    </div>
+                    {{/todo:if}}
+
+                    {{todo:if next_post_url}}
+                    <div class="nav-item nav-next">
+                        <span class="nav-label">{{todo:t|text=下一篇}}</span>
+                        <a href="{{todo:next_post_url}}" class="nav-link">
+                            {{todo:next_post_title}}
+                            <div style="max-width: 100px;">
+                                {{todo:post_thumbnail class="lazy-load" loading="lazy"}}
+                            </div>
+                            <i class="icon todofont todo-ArrowRight"></i>
+                        </a>
+                    </div>
+                    {{/todo:if}}
+                </div>
+                {{/todo:if}}
+
+                <!-- 评论区模版引入 -->
+                {{todo:include file="comment_section.html"}}
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:post_categories}}
+                    <a href="{{todo:top_category_url}}" title="{{todo:top_category_slug}}">{{todo:top_category_name}}:{{todo:top_category_id}}</a>
+                    <a href="{{todo:parent_category_url}}" title="{{todo:parent_category_slug}}">{{todo:parent_category_name}}:{{todo:parent_category_id}}</a>
+                    <a href="{{todo:category_url}}" title="{{todo:category_slug}}">{{todo:category_name}}:{{todo:category_id}}</a>
+                {{/todo:post_categories}}
+                {{todo:get_sidebar}}
+            </aside>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .article-detail {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .article-header {
+        padding: 15px 15px 30px 0;
+        position: relative;
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .article-title {
+        font-size: 32px;
+        line-height: 1.3;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .article-subtitle {
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        color: #666;
+        font-weight: 400;
+    }
+
+    .article-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin: 0 0 10px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .meta-left,
+    .meta-right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .meta-right {
+        gap: 15px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .meta-item a {
+        color: #007cba;
+        text-decoration: none;
+    }
+
+    .meta-item a:hover {
+        text-decoration: underline;
+    }
+
+    .document-attributes {
+        display: inline-flex;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .document-attributes span{
+        font-size: 12px;
+        padding: 2px 5px;
+        background: #f1f1f1;
+        border-radius: 3px;
+        color: #666;
+        font-weight: normal;
+    }
+
+    .attr-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        margin-inline-end: 6px;
+        margin-bottom: 6px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        color: white;
+    }
+
+    .attr-featured {
+        background: #ff6b6b;
+    }
+
+    .attr-recommended {
+        background: #28a745;
+    }
+
+    .attr-hot {
+        background: #ff9f43;
+    }
+
+    .attr-new {
+        background: #26de81;
+    }
+
+    .attr-top {
+        background: #007cba;
+    }
+
+    .article-tags {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .tag {
+        padding: 3px 8px;
+        background: #f0f0f0;
+        color: #666;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .tag:hover {
+        background: #007cba;
+        color: white;
+    }
+
+    .featured-image {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .featured-image img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-caption {
+        margin-top: -15px;
+        font-size: 14px;
+        color: #999;
+        text-align: center;
+    }
+
+    .article-summary {
+        background: #f8f9fa;
+        border-inline-start: 4px solid #bbdaf2;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+
+    .summary-content {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    .table-of-contents {
+        position: sticky;
+        top: 0;
+        right: 0;
+        padding: 20px 30px 0 0;
+        z-index: 1;
+        float: right;
+        margin-inline-start: -400px;
+    }
+
+    .table-of-contents .toc-box {
+        padding: 15px 15px 5px;
+        display: flex;
+        gap: 10px;
+        width: fit-content;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+    }
+
+    .table-of-contents .toc-box h3 {
+        font-size: 16px;
+        color: #333;
+    }
+
+    .table-of-contents .toc-box ul li {
+        max-width: 200px;
+        line-height: normal;
+        margin: 0 0 10px 0;
+    }
+
+    .article-content {
+        padding: 30px 20px;
+        font-size: 16px;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    .article-content h1,
+    .article-content h2,
+    .article-content h3,
+    .article-content h4,
+    .article-content h5,
+    .article-content h6 {
+        margin: 30px 0 15px 0;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .article-content h1 {
+        font-size: 28px;
+    }
+
+    .article-content h2 {
+        font-size: 24px;
+    }
+
+    .article-content h3 {
+        font-size: 20px;
+    }
+
+    .article-content h4 {
+        font-size: 18px;
+    }
+
+    .article-content h5 {
+        font-size: 16px;
+    }
+
+    .article-content h6 {
+        font-size: 14px;
+    }
+
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        margin: 15px 0;
+        font-size: 10px; line-height: 16px; text-indent: 5px; color: #333; word-break: break-all; letter-spacing: -0.05rem;
+    }
+
+    .article-content blockquote {
+        border-inline-start: 4px solid #007cba;
+        padding: 15px 20px;
+        margin: 20px 0;
+        background: #f8f9fa;
+        border-radius: 0 4px 4px 0;
+        font-style: italic;
+    }
+
+    .article-content code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+    }
+
+    .article-content pre {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 15px 0;
+    }
+
+    .article-content pre code {
+        background: none;
+        padding: 0;
+    }
+
+    .custom-fields {
+        padding: 30px;
+        background: #f8f9fa;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .custom-fields h3 {
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .fields-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .field-item {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .field-label {
+        display: block;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .field-value {
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .field-value img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .file-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #007cba;
+        text-decoration: none;
+        padding: 6px 12px;
+        background: #f0f8ff;
+        border-radius: 4px;
+        transition: background 0.3s ease;
+    }
+
+    .file-link:hover {
+        background: #e6f3ff;
+    }
+
+    .switch-value {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .switch-on {
+        background: #28a745;
+        color: white;
+    }
+
+    .switch-off {
+        background: #6c757d;
+        color: white;
+    }
+
+    .field-description {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #999;
+        font-style: italic;
+    }
+
+    .article-attachments {
+        padding: 30px;
+        background: #f8f9fa;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .article-attachments h3 {
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .attachments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .attachment-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .attachment-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #007cba;
+        color: white;
+        border-radius: 6px;
+        font-size: 18px;
+    }
+
+    .attachment-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .attachment-name {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .attachment-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .attachment-description {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.4;
+    }
+
+    .attachment-actions {
+        flex-shrink: 0;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        line-height: normal;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #007cba;
+        color: white;
+        border-color: #007cba;
+    }
+
+    .btn-primary:hover {
+        background: #006ba1;
+        border-color: #006ba1;
+    }
+
+    .article-actions {
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 15px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #666;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        background: #007cba;
+        color: white;
+        border-color: #007cba;
+    }
+
+    .action-btn.active,
+    .action-btn.liked {
+        background: #007cba;
+        color: white;
+        border-color: #007cba;
+    }
+
+    .article-copyright {
+        padding: 20px 30px;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        margin: 20px 30px;
+    }
+
+    .copyright-content h4 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        color: #856404;
+    }
+
+    .copyright-content p {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: #856404;
+        line-height: 1.5;
+    }
+
+    .copyright-content a {
+        color: #007cba;
+        text-decoration: none;
+    }
+
+    .copyright-content a:hover {
+        text-decoration: underline;
+    }
+
+    .author-info {
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .author-avatar {
+        flex-shrink: 0;
+    }
+
+    .author-avatar img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .author-details {
+        flex: 1;
+    }
+
+    .author-name {
+        margin: 0 0 5px 0;
+        font-size: 20px;
+    }
+
+    .author-name a {
+        color: #333;
+        text-decoration: none;
+    }
+
+    .author-name a:hover {
+        color: #007cba;
+    }
+
+    .author-title {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .author_description {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+
+    .author-stats {
+        display: flex;
+        gap: 20px;
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 10px;
+    }
+
+    .author-social {
+        display: flex;
+        gap: 10px;
+    }
+
+    .author-social a {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0;
+        color: #666;
+        border-radius: 50%;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .author-social a:hover {
+        background: #007cba;
+        color: white;
+    }
+
+    .related-articles {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        border: 1px solid #eee;
+    }
+
+    .related-articles h3 {
+        font-size: 20px;
+        color: #333;
+    }
+
+    .related-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 0 20px;
+        margin-top: 10px;
+    }
+
+    .related-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .related-item:hover {
+        background: #f8f9fa;
+    }
+
+    .related-thumb {
+        width: 80px;
+        height: 60px;
+        overflow: hidden;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+
+    .related-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .related-item:hover .related-thumb img {
+        transform: scale(1.2);
+    }
+
+    .thumb-placeholder {
+        width: 100%;
+        height: 100%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 24px;
+    }
+
+    .related-content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .related-title {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .related-title a {
+        color: #333;
+        text-decoration: none;
+    }
+
+    .related-title a:hover {
+        color: #007cba;
+    }
+
+    .related-meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 12px;
+        color: #999;
+    }
+
+    .related-summary {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .article-navigation {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .nav-item {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-item:only-child {
+        grid-column: 1 / -1;
+    }
+
+    .nav-label {
+        flex-shrink: 0;
+        display: block;
+        padding: 10px 15px;
+        color: #999;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .nav-link > div { border-radius: 4px; overflow: hidden; }
+
+    .nav-link > div img { transition: all 0.3s ease; }
+
+    .nav-link:hover {
+        text-decoration: none;
+        color: #007cba;
+    }
+
+    .nav-link:hover img {
+        transform: scale(1.2);
+    }
+
+    .nav-next .nav-link {
+        justify-content: flex-end;
+        text-align: right;
+    }
+
+    .comments-section {
+        margin-bottom: 100px;
+    }
+
+    .comments-section h3 {
+        margin: 0 0 20px 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .comment-form {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f4f4f4;
+        border-radius: 5px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .captcha-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .captcha-group input {
+        flex: 1;
+    }
+
+    .captcha-image {
+        height: 40px;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .form-actions {
+        text-align: right;
+    }
+
+    .back-to-top {
+        position: fixed;
+        bottom: 30px;
+        inset-inline-end: 30px;
+        width: 50px;
+        height: 50px;
+        background: #007cba;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .back-to-top.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .back-to-top:hover {
+        background: #006ba1;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .article-title {
+            font-size: 24px;
+        }
+
+        .article-meta {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .meta-left,
+        .meta-right {
+            width: 100%;
+        }
+
+        .article-header,
+        .article-content,
+        .custom-fields,
+        .article-attachments,
+        .article-actions,
+        .author-info,
+        .related-articles,
+        .comments-section {
+            padding: 20px;
+        }
+
+        .author-info {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .related-list {
+            grid-template-columns: 1fr;
+        }
+
+        .article-navigation {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            justify-content: center;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .comment-item.reply {
+            margin-inline-start: 20px;
+        }
+
+        .back-to-top {
+            bottom: 20px;
+            inset-inline-end: 20px;
+            width: 45px;
+            height: 45px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 生成目录
+        generateTOC();
+
+        // 代码高亮（如果有相关库）
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightAll();
+        }
+
+        // 初始化轮播 slide 内容（视频/图片）——与小程序 heroSlides 逻辑保持一致
+        document.querySelectorAll('.slider-track .slide[data-type]').forEach(function(slide) {
+            const type = slide.dataset.type;
+            const url  = slide.dataset.url  || '';
+            const alt  = slide.dataset.alt  || '';
+            if (!url) return;
+            if (type === 'video') {
+                slide.classList.add('slide--video');
+                slide.style.background = '#000';
+                const video = document.createElement('video');
+                video.src = url;
+                video.controls = true;
+                video.setAttribute('playsinline', '');
+                video.muted = true;
+                video.preload = 'metadata';
+                video.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
+                slide.appendChild(video);
+            } else if (type === 'html') {
+                const iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.style.cssText = 'width:100%;height:100%;border:0;background-color:#fff;display:block;';
+                slide.appendChild(iframe);
+            }
+        });
+    });
+
+    // 生成目录
+    function generateTOC() {
+        const tocContent = document.getElementById('toc-content');
+        if (!tocContent) return;
+
+        const headings = document.querySelectorAll('#articleContent h1, #articleContent h2, #articleContent h3, #articleContent h4, #articleContent h5, #articleContent h6');
+        if (headings.length === 0) {
+            document.querySelector('.table-of-contents').style.display = 'none';
+            return;
+        }
+
+        const tocList = document.createElement('ul');
+        tocList.className = 'toc-list';
+
+        headings.forEach((heading, index) => {
+            const id = 'heading-' + index;
+            heading.id = id;
+
+            const li = document.createElement('li');
+            li.className = 'toc-item toc-' + heading.tagName.toLowerCase();
+
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.textContent = heading.textContent;
+            a.addEventListener('click', function (e) {
+                e.preventDefault();
+                heading.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            li.appendChild(a);
+            tocList.appendChild(li);
+        });
+
+        tocContent.appendChild(tocList);
+    }
+
+    // 返回顶部
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 点赞功能
+    function toggleLike(articleId) {
+        var btn = document.getElementById('likeBtn');
+        var countEl = document.getElementById('likeCount');
+
+        fetch('{{todo:site_url}}/api/v1/posts/' + articleId + '/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.status === 'success' && data.data) {
+                btn.classList.toggle('liked', data.data.liked);
+                if (countEl) {
+                    countEl.textContent = data.data.likes_count;
+                }
+            } else {
+                console.error('Failed to like:', data.message);
+            }
+        })
+        .catch(function (error) {
+            console.error('Like request failed:', error);
+        });
+    }
+
+    // 刷新验证码
+    function refreshCaptcha() {
+        const captchaImg = document.querySelector('.captcha-image');
+        if (captchaImg) {
+            captchaImg.src = captchaImg.src + '?t=' + Date.now();
+        }
+    }
+
+    // 文章收藏逻辑
+    (function initArticleFavorite() {
+        const getMeta = (name) => document.querySelector(`meta[name="${name}"]`);
+        const IS_LOGGED_IN = (getMeta('todo-user-logged-in')?.getAttribute('content') === '1');
+        const BASE_URL = (window.TODO && window.TODO.SITE_URL) ? window.TODO.SITE_URL : (getMeta('site-url')?.getAttribute('content') || window.location.origin);
+        const LOGIN_URL_BASE = getMeta('todo-login-url')?.getAttribute('content') || (BASE_URL.replace(/\/+$/, '') + '/login');
+        const LOGIN_URL = LOGIN_URL_BASE + (LOGIN_URL_BASE.includes('?') ? '&' : '?') + 'redirect_to=' + encodeURIComponent(window.location.href);
+
+        const cartAjaxUrl = (window.TODO && window.TODO.join && window.TODO.INCLUDES_AJAX)
+            ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'cart-handler.php')
+            : (BASE_URL.replace(/\/+$/, '') + '/includes/ajax/cart-handler.php');
+
+        const favoritesAjaxUrl = (window.TODO && window.TODO.join && window.TODO.INCLUDES_AJAX)
+            ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'favorites-handler.php')
+            : (BASE_URL.replace(/\/+$/, '') + '/includes/ajax/favorites-handler.php');
+
+        async function getCsrfToken(action) {
+            try {
+                var formData = new FormData();
+                formData.append('cart_action', 'csrf_token');
+                formData.append('action', action);
+                var resp = await fetch(cartAjaxUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                var data = await resp.json();
+                if (data && data.success && data.data && data.data.token) {
+                    return data.data.token;
+                }
+            } catch (e) {
+                console.error('Failed to retrieve CSRF token', e);
+            }
+            return '';
+        }
+
+        function updateArticleFavoriteUI(isFavorited) {
+            const btn = document.getElementById('articleFavoriteBtn');
+            const text = document.getElementById('articleFavoriteText');
+            if (!btn) return;
+
+            if (isFavorited) {
+                btn.classList.add('favorited');
+                if (text) text.textContent = '{{todo:t text="已收藏"}}';
+            } else {
+                btn.classList.remove('favorited');
+                if (text) text.textContent = '{{todo:t text="收藏"}}';
+            }
+        }
+
+        async function checkArticleFavoriteStatus() {
+            const btn = document.getElementById('articleFavoriteBtn');
+            if (!btn) return;
+            const articleId = btn.dataset.articleId;
+            if (!articleId || !IS_LOGGED_IN) return;
+
+            try {
+                var resp = await fetch(favoritesAjaxUrl + '?action=check&object_type=post&article_id=' + articleId, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                var data = await resp.json();
+                if (data && data.success) {
+                    updateArticleFavoriteUI(data.is_favorited);
+                }
+            } catch (e) {
+                console.error('Failed to check favorite status', e);
+            }
+        }
+
+        async function toggleArticleFavorite() {
+            if (!IS_LOGGED_IN) {
+                window.location.href = LOGIN_URL;
+                return;
+            }
+
+            const btn = document.getElementById('articleFavoriteBtn');
+            if (!btn || btn.getAttribute('data-disabled') === '1') return;
+
+            const articleId = btn.dataset.articleId;
+            if (!articleId) return;
+
+            btn.setAttribute('data-disabled', '1');
+            try {
+                const token = await getCsrfToken('toggle_favorite');
+                var formData = new FormData();
+                formData.append('action', 'toggle');
+                formData.append('object_type', 'post');
+                formData.append('article_id', articleId);
+                if (token) {
+                    formData.append('_todononce', token);
+                }
+
+                var resp = await fetch(favoritesAjaxUrl, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+
+                var data = await resp.json();
+                if (data && data.success) {
+                    updateArticleFavoriteUI(data.is_favorited);
+                } else if (data && data.data) {
+                    alert(data.data);
+                }
+            } catch (e) {
+                console.error('An error occurred while saving the article', e);
+            } finally {
+                btn.removeAttribute('data-disabled');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('articleFavoriteBtn');
+            if (btn) {
+                btn.addEventListener('click', toggleArticleFavorite);
+                checkArticleFavoriteStatus();
+            }
+        });
+    })();
+
+</script>
+
+<!-- Google SEO Rich Snippets: Article / BlogPosting Schema.org (提升 Google 资讯与 SERP 排名，遵循 EEAT 标准) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{todo:canonical_url}}"
+  },
+  "headline": "{{todo:post_title format='json'}}",
+  "description": "{{todo:meta_description format='json'}}",
+  "image": [
+    {{todo:if post_featured_image}}"{{todo:post_featured_image}}"{{todo:else}}"{{todo:site_url}}/static/images/default.jpg"{{/todo:if}}
+  ],
+  "datePublished": "{{todo:post_date format='c'}}",
+  "dateModified": "{{todo:post_modified format='c'}}",
+  "author": {
+    "@type": "Person",
+    "name": "{{todo:if author_name}}{{todo:author_name format='json'}}{{todo:else}}{{todo:site_title format='json'}}{{/todo:if}}",
+    "url": "{{todo:author_url}}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{todo:site_title format='json'}}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{todo:if site_logo}}{{todo:site_logo}}{{todo:else}}{{todo:site_favicon}}{{/todo:if}}"
+    }
+  }
+}
+</script>
+
+{{todo:include file="footer.html"}}
+

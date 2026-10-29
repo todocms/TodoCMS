@@ -1,0 +1,48 @@
+/* TodoCMS 语言切换器样式 @package TodoCMS @subpackage Language */
+
+/* 基础样式 */
+.todo-language-switcher { position: relative; display: flex; font-family: inherit; }
+.todo-language-switcher .flag { display: inline-block; margin-inline-end: 5px; font-size: 16px; }
+.todo-language-switcher .name { font-size: 12px; display: inline-block; word-break: keep-all; }
+
+/* 下拉菜单样式 */
+.todo-language-switcher.dropdown-style { position: relative; }
+.todo-language-switcher.dropdown-style .current-language { align-self: center; display: flex; align-items: center; padding: 5px 10px; background: none; border: 1px solid transparent; cursor: pointer; font-size: 14px; color: #999; text-decoration: none; transition: all 0.2s ease; }
+.todo-language-switcher.dropdown-style .current-language:hover { color: #333; }
+.todo-language-switcher.dropdown-style .current-language i { margin-inline-start: 3px; font-size: 12px; }
+.todo-language-switcher.dropdown-style .language-dropdown { position: absolute; top: 120%; left: 0; right: 0; background: #fff; border: 1px solid #efefef; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); z-index: 9999; max-height: 200px; min-width: 100px; overflow-y: auto; }
+.todo-language-switcher.dropdown-style .language-option { display: flex; align-items: center; padding: 8px 12px; color: #333; text-decoration: none; transition: background-color 0.2s ease; border-bottom: 1px solid #eee; }
+.todo-language-switcher.dropdown-style .language-option:last-child { border-bottom: none; }
+.todo-language-switcher.dropdown-style .language-option:hover { background: #f5f5f5; }
+
+/* 列表样式 */
+.todo-language-switcher.list-style { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; }
+.todo-language-switcher.list-style li { margin: 0; padding: 0; }
+.todo-language-switcher.list-style a { display: flex; align-items: center; padding: 6px 10px; color: #666; text-decoration: none; border-radius: 3px; transition: all 0.2s ease; font-size: 14px; }
+.todo-language-switcher.list-style a:hover { background: #f0f0f0; color: #333; }
+.todo-language-switcher.list-style .current a { background: #0073aa; color: #fff; }
+.todo-language-switcher.list-style .current a:hover { background: #005a87; }
+
+/* 旗帜样式 */
+.todo-language-switcher.flags-style { display: flex; gap: 8px; align-items: center; }
+.todo-language-switcher.flags-style .flag-link { display: inline-block; padding: 4px; border-radius: 3px; transition: all 0.2s ease; text-decoration: none; opacity: 0.7; }
+.todo-language-switcher.flags-style .flag-link:hover { opacity: 1; transform: scale(1.1); }
+.todo-language-switcher.flags-style .flag-link.current { opacity: 1; background: rgba(0, 115, 170, 0.1); border: 1px solid #0073aa; }
+.todo-language-switcher.flags-style .flag { font-size: 20px; display: block; }
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .todo-language-switcher.dropdown-style .current-language { padding: 6px 10px; font-size: 13px; }
+  .todo-language-switcher.dropdown-style .language-option { padding: 6px 10px; font-size: 13px; }
+  .todo-language-switcher.list-style { flex-wrap: wrap; gap: 5px; }
+  .todo-language-switcher.list-style a { padding: 4px 8px; font-size: 13px; }
+  .todo-language-switcher.flags-style .flag { font-size: 18px; }
+}
+
+/* 动画效果 */
+.todo-language-switcher.dropdown-style .language-dropdown { opacity: 0; transform: translateY(-10px); transition: all 0.2s ease; }
+.todo-language-switcher.dropdown-style .language-dropdown.show { opacity: 1; transform: translateY(0); }
+
+/* 国旗图片样式 */
+.todo-language-switcher .flag-img { width: 20px; height: 14px; margin-inline-end: 5px; object-fit: cover; vertical-align: middle; }
+.todo-language-switcher .flag-img.large { width: 30px; height: 20px; margin-inline-end: 0; }

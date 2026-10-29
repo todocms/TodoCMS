@@ -1,0 +1,10 @@
+# TodoCMS Composer Vendor 目录保护 - 禁止所有 HTTP 访问
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

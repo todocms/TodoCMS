@@ -1,0 +1,241 @@
+<!-- 产品询盘组件模版 -->
+<div class="inquiry-section" id="inquiry">
+    <div class="inquiry-card">
+        <h3 class="inquiry-title">{{todo:t|text=产品询盘 / 在线留言}}</h3>
+        <p class="inquiry-subtitle">{{todo:t|text=如果您对此产品有任何疑问或采购需求，请填写下方表单，我们会尽快与您联系}}</p>
+
+        <form id="inquiryForm" class="inquiry-form">
+            <input type="hidden" name="post_id" value="{{todo:post_id}}">
+            <input type="hidden" name="product_id" value="{{todo:post_id}}">
+            <input type="hidden" name="comment_type" value="inquiry">
+            <input type="hidden" name="product_title" value="{{todo:post_title}}">
+            <input type="hidden" name="lang_code" value="{{todo:current_language}}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inquiry_author_name">{{todo:t|text=您的姓名}} <span class="required">*</span></label>
+                    <input type="text" id="inquiry_author_name" name="author_name" placeholder="{{todo:t|text=请输入姓名}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="inquiry_author_email">{{todo:t|text=电子邮箱}} <span class="required">*</span></label>
+                    <input type="email" id="inquiry_author_email" name="author_email" placeholder="{{todo:t|text=请输入电子邮箱}}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="inquiry_subject">{{todo:t|text=询盘主题}}</label>
+                <input type="text" id="inquiry_subject" name="subject" value="{{todo:t|text=关于}}【{{todo:post_title}}】{{todo:t|text=的询盘}}" placeholder="{{todo:t|text=询盘主题}}">
+            </div>
+
+            <div class="form-group">
+                <label for="inquiry_content">{{todo:t|text=询盘详细内容}} <span class="required">*</span></label>
+                <textarea id="inquiry_content" name="content" placeholder="{{todo:t|text=请详细说明您的采购数量、规格要求或其他问题}}" rows="5" required></textarea>
+            </div>
+
+            {{todo:if captcha_enabled}}
+            <div class="form-group">
+                <label>{{todo:t|text=验证码}} <span class="required">*</span></label>
+                <div class="captcha-group" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" name="captcha" placeholder="{{todo:t|text=验证码}}" required style="flex: 1;">
+                    <img src="{{todo:captcha_url}}" alt="{{todo:t|text=验证码}}" class="captcha-image" onclick="refreshCaptcha()" style="height: 38px; cursor: pointer;">
+                </div>
+            </div>
+            {{/todo:if}}
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-primary btn-submit-inquiry" id="inquirySubmitBtn">
+                    <i class="icon todofont todo-Send" style="height: auto;"></i> {{todo:t|text=提交询盘}}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.inquiry-section {
+    padding: 10px 0;
+}
+.inquiry-card {
+    background: #fff;
+    border-radius: 8px;
+}
+.inquiry-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+.inquiry-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+}
+.inquiry-form .form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+.inquiry-form .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+.inquiry-form .form-group {
+    margin-bottom: 18px;
+}
+.inquiry-form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 6px;
+}
+.inquiry-form input[type="text"],
+.inquiry-form input[type="email"],
+.inquiry-form input[type="tel"],
+.inquiry-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.inquiry-form input:focus,
+.inquiry-form textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+.btn-submit-inquiry {
+    padding: 12px 32px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    letter-spacing: normal;
+    text-transform: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-submit-inquiry:hover {
+    background: #2980b9;
+}
+@media (max-width: 768px) {
+    .inquiry-form .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+</style>
+
+<script>
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        var inquiryForm = document.getElementById('inquiryForm');
+        if (inquiryForm) {
+            inquiryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitInquiryAjax(this);
+            });
+        }
+    });
+
+    function submitInquiryAjax(form) {
+        var now = Date.now();
+        var lastSub = form.dataset.lastSubmit || 0;
+        if (now - lastSub < 10000) {
+            var msg = '{{todo:t|text=提交过于频繁，请 10 秒后再试}}';
+            if (window.layer) layer.msg(msg, {icon: 2});
+            else alert(msg);
+            return;
+        }
+        form.dataset.lastSubmit = now;
+
+        var doSubmit = function() {
+            var submitBtn = document.getElementById('inquirySubmitBtn');
+            var originalText = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '{{todo:t|text=提交中}}';
+            }
+
+            var formData = new FormData(form);
+            formData.append('action', 'add_inquiry');
+            // 幂等键：服务端据此识别重复提交
+            formData.append('_submit_key', Date.now().toString(16) + '-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2));
+
+            var defaultAjaxUrl = '{{todo:site_url|default}}/admin/admin-ajax.php';
+            var ajaxUrl = (window.TODO && window.TODO.ADMIN_AJAX) ? window.TODO.ADMIN_AJAX : defaultAjaxUrl;
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function(res) { 
+                return res.json().then(function(d){
+                    return { status: res.status, data: d };
+                });
+            })
+            .then(function(resObj) {
+                var res = resObj.data;
+                if (resObj.status === 403 && res && res.require_captcha) {
+                    if (window.Captcha && typeof window.Captcha.show === 'function') {
+                        window.Captcha.show(function() {
+                            doSubmit();
+                        });
+                        return;
+                    }
+                }
+
+                if (res && res.success) {
+                    // Google Ads & GA4: 询盘转化事件 (Lead 核心关键事件)
+                    try {
+                        window.dataLayer = window.dataLayer || [];
+                        window.dataLayer.push({
+                            'event': 'generate_lead',
+                            'lead_type': 'product_inquiry',
+                            'product_id': '{{todo:post_id}}',
+                            'product_title': '{{todo:post_title format="json"}}'
+                        });
+                    } catch (e) {}
+
+                    var msg = res.message || '{{todo:t|text=询盘提交成功，我们非常感谢您的关注，并将尽快回复}}';
+                    if (window.layer) {
+                        layer.msg(msg, {icon: 1}, function() {
+                            form.reset();
+                        });
+                    } else {
+                        alert(msg);
+                        form.reset();
+                    }
+                } else {
+                    var errMsg = (res && res.message) ? res.message : '{{todo:t|text=提交失败}}';
+                    if (window.layer) layer.msg(errMsg, {icon: 2});
+                    else alert(errMsg);
+                }
+            })
+            .catch(function(err) {
+                var errStr = '{{todo:t|text=网络错误}}';
+                if (window.layer) layer.msg(errStr, {icon: 2});
+                else alert(errStr);
+            })
+            .finally(function() {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        };
+
+        doSubmit();
+    }
+})();
+</script>

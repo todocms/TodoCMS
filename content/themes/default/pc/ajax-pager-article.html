@@ -1,0 +1,118 @@
+<!-- 分页导航（上） -->
+{{todo:if pagination}}
+<div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+    <div class="pagination flex gap-2">
+        {{todo:if pagination_prev_page > 0}}
+        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+            <i class="fa fa-chevron-left"></i>
+            <span>{{todo:t text="上一页"}}</span>
+        </a>
+        {{/todo:if}}
+
+        <div class="pagination-numbers flex gap-2 items-center">
+            {{todo:loop pagination_pages}}
+            {{todo:if page_is_dots}}
+            <span class="pagination-number dots">...</span>
+            {{todo:elseif page_is_current}}
+            <span class="pagination-number current">{{todo:page_number}}</span>
+            {{todo:else}}
+            <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+            {{/todo:if}}
+            {{/todo:loop}}
+        </div>
+
+        {{todo:if pagination_next_page > 0}}
+        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+            <span>{{todo:t text="下一页"}}</span>
+            <i class="fa fa-chevron-right"></i>
+        </a>
+        {{/todo:if}}
+    </div>
+</div>
+{{/todo:if}}
+
+{{todo:loop posts|model=article|categories=article|per_page=2|pager=article}}
+<article class="post post-{{todo:index}}">
+    <header class="entry-header">
+        <h2 class="entry-title">
+            <a href="{{todo:permalink}}">{{todo:title}}</a>
+        </h2>
+
+        <div class="dec flex gap-3 items-center">
+            {{todo:if tags}}
+            <span class="tags">
+                <i class="fa fa-tags"></i>
+                {{todo:loop tags}}
+                {{todo:if index > 0}},{{/todo:if}}
+                <a href="{{todo:url}}" class="tag">{{todo:name}}</a>
+                {{/todo:loop}}
+            </span>
+            {{/todo:if}}
+            {{todo:if category}}
+            <span class="cat-links">
+                <i class="far fa-folder"></i>
+                <a href="{{todo:category_url}}">{{todo:category}}</a>
+            </span>
+            {{/todo:if}}
+            <span class="byline">
+                <i class="far fa-user"></i>
+                <a href="{{todo:author_url}}">{{todo:author}}</a>
+            </span>
+            {{todo:if comments_enabled && comment_count}}
+            <span class="comments-link">
+                <i class="far fa-comments"></i>
+                <a href="{{todo:permalink}}#comments">{{todo:comment_count}} {{todo:t text="评论"}}</a>
+            </span>
+            {{/todo:if}}
+            <span class="views-count">
+                <i class="far fa-eye"></i>
+                {{todo:views}} {{todo:t text="浏览"}}
+            </span>
+        </div>
+    </header>
+
+    <div class="entry-content">
+        <p>{{todo:excerpt}}</p>
+    </div>
+
+    <footer class="entry-footer">
+        <div class="dec">
+            <i class="far fa-calendar"></i>
+            <time datetime="{{todo:date_iso}}">{{todo:date}}</time>
+        </div>
+    </footer>
+</article>
+{{/todo:loop}}
+
+<!-- 分页导航（下） -->
+{{todo:if pagination}}
+<div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+    <div class="pagination flex gap-2">
+        {{todo:if pagination_prev_page > 0}}
+        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+            <i class="fa fa-chevron-left"></i>
+            <span>{{todo:t text="上一页"}}</span>
+        </a>
+        {{/todo:if}}
+
+        <div class="pagination-numbers flex gap-2 items-center">
+            {{todo:loop pagination_pages}}
+            {{todo:if page_is_dots}}
+            <span class="pagination-number dots">...</span>
+            {{todo:elseif page_is_current}}
+            <span class="pagination-number current">{{todo:page_number}}</span>
+            {{todo:else}}
+            <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+            {{/todo:if}}
+            {{/todo:loop}}
+        </div>
+
+        {{todo:if pagination_next_page > 0}}
+        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+            <span>{{todo:t text="下一页"}}</span>
+            <i class="fa fa-chevron-right"></i>
+        </a>
+        {{/todo:if}}
+    </div>
+</div>
+{{/todo:if}}

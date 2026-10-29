@@ -1,0 +1,888 @@
+<!-- 评论区模版组件 -->
+{{todo:if comments_enabled}}
+{{todo:include file="captcha_modal.html"}}
+
+<div class="comments-section" id="comments">
+    <!-- TikTok 风评论头与排序切换 -->
+    <div class="comments-header-bar flex items-center justify-between" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px;">
+        <h3 style="margin:0;"><span id="commentSectionTitle" data-review-title="{{todo:t|text=评价}}" data-comment-title="{{todo:t|text=评论}}">{{todo:t|text=评论}}</span> (<span id="commentsCount">{{todo:comment_count}}</span>)</h3>
+        <div class="comments-sort-tabs" style="display: flex; gap: 15px;">
+            <button type="button" class="sort-tab active" data-sort="hot" style="background: none; border: none; border-radius: 0; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; padding: 4px 0; border-bottom: 2px solid #333;">{{todo:t|text=最热}}</button>
+            <button type="button" class="sort-tab" data-sort="newest" style="background: none; border: none; border-radius: 0; font-size: 14px; font-weight: 500; color: #666; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent;">{{todo:t|text=最新}}</button>
+        </div>
+    </div>
+
+    <!-- 评论表单 -->
+    {{todo:if user_can_comment}}
+    <div class="comment-form">
+        <form id="commentForm">
+            <input type="hidden" name="article_id" value="{{todo:post_id}}">
+            <input type="hidden" name="post_id" value="{{todo:post_id}}">
+            <input type="hidden" name="parent_id" id="commentParentId" value="0">
+
+            <!-- 回复提示条 -->
+            <div id="replyingToNotice" class="replying-to-notice" style="display: none; margin-bottom: 12px; padding: 12px; background: var(--bg-secondary, #f5f5f5); border-inline-start: 3px solid var(--primary-color, #1890ff); border-radius: 4px; font-size: 14px;">
+                <span>{{todo:t|text=正在回复评论}} <strong id="replyingToAuthor"></strong></span>
+                <button type="button" onclick="cancelReplyComment()" style="padding: 0; background: none; border: none; font-size: 14px; color: #ff4d4f; margin-inline-start: 10px; cursor: pointer;">{{todo:t|text=取消回复}}</button>
+            </div>
+
+            {{todo:if !user_logged_in}}
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" name="author_name" placeholder="{{todo:t|text=姓名}} *" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="author_email" placeholder="{{todo:t|text=邮箱}} *" required>
+                </div>
+                <div class="form-group" id="authorWebsiteGroup">
+                    <input type="url" name="author_website" placeholder="{{todo:t|text=网站}}">
+                </div>
+            </div>
+            {{/todo:if}}
+
+            <div class="form-group">
+                <textarea name="content" id="commentContent" placeholder="{{todo:t|text=写下您的评论}}" rows="4" required></textarea>
+            </div>
+
+            {{todo:if captcha_enabled}}
+            <div class="form-group">
+                <div class="captcha-group">
+                    <input type="text" name="captcha" placeholder="{{todo:t|text=验证码}}" required>
+                    <img src="{{todo:captcha_url}}" alt="{{todo:t|text=验证码}}" class="captcha-image" onclick="refreshCaptcha()">
+                </div>
+            </div>
+            {{/todo:if}}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="commentSubmitBtn">
+                    <i class="icon todofont todo-CommentOne"></i> {{todo:t|text=发表评论}}
+                </button>
+            </div>
+        </form>
+    </div>
+    {{todo:else}}
+    <div class="comment-login-prompt">
+        <p><a href="{{todo:login_url}}">{{todo:t|text=登录}}</a> {{todo:t|text=后发表评论}}</p>
+    </div>
+    {{/todo:if}}
+
+    <!-- 评论动态渲染容器（内置 SSR 静态降级，确保 Googlebot / AI 搜索在未执行 JS 时也能提取真实买家评论） -->
+    <div class="comments-list" id="commentsListContainer" data-post-id="{{todo:post_id}}" data-comment-type="{{todo:comment_type default='comment'}}">
+        {{todo:if comments}}
+        {{todo:loop comments limit="5"}}
+        <div class="comment-item" id="ssr-comment-{{todo:comment_id}}">
+            <div class="comment-avatar"><div class="default-avatar">{{todo:comment_author_avatar}}</div></div>
+            <div class="comment-content">
+                <div class="comment-header">
+                    <span class="comment-author">{{todo:comment_author}}</span>
+                    {{todo:if comment_rating > 0}}
+                    <span class="comment-rating-stars" style="color: #fadb14; font-size: 13px; margin-inline-start: 8px;" title="{{todo:comment_rating}} {{todo:t|text='分'}}">★ {{todo:comment_rating}}/5</span>
+                    {{/todo:if}}
+                    <span class="comment-date"><time datetime="{{todo:comment_date format=c}}">{{todo:comment_date}}</time></span>
+                </div>
+                <div class="comment-text">{{todo:comment_content}}</div>
+            </div>
+        </div>
+        {{/todo:loop}}
+        {{/todo:if}}
+    </div>
+
+    <!-- 加载更多控制条 -->
+    <div class="comments-load-more-box" style="text-align: center; margin-top: 30px;">
+        <button type="button" id="btnLoadMoreComments" class="btn btn-default" style="padding: 10px 24px; border: 1px solid #ddd; background: #fff; border-radius: 20px; color: #666; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+            {{todo:t|text=加载更多评论}}
+        </button>
+        <div id="commentsNoMoreTip" style="display: none; color: #999; font-size: 13px;">{{todo:t|text=已加载全部评论}}</div>
+    </div>
+</div>
+
+<style>
+    .comment-login-prompt {
+        text-align: center;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .comment-login-prompt a {
+        color: #007cba;
+        text-decoration: none;
+    }
+
+    .comment-login-prompt a:hover {
+        text-decoration: underline;
+    }
+
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .comment-item {
+        display: flex;
+        gap: 15px;
+    }
+
+    .comment-item.reply {
+        margin-inline-start: 15px;
+        padding-inline-start: 15px;
+        border-inline-start: 2px solid #e0e0e0;
+    }
+
+    .comment-avatar {
+        flex-shrink: 0;
+    }
+
+    .comment-avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .comment-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .comment-author {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .author-website {
+        color: #007cba;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .comment-date {
+        font-size: 12px;
+        color: #999;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.2s ease, transform 0.15s ease;
+        display: inline-block;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .comment-date:hover {
+        color: #333;
+    }
+
+    .comment-date:active {
+        transform: scale(0.95);
+    }
+
+    .author-badge {
+        padding: 2px 6px;
+        background: #007cba;
+        color: white;
+        border-radius: 10px;
+        font-size: 10px;
+    }
+
+    .reply-to {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .comment-text {
+        margin-bottom: 10px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .comment-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .comment-action {
+        opacity: 0.4;
+        background: none;
+        border: none;
+        padding: 0;
+        color: #8a8b91;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.2s ease;
+    }
+
+    .comment-action:hover {
+        opacity: 1;
+        background: none;
+    }
+
+    .comment-action.delete:hover {
+        color: #dc3545;
+    }
+
+    .no-comments {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+</style>
+<script>
+(function() {
+    // 监听评论表单 AJAX 提交及星级交互
+    document.addEventListener('DOMContentLoaded', function() {
+        var commentForm = document.getElementById('commentForm');
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitCommentAjax(this);
+            });
+        }
+
+    });
+
+
+
+    window.submitCommentAjax = function(form) {
+        var content = form.querySelector('[name="content"]');
+        if (content && !content.value.trim()) {
+            if (window.layer) layer.msg('{{todo:t|text=写下您的评论}}', {icon: 2});
+            else alert('{{todo:t|text=写下您的评论}}');
+            return;
+        }
+
+        // 触发 Captcha 验证码滑动框
+        Captcha.show(function() {
+            var submitBtn = document.getElementById('commentSubmitBtn');
+            var originalText = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '{{todo:t|text=提交中}}';
+            }
+
+            var formData = new FormData(form);
+            var parentInput = document.getElementById('commentParentId');
+            var currentParentId = parentInput ? parentInput.value : '0';
+            formData.set('parent_id', currentParentId);
+            formData.set('comment_parent', currentParentId);
+            formData.append('action', 'add_comment');
+
+            // 明确指定评论类型（从容器的 data-comment-type 获取，如 review / comment），避免类型与ID混淆
+            var currentCommentType = (container && container.getAttribute('data-comment-type')) ? container.getAttribute('data-comment-type') : (wrapperType || 'comment');
+            if (!formData.has('comment_type')) {
+                formData.append('comment_type', currentCommentType);
+            }
+
+            // 幂等键：服务端据此识别重复提交
+            formData.append('_submit_key', Date.now().toString(16) + '-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2));
+
+            var defaultAjaxUrl = '{{todo:site_url|default}}/admin/admin-ajax.php';
+            var ajaxUrl = (window.TODO && window.TODO.ADMIN_AJAX) ? window.TODO.ADMIN_AJAX : defaultAjaxUrl;
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                if (res.success) {
+                    var msg = res.message || '{{todo:t|text=评论发表成功}}';
+                    if (window.layer) {
+                        layer.msg(msg, {icon: 1}, function() {
+                            cancelReplyComment();
+                            if (content) content.value = '';
+                            if (window.resetRatingForm) window.resetRatingForm();
+                            reloadCommentsList();
+                        });
+                    } else {
+                        alert(msg);
+                        cancelReplyComment();
+                        if (content) content.value = '';
+                        if (window.resetRatingForm) window.resetRatingForm();
+                        reloadCommentsList();
+                    }
+                } else {
+                    var errMsg = res.message || '{{todo:t|text=评论发表失败}}';
+                    if (window.layer) layer.msg(errMsg, {icon: 2});
+                    else alert(errMsg);
+                }
+            })
+            .catch(function(err) {
+                var errStr = '{{todo:t|text=网络错误}}';
+                if (window.layer) layer.msg(errStr, {icon: 2});
+                else alert(errStr);
+            })
+            .finally(function() {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        });
+    };
+
+    window.replyComment = function(target, authorName) {
+        var commentId = 0;
+        var author = '';
+
+        if (target && typeof target === 'object') {
+            var btn = target.target ? target.target : target;
+            if (btn.closest) {
+                var btnEl = btn.closest('.btn-reply-comment') || btn;
+                commentId = btnEl.getAttribute('data-id') || 0;
+                author = btnEl.getAttribute('data-author') || '';
+            } else if (btn.getAttribute) {
+                commentId = btn.getAttribute('data-id') || 0;
+                author = btn.getAttribute('data-author') || '';
+            }
+        } else {
+            commentId = target;
+            author = authorName || '';
+        }
+
+        var parentInput = document.getElementById('commentParentId');
+        var noticeBox = document.getElementById('replyingToNotice');
+        var authorSpan = document.getElementById('replyingToAuthor');
+        var textarea = document.getElementById('commentContent');
+
+        if (parentInput) parentInput.value = commentId;
+        if (authorSpan) authorSpan.textContent = author || ('#' + commentId);
+        if (noticeBox) noticeBox.style.display = 'block';
+        var formEl = document.getElementById('commentForm');
+        if (formEl) formEl.style.display = 'block';
+        if (textarea) {
+            textarea.focus();
+            textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    window.cancelReplyComment = function() {
+        var parentInput = document.getElementById('commentParentId');
+        var noticeBox = document.getElementById('replyingToNotice');
+        if (parentInput) parentInput.value = '0';
+        if (noticeBox) noticeBox.style.display = 'none';
+
+        var formEl = document.getElementById('commentForm');
+        var parentWrapper = container ? (container.closest('[data-comment-type]')) : null;
+        var wrapperType = parentWrapper ? parentWrapper.getAttribute('data-comment-type') : null;
+        if (wrapperType === 'review' && formEl) {
+            formEl.style.display = 'none';
+        }
+    };
+
+    var currentPage = 1;
+    var currentSort = 'hot';
+    var hasMoreData = true;
+    var isLoading = false;
+
+    var container = document.getElementById('commentsListContainer');
+    var loadMoreBtn = document.getElementById('btnLoadMoreComments');
+    var noMoreTip = document.getElementById('commentsNoMoreTip');
+    var countEl = document.getElementById('commentsCount');
+
+    // 绑定排序 Tab
+    var sortTabs = document.querySelectorAll('.comments-sort-tabs .sort-tab');
+    sortTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            var sort = this.getAttribute('data-sort');
+            if (sort === currentSort) return;
+
+            sortTabs.forEach(function(t) {
+                t.style.color = '#666';
+                t.style.fontWeight = '500';
+                t.style.borderBottomColor = 'transparent';
+                t.classList.remove('active');
+            });
+            this.classList.add('active');
+            this.style.color = '#333';
+            this.style.fontWeight = '600';
+            this.style.borderBottomColor = '#333';
+
+            currentSort = sort;
+            currentPage = 1;
+            hasMoreData = true;
+            if (container) container.innerHTML = '';
+            fetchCommentsList(true);
+        });
+    });
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            if (!hasMoreData || isLoading) return;
+            currentPage++;
+            fetchCommentsList(false);
+        });
+    }
+
+    // 检查上下文是否需要开启星级打分及表单字段显示控制
+    var ratingGroup = document.getElementById('ratingFormGroup');
+    var websiteGroup = document.getElementById('authorWebsiteGroup');
+    var commentFormEl = document.getElementById('commentForm');
+    var parentWrapper = container ? (container.closest('[data-show-rating]') || container.closest('[data-comment-type]') || container.closest('[data-show-website]')) : null;
+    var showRating = parentWrapper ? (parentWrapper.getAttribute('data-show-rating') === 'true') : false;
+    var wrapperType = parentWrapper ? parentWrapper.getAttribute('data-comment-type') : null;
+    var hideWebsite = parentWrapper ? (parentWrapper.getAttribute('data-show-website') === 'false' || wrapperType === 'review') : false;
+
+    // 当为 review 模版类型时将标题动态切换为“评价”（支持多语言翻译）
+    var sectionTitleEl = parentWrapper ? parentWrapper.querySelector('#commentSectionTitle') : document.getElementById('commentSectionTitle');
+    if (!sectionTitleEl) sectionTitleEl = document.getElementById('commentSectionTitle');
+    if (wrapperType === 'review' && sectionTitleEl) {
+        sectionTitleEl.textContent = sectionTitleEl.getAttribute('data-review-title') || '{{todo:t|text=评价}}';
+    }
+
+    // 当页面作为产品评价 (review) 类型使用时：
+    // 1. 默认隐蔽未带有 parent_id 的公开表单；
+    // 2. 当点击任意买家评价的 [回复] 按钮后，评论表单出现，携带 parent_id 允许针对该条评价进行讨论回复。
+    if (wrapperType === 'review') {
+        if (commentFormEl) {
+            var parentInput = document.getElementById('commentParentId');
+            var currentParentId = parentInput ? parseInt(parentInput.value) || 0 : 0;
+            if (currentParentId <= 0) {
+                commentFormEl.style.display = 'none';
+            }
+        }
+    }
+
+    if (showRating && ratingGroup) {
+        ratingGroup.style.display = 'flex';
+    } else if (ratingGroup) {
+        ratingGroup.style.display = 'none';
+    }
+
+    if (websiteGroup && hideWebsite) {
+        websiteGroup.style.display = 'none';
+    }
+
+    if (wrapperType && container) {
+        container.setAttribute('data-comment-type', wrapperType);
+    }
+
+    // 初始化获取列表
+    if (container) {
+        fetchCommentsList(true);
+    }
+
+    function fetchCommentsList(isReset) {
+        if (!container) return;
+        isLoading = true;
+        if (loadMoreBtn) loadMoreBtn.textContent = '{{todo:t|text=加载中}}';
+
+        var postId = container.getAttribute('data-post-id') || 0;
+        var commentType = container.getAttribute('data-comment-type') || 'comment';
+
+        var defaultAjaxUrl = '{{todo:site_url|default}}/admin/admin-ajax.php';
+        var ajaxUrl = (window.TODO && window.TODO.ADMIN_AJAX) ? window.TODO.ADMIN_AJAX : defaultAjaxUrl;
+
+        var url = ajaxUrl + '?action=get_comments_list&post_id=' + postId + '&type=' + commentType + '&sort=' + currentSort + '&page=' + currentPage;
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+            isLoading = false;
+            if (res.success) {
+                if (countEl && typeof res.total !== 'undefined') {
+                    countEl.textContent = res.total;
+                }
+
+                if (isReset) {
+                    container.innerHTML = '';
+                }
+
+                if (!res.items || res.items.length === 0) {
+                    if (isReset) {
+                        if (commentType === 'review' || wrapperType === 'review') {
+                            container.innerHTML = '<div class="no-comments" style="text-align:center;padding:30px 0;color:#999;"><p>{{todo:t|text=暂无评价}}</p></div>';
+                        } else {
+                            container.innerHTML = '';
+                        }
+                    }
+                    hasMoreData = false;
+                    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                    if (noMoreTip) noMoreTip.style.display = 'none';
+                    return;
+                }
+
+                renderCommentItems(res.items);
+
+                hasMoreData = res.has_more;
+                if (hasMoreData) {
+                    if (loadMoreBtn) {
+                        loadMoreBtn.style.display = 'inline-block';
+                        loadMoreBtn.textContent = (commentType === 'review' || wrapperType === 'review') ? '{{todo:t|text=加载更多评价}}' : '{{todo:t|text=加载更多评论}}';
+                    }
+                    if (noMoreTip) noMoreTip.style.display = 'none';
+                } else {
+                    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                    if (noMoreTip && res.total > 5) noMoreTip.style.display = 'block';
+                    else if (noMoreTip) noMoreTip.style.display = 'none';
+                }
+            }
+        })
+        .catch(function(err) {
+            isLoading = false;
+            if (loadMoreBtn) loadMoreBtn.textContent = '{{todo:t|text=加载失败，点击重试}}';
+        });
+    }
+
+    // 计算人性化时间差 (对应后台 human_time_diff 格式)
+    function formatHumanTimeDiff(dateStr) {
+        if (!dateStr) return '';
+        var timestamp = new Date(dateStr.replace(/-/g, '/')).getTime();
+        if (isNaN(timestamp) || timestamp <= 0) return dateStr;
+        
+        var now = new Date().getTime();
+        var diff = Math.abs(now - timestamp) / 1000;
+        
+        if (diff < 3600) {
+            var mins = Math.round(diff / 60);
+            return mins <= 1 ? '{{todo:t text="刚刚"}}' : (mins === 1 ? '{{todo:t text="1分钟前"}}' : '{{todo:t text="{n}分钟前"}}').replace('{n}', mins);
+        } else if (diff < 86400) {
+            var hours = Math.round(diff / 3600);
+            return (hours === 1 ? '{{todo:t text="1小时前"}}' : '{{todo:t text="{n}小时前"}}').replace('{n}', hours);
+        } else if (diff < 7 * 86400) {
+            var days = Math.round(diff / 86400);
+            return (days === 1 ? '{{todo:t text="1天前"}}' : '{{todo:t text="{n}天前"}}').replace('{n}', days);
+        } else if (diff < 30 * 86400) {
+            var weeks = Math.round(diff / (7 * 86400));
+            return (weeks === 1 ? '{{todo:t text="1周前"}}' : '{{todo:t text="{n}周前"}}').replace('{n}', weeks);
+        } else if (diff < 365 * 86400) {
+            var months = Math.round(diff / (30 * 86400));
+            return (months === 1 ? '{{todo:t text="1个月前"}}' : '{{todo:t text="{n}个月前"}}').replace('{n}', months);
+        } else {
+            var years = Math.round(diff / (365 * 86400));
+            return (years === 1 ? '{{todo:t text="1年前"}}' : '{{todo:t text="{n}年前"}}').replace('{n}', years);
+        }
+    }
+
+    // 单击切换详细时间与人性化时间
+    window.toggleCommentDate = function(el) {
+        if (!el) return;
+        var fullDate = el.getAttribute('data-full-date') || '';
+        var humanDate = el.getAttribute('data-human-date') || '';
+        var currentMode = el.getAttribute('data-mode') || 'human';
+
+        el.style.transform = 'scale(0.92)';
+        setTimeout(function() {
+            if (currentMode === 'human') {
+                el.textContent = fullDate;
+                el.setAttribute('data-mode', 'full');
+                el.title = '{{todo:t text="点击切换为简化时间"}} (' + humanDate + ')';
+            } else {
+                el.textContent = humanDate;
+                el.setAttribute('data-mode', 'human');
+                el.title = '{{todo:t text="点击切换为详细日期"}} (' + fullDate + ')';
+            }
+            el.style.transform = 'scale(1)';
+        }, 100);
+    };
+
+    function renderDateSpan(dateStr) {
+        var fullDate = dateStr || '';
+        var humanDate = formatHumanTimeDiff(fullDate);
+        return '<span class="comment-date" data-full-date="' + fullDate + '" data-human-date="' + humanDate + '" data-mode="human" title="{{todo:t text="点击切换为详细日期"}} (' + fullDate + ')" onclick="toggleCommentDate(this)">' + humanDate + '</span>';
+    }
+
+    function renderCommentItems(items) {
+        items.forEach(function(item) {
+            var itemEl = document.createElement('div');
+            itemEl.className = 'comment-item';
+            itemEl.id = 'comment-' + item.comment_id;
+
+            var ratingHtml = '';
+            if (showRating && item.rating && item.rating > 0) {
+                ratingHtml = '<span class="comment-rating-stars" title="' + item.rating + ' {{todo:t|text=分}}">' +
+                                '<span class="stars-outer">★★★★★</span>' +
+                                '<span class="stars-inner" style="width: ' + item.rating_percent + '%;">★★★★★</span>' +
+                            '</span>';
+            }
+
+            var verifiedBadge = (wrapperType === 'review') ? '<span class="badge-verified" style="display:inline-flex;align-items:center;padding:2px 6px;background:#e6f7ff;color:#1890ff;border:1px solid #91d5ff;border-radius:4px;font-size:11px;font-weight:normal;">{{todo:t|text=已购}}</span>' : '';
+            var specHtml = (item.spec_name) ? '<div class="comment-spec-info" style="font-size:12px;color:#8c8c8c;margin-bottom:6px;">' + item.spec_name + '</div>' : '';
+
+            var subRepliesHtml = '';
+            if (item.replies && item.replies.length > 0) {
+                var subList = item.replies.map(function(sub) {
+                    return '<div class="comment-item reply" id="comment-' + sub.comment_id + '">' +
+                                '<div class="comment-avatar"><div class="default-avatar">' + sub.author_avatar + '</div></div>' +
+                                '<div class="comment-content">' +
+                                    '<div class="comment-header">' +
+                                        '<span class="comment-author">' + sub.author_name + '</span>' +
+                                        '<span class="reply-to-text" style="color:#8a8b91;font-size:12px;">{{todo:t text="回复"}} <span class="reply-to-tag">@' + sub.reply_to_name + '</span></span>' +
+                                        renderDateSpan(sub.comment_date) +
+                                    '</div>' +
+                                    '<div class="comment-text">' + sub.comment_content + '</div>' +
+                                    '<div class="comment-actions">' +
+                                        '<button type="button" class="comment-action btn-reply-comment" data-id="' + sub.comment_id + '" data-author="' + sub.author_name + '" onclick="replyComment(this)">' +
+                                            '<i class="icon todofont todo-CommentOne"></i>' +
+                                        '</button>' +
+                                        '<button type="button" class="comment-action" onclick="likeComment(' + sub.comment_id + ')">' +
+                                            '<i class="icon todofont todo-Like"></i> <span id="commentLikes' + sub.comment_id + '">' + sub.likes_count + '</span>' +
+                                        '</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>';
+                }).join('');
+
+                var moreSubBtn = '';
+                if (item.has_more_replies) {
+                    moreSubBtn = '<button type="button" class="more-replies-tip nohover" data-parent-id="' + item.comment_id + '" onclick="toggleExpandCommentReplies(' + item.comment_id + ', this)" style="background:none;border:none;cursor:pointer;color:inherit;padding:0;align-self:baseline;font-size:13px;margin-top:6px;">{{todo:t text="展开"}} (' + (item.sub_total - item.replies.length) + ')</button>';
+                }
+
+                subRepliesHtml = '<div class="comment-replies" id="comment-replies-' + item.comment_id + '">' + subList + moreSubBtn + '</div>';
+            }
+
+            var imagesHtml = '';
+            if (item.images && item.images.length > 0) {
+                imagesHtml = '<div class="comment-images-grid" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' +
+                    item.images.map(function(imgUrl, imgIndex) {
+                        return '<img src="' + (imgUrl || '') + '" class="comment-image-thumb" style="width:72px;height:72px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid #eee;" onclick="previewCommentImages(this, ' + imgIndex + ')">';
+                    }).join('') +
+                    '</div>';
+            }
+
+            itemEl.innerHTML = 
+                '<div class="comment-avatar"><div class="default-avatar">' + item.author_avatar + '</div></div>' +
+                '<div class="comment-content">' +
+                    '<div class="comment-header">' +
+                        '<span class="comment-author">' + item.author_name + '</span>' +
+                        verifiedBadge +
+                        ratingHtml +
+                        renderDateSpan(item.comment_date) +
+                    '</div>' +
+                    specHtml +
+                    '<div class="comment-text">' + item.comment_content + '</div>' +
+                    imagesHtml +
+                    '<div class="comment-actions">' +
+                        '<button type="button" class="comment-action btn-reply-comment" data-id="' + item.comment_id + '" data-author="' + item.author_name + '" onclick="replyComment(this)">' +
+                            '<i class="icon todofont todo-CommentOne"></i>' +
+                        '</button>' +
+                        '<button type="button" class="comment-action" onclick="likeComment(' + item.comment_id + ')">' +
+                            '<i class="icon todofont todo-Like"></i> <span id="commentLikes' + item.comment_id + '">' + item.likes_count + '</span>' +
+                        '</button>' +
+                    '</div>' +
+                    subRepliesHtml +
+                '</div>';
+
+            container.appendChild(itemEl);
+        });
+    }
+
+    window.toggleExpandCommentReplies = function(parentId, tipBtn) {
+        if (!parentId || !tipBtn) return;
+
+        var repliesBox = document.getElementById('comment-replies-' + parentId);
+        if (!repliesBox) return;
+
+        var isExpanded = repliesBox.getAttribute('data-expanded') === 'true';
+
+        if (isExpanded) {
+            // 收起：只展示前 2 条
+            var allReplies = repliesBox._allReplies || [];
+            var initialReplies = allReplies.slice(0, 2);
+            var renderSubItem = function(sub) {
+                return '<div class="comment-item reply" id="comment-' + sub.comment_id + '">' +
+                            '<div class="comment-avatar"><div class="default-avatar">' + sub.author_avatar + '</div></div>' +
+                            '<div class="comment-content">' +
+                                '<div class="comment-header">' +
+                                    '<span class="comment-author">' + sub.author_name + '</span>' +
+                                    '<span class="reply-to-text" style="color:#8a8b91;font-size:12px;">{{todo:t text="回复"}} <span class="reply-to-tag">@' + sub.reply_to_name + '</span></span>' +
+                                    renderDateSpan(sub.comment_date) +
+                                '</div>' +
+                                '<div class="comment-text">' + sub.comment_content + '</div>' +
+                                '<div class="comment-actions">' +
+                                    '<button type="button" class="comment-action btn-reply-comment" data-id="' + sub.comment_id + '" data-author="' + sub.author_name + '" onclick="replyComment(this)">' +
+                                        '<i class="icon todofont todo-CommentOne"></i>' +
+                                    '</button>' +
+                                    '<button type="button" class="comment-action" onclick="likeComment(' + sub.comment_id + ')">' +
+                                        '<i class="icon todofont todo-Like"></i> <span id="commentLikes' + sub.comment_id + '">' + sub.likes_count + '</span>' +
+                                    '</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+            };
+
+            var html = initialReplies.map(renderSubItem).join('');
+            var moreBtn = '<button type="button" class="more-replies-tip nohover" data-parent-id="' + parentId + '" onclick="toggleExpandCommentReplies(' + parentId + ', this)" style="background:none;border:none;cursor:pointer;color:inherit;padding:0;align-self:baseline;font-size:13px;margin-top:6px;">{{todo:t text="展开"}} (' + (allReplies.length - 2) + ')</button>';
+
+            repliesBox.innerHTML = html + moreBtn;
+            repliesBox.setAttribute('data-expanded', 'false');
+            return;
+        }
+
+        // 如果已经打平缓存了全部 replies，直接渲染全量
+        if (repliesBox._allReplies) {
+            var renderSubItem = function(sub) {
+                return '<div class="comment-item reply" id="comment-' + sub.comment_id + '">' +
+                            '<div class="comment-avatar"><div class="default-avatar">' + sub.author_avatar + '</div></div>' +
+                            '<div class="comment-content">' +
+                                '<div class="comment-header">' +
+                                    '<span class="comment-author">' + sub.author_name + '</span>' +
+                                    '<span class="reply-to-text" style="color:#8a8b91;font-size:12px;">{{todo:t text="回复"}} <span class="reply-to-tag">@' + sub.reply_to_name + '</span></span>' +
+                                    renderDateSpan(sub.comment_date) +
+                                '</div>' +
+                                '<div class="comment-text">' + sub.comment_content + '</div>' +
+                                '<div class="comment-actions">' +
+                                    '<button type="button" class="comment-action btn-reply-comment" data-id="' + sub.comment_id + '" data-author="' + sub.author_name + '" onclick="replyComment(this)">' +
+                                        '<i class="icon todofont todo-CommentOne"></i>' +
+                                    '</button>' +
+                                    '<button type="button" class="comment-action" onclick="likeComment(' + sub.comment_id + ')">' +
+                                        '<i class="icon todofont todo-Like"></i> <span id="commentLikes' + sub.comment_id + '">' + sub.likes_count + '</span>' +
+                                    '</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+            };
+
+            var html = repliesBox._allReplies.map(renderSubItem).join('');
+            var foldBtn = '<button type="button" class="more-replies-tip nohover" data-parent-id="' + parentId + '" onclick="toggleExpandCommentReplies(' + parentId + ', this)" style="background:none;border:none;cursor:pointer;color:inherit;padding:0;align-self:baseline;font-size:13px;margin-top:6px;">{{todo:t text="收起"}}</button>';
+
+            repliesBox.innerHTML = html + foldBtn;
+            repliesBox.setAttribute('data-expanded', 'true');
+            return;
+        }
+
+        // 请求后台获取全量回复
+        tipBtn.textContent = '{{todo:t|text=加载中}}';
+
+        var postId = (container && container.getAttribute('data-post-id')) ? container.getAttribute('data-post-id') : 0;
+        var commentType = (container && container.getAttribute('data-comment-type')) ? container.getAttribute('data-comment-type') : (wrapperType || 'comment');
+
+        var defaultAjaxUrl = '{{todo:site_url|default}}/admin/admin-ajax.php';
+        var ajaxUrl = (window.TODO && window.TODO.ADMIN_AJAX) ? window.TODO.ADMIN_AJAX : defaultAjaxUrl;
+        var url = ajaxUrl + '?action=get_comments_list&parent_id=' + parentId + '&post_id=' + postId + '&type=' + commentType;
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+            if (res.success && res.replies) {
+                repliesBox._allReplies = res.replies;
+                var renderSubItem = function(sub) {
+                    return '<div class="comment-item reply" id="comment-' + sub.comment_id + '">' +
+                                '<div class="comment-avatar"><div class="default-avatar">' + sub.author_avatar + '</div></div>' +
+                                '<div class="comment-content">' +
+                                    '<div class="comment-header">' +
+                                        '<span class="comment-author">' + sub.author_name + '</span>' +
+                                        '<span class="reply-to-text" style="color:#8a8b91;font-size:12px;">{{todo:t text="回复"}} <span class="reply-to-tag">@' + sub.reply_to_name + '</span></span>' +
+                                        renderDateSpan(sub.comment_date) +
+                                    '</div>' +
+                                    '<div class="comment-text">' + sub.comment_content + '</div>' +
+                                    '<div class="comment-actions">' +
+                                        '<button type="button" class="comment-action btn-reply-comment" data-id="' + sub.comment_id + '" data-author="' + sub.author_name + '" onclick="replyComment(this)">' +
+                                            '<i class="icon todofont todo-CommentOne"></i>' +
+                                        '</button>' +
+                                        '<button type="button" class="comment-action" onclick="likeComment(' + sub.comment_id + ')">' +
+                                            '<i class="icon todofont todo-Like"></i> <span id="commentLikes' + sub.comment_id + '">' + sub.likes_count + '</span>' +
+                                        '</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>';
+                };
+
+                var html = res.replies.map(renderSubItem).join('');
+                var foldBtn = '<button type="button" class="more-replies-tip nohover" data-parent-id="' + parentId + '" onclick="toggleExpandCommentReplies(' + parentId + ', this)" style="background:none;border:none;cursor:pointer;color:inherit;padding:0;align-self:baseline;font-size:13px;margin-top:6px;">{{todo:t text="收起"}}</button>';
+
+                repliesBox.innerHTML = html + foldBtn;
+                repliesBox.setAttribute('data-expanded', 'true');
+            } else {
+                tipBtn.textContent = '{{todo:t|text=加载失败，点击重试}}';
+            }
+        })
+        .catch(function() {
+            tipBtn.textContent = '{{todo:t|text=加载失败，点击重试}}';
+        });
+    };
+
+    window.likeComment = function(commentId) {
+        var likesSpan = document.getElementById('commentLikes' + commentId);
+        var likedStorageKey = 'todo_comment_liked_' + commentId;
+        
+        // 前端 localStorage 校验是否已点赞
+        if (localStorage.getItem(likedStorageKey)) {
+            if (window.layer) layer.msg('{{todo:t|text=您已经点赞过了}}', {icon: 0});
+            else alert('{{todo:t|text=您已经点赞过了}}');
+            return;
+        }
+
+        var defaultAjaxUrl = '{{todo:site_url|default}}/admin/admin-ajax.php';
+        var ajaxUrl = (window.TODO && window.TODO.ADMIN_AJAX) ? window.TODO.ADMIN_AJAX : defaultAjaxUrl;
+
+        var formData = new FormData();
+        formData.append('action', 'like_comment');
+        formData.append('comment_id', commentId);
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+            if (res.success && likesSpan) {
+                likesSpan.textContent = res.likes_count;
+                localStorage.setItem(likedStorageKey, '1');
+                
+                var btn = likesSpan.closest('.comment-action');
+                if (btn) {
+                    btn.style.color = '#ff4d4f';
+                    btn.classList.add('liked');
+                }
+                
+                if (window.layer) layer.msg('{{todo:t|text=点赞成功}}', {icon: 1});
+                else alert('{{todo:t|text=点赞成功}}');
+            }
+        });
+    };
+
+    window.previewCommentImages = function(imgEl, startIdx) {
+        if (!imgEl) return;
+        var grid = imgEl.closest('.comment-images-grid');
+        if (!grid) {
+            if (window.layer) {
+                layer.photos({ photos: { data: [{ src: imgEl.src }] } });
+            } else {
+                window.open(imgEl.src);
+            }
+            return;
+        }
+
+        var imgNodes = grid.querySelectorAll('img.comment-image-thumb');
+        var photosData = [];
+        imgNodes.forEach(function(node) {
+            photosData.push({
+                alt: node.getAttribute('alt'),
+                src: node.getAttribute('src')
+            });
+        });
+
+        if (window.layer && photosData.length > 0) {
+            layer.photos({
+                photos: {
+                    title: '{{todo:t|text=评价图片预览}}',
+                    start: startIdx >= 0 ? startIdx : 0,
+                    data: photosData
+                },
+                anim: 5
+            });
+        } else {
+            window.open(imgEl.src);
+        }
+    };
+
+    function reloadCommentsList() {
+        currentPage = 1;
+        fetchCommentsList(true);
+    }
+})();
+</script>
+{{/todo:if}}

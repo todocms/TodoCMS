@@ -1,0 +1,253 @@
+/* * * TodoCMS 用户中心响应式样式 * 适配不同屏幕尺寸的布局和样式 */
+
+/* 横屏适配 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidebar { height: 100vh; overflow-y: auto; }
+  .modal-body { max-height: calc(100vh - 180px); }
+}
+
+/* 超小屏幕 (<576px) */
+@media (max-width: 575.98px) {
+  .container { padding: 0 10px; }
+  .user-main { padding: 15px 10px; }
+  .page-title { font-size: 1.3rem; }
+  .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .quick-actions { grid-template-columns: repeat(2, 1fr); }
+  .table th, .table td { padding: 6px 3px; font-size: 0.75rem; }
+  .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+  .modal-dialog { margin: 5px; max-width: calc(100% - 10px); }
+  .form-control { padding: 8px 12px; }
+}
+
+/* 超小屏幕 (<768px) */
+@media (max-width: 767.98px) {
+  .container { max-width: 100%; padding: 0 15px; }
+
+  /* 侧边栏移动端适配 */
+  .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; z-index: 1050; transition: left 0.3s ease; background: #fff; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); }
+  .sidebar.show { left: 0; }
+  .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1040; display: none; }
+  .sidebar-overlay.show { display: block; }
+
+  /* 移动端头部 */
+  .mobile-header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; border-bottom: 1px solid #e9ecef; z-index: 1030; display: flex; align-items: center; padding: 0 15px; }
+  .mobile-menu-btn { background: none; border: none; font-size: 1.5rem; color: #6c757d; margin-inline-end: 15px; }
+  .mobile-title { font-size: 1.1rem; font-weight: 500; color: #495057; flex: 1; }
+
+  /* 用户信息移动端适配 */
+  .user-avatar { width: 60px; height: 60px; margin: 0 auto 10px; }
+  .user-level { font-size: 0.8rem; }
+
+  /* 统计卡片移动端适配 */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stats-card { padding: 15px; text-align: center; }
+  .stats-card .stats-number { font-size: 1.5rem; margin-bottom: 5px; }
+  .stats-card .stats-label { font-size: 0.8rem; }
+
+  /* 快捷操作移动端适配 */
+  .quick-actions { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .quick-action { padding: 15px 10px; text-align: center; }
+  .quick-action i { font-size: 1.5rem; margin-bottom: 8px; }
+  .quick-action span { font-size: 0.8rem; }
+
+  /* 表格移动端适配 */
+  .table-responsive { border: none; }
+  .table { font-size: 0.8rem; }
+  .table th, .table td { padding: 8px 5px; white-space: nowrap; }
+
+  /* 隐藏部分列 */
+  .table .d-none-mobile { display: none; }
+
+  /* 分页移动端适配 */
+  .pagination { justify-content: center; flex-wrap: wrap; }
+  .pagination .page-item { margin: 2px; }
+  .pagination .page-link { padding: 6px 10px; font-size: 0.8rem; }
+
+  /* 隐藏首页末页 */
+  .pagination .page-item:first-child, .pagination .page-item:last-child { display: none; }
+
+  /* 表单移动端适配 */
+  .form-group { margin-bottom: 15px; }
+  .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+  /* 模态框移动端适配 */
+  .modal-dialog { max-width: calc(100% - 20px); }
+  .modal-body { max-height: calc(100vh - 300px); }
+
+  /* 标签页移动端适配 */
+  .nav-tabs { flex-wrap: nowrap; overflow-x: auto; }
+
+  /* 批量操作移动端适配 */
+  .batch-actions { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e9ecef; padding: 10px 15px; z-index: 1020; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); }
+  .batch-actions .btn { margin-inline-end: 10px; margin-bottom: 5px; }
+
+  /* 加载状态移动端适配 */
+  .loading-overlay { background: rgba(255, 255, 255, 0.9); }
+  .spinner { width: 30px; height: 30px; }
+
+  /* 工具栏移动端适配 */
+  .toolbar { flex-direction: column; gap: 10px; }
+
+  /* 购物车移动端适配 */
+  .cart-table-header { display: none; }
+  .cart-item { flex-wrap: wrap; padding: 14px 0; position: relative; }
+  .cart-item .col-check { width: auto; position: absolute; top: 20%; z-index: 2; }
+  .cart-item .col-product { width: 100%; flex: auto; padding-inline-start: 32px; margin-bottom: 10px; }
+  .cart-item .col-price, .cart-item .col-quantity, .cart-item .col-total { width: auto; flex: 1; }
+  .cart-item .col-actions { width: auto; flex: 0 0 auto; text-align: right; }
+  .cart-item .product-image { width: 72px; height: 72px; }
+  .cart-summary { flex-direction: column; gap: 14px; padding: 14px 0; }
+  .summary-left { width: 100%; justify-content: space-between; }
+  .summary-right { width: 100%; flex-direction: column; align-items: stretch; gap: 12px; }
+  .price-summary { justify-content: space-between; }
+  .checkout-actions .btn-primary { width: 100%; text-align: center; }
+  .toolbar .toolbar-left, .toolbar .toolbar-right { width: 100%; justify-content: center; }
+
+  /* 搜索框移动端适配 */
+  .search-box { width: 100%; margin-bottom: 15px; }
+  .search-box .form-control { border-radius: 20px; padding-inline-start: 40px; }
+  .search-box .search-icon { left: 15px; }
+
+  /* 结算页 */
+  .checkout-content { flex-direction: column; }
+  .checkout-sidebar { width: auto; }
+  .payment-content { margin-bottom: 30px !important; gap: 50px 100px !important; flex-direction: column; }
+  .payment-actions .btn { width: 100%; }
+  .payment-sidebar { width: 100% !important; }
+}
+
+/* 小屏幕 (≥768px) */
+@media (min-width: 768px) {
+  .container { max-width: 720px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .quick-actions { grid-template-columns: repeat(3, 1fr); }
+  .modal-dialog { max-width: 600px; margin: 30px auto; }
+  .form-row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+  .form-row .form-group { flex: 1; padding: 0 10px; min-width: 0; }
+  .form-row .form-group.col-6 { flex: 0 0 50%; }
+  .form-row .form-group.col-4 { flex: 0 0 33.333333%; }
+  .form-row .form-group.col-3 { flex: 0 0 25%; }
+}
+
+/* 中等屏幕 (≥992px) */
+@media (min-width: 992px) {
+  .container { max-width: 960px; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .quick-actions { grid-template-columns: repeat(4, 1fr); }
+  .table-responsive { overflow-x: visible; }
+}
+
+/* 大屏幕 (≥1200px) */
+@media (min-width: 1200px) {
+  .container { max-width: 1140px; }
+  .sidebar { width: 280px; }
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .quick-actions { grid-template-columns: repeat(6, 1fr); }
+}
+
+/* 超大屏幕 (≥1400px) */
+@media (min-width: 1400px) {
+  .container { max-width: 1320px; }
+  .user-main { padding: 30px; }
+  .stats-card { padding: 25px; }
+  .stats-card .stats-number { font-size: 2.5rem; }
+}
+
+/* 打印样式 */
+@media print {
+  .sidebar, .mobile-header, .batch-actions, .quick-actions, .toolbar, .pagination, .btn, .modal { display: none !important; }
+  .table { border-collapse: collapse; }
+  .table th, .table td { border: 1px solid #000; padding: 5px; }
+  .page-header { border-bottom: 2px solid #000; margin-bottom: 20px; }
+}
+
+/* ---- 平板 / 手机 ---- */
+@media (max-width: 991.98px) {
+  .user-header .top-nav .nav-item:not(.cart-link) { display: none; }
+  .user-center-container .row { flex-wrap: wrap; gap: 16px; margin-inline: 0; }
+  .user-center-container .row > .col-3 { width: 100%; flex: 0 0 100%; max-width: 100%; padding: 0; }
+  .user-center-container .row > div[style*="flex: 1"] { flex: 0 0 100% !important; width: 100%; min-width: 0; padding: 0; }
+  .user-sidebar { width: 100%; height: auto; margin-bottom: 0; }
+  .user-nav, .logout-section { display: inline-block; vertical-align: top; }
+  .user-nav { margin: 0; }
+  .logout-link { margin-bottom: 50px !important; }
+  .breadcrumb-section { background: #edf0f3; }
+}
+
+@media (max-width: 767.98px) {
+  .user-header { border-bottom: none; }
+  .user-header .header-content { flex-wrap: wrap; height: auto; justify-content: end; margin: 0; padding: 8px 0; }
+  .user-header .site-logo img { max-height: 36px; margin: 0 8px 0 0; }
+  .user-header .site-logo a { font-size: 20px; }
+  .user-header .top-nav { order: 3; margin-inline-start: auto; margin-inline-end: 13px; }
+  .user-header .top-nav .nav-item { padding: 6px 8px; font-size: 13px; }
+  .user-header .top-nav .nav-item:not(.cart-link) { display: inline-block; }
+  .user-header .user-info { order: 2; margin-inline-start: auto; width: calc(60vw); justify-content: right; }
+  .user-header .header-search { order: 4; flex: 0 0 100%; max-width: 100%; margin: 8px 0 0; }
+  .user-header .user-menu { inset-inline-end: 0; }
+  .user-header .user-dropdown:focus-within .user-menu { opacity: 1; visibility: visible; transform: none; }
+  .breadcrumb { flex-wrap: wrap; font-size: 13px; line-height: normal; }
+  .user-center-container { padding: 12px 0 32px; }
+  .user-sidebar { border-radius: 8px; }
+  .user-info-card { flex-direction: row !important; text-align: start !important; padding: 16px !important; }
+  .user-info-card .address-link { margin: 15px 0 0 !important; }
+  .quick-stats { grid-template-columns: repeat(5, 1fr) !important; }
+  .stat-number { font-size: 1.15rem; }
+  .balance-card { flex-direction: row !important; text-align: start !important; padding: 14px 16px !important; }
+  .user-nav, .logout-section { display: block; }
+  .nav-link, .logout-link { padding: 12px 16px; }
+  /* 表格 / 表单 / 按钮 */
+  .checkout-section { padding-inline-end: 0; }
+  .user-main-content table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .user-main-content img { max-width: 100%; height: auto; }
+  .form-row { flex-direction: column; gap: 0; }
+  .form-row .form-group, .form-row .form-group[class*="col-"] { flex: 0 0 100%; width: 100%; padding: 0; }
+  .cart-summary, .checkout-actions { position: static; }
+}
+
+@media (max-width: 479.98px) {
+  .quick-stats { grid-template-columns: repeat(3, 1fr) !important; }
+  .addresses-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)) !important; }
+  .addresses-grid .address-card { padding: 16px 0; background: no-repeat; border: none; border-radius: 0; }
+  .addresses-grid .address-card .address-header { flex-wrap: wrap; }
+  .order-item { flex-direction: column; align-items: start !important; }
+  .order-item .item-price { align-self: start !important; }
+  .order-detail-page .info-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)) !important; }
+}
+
+@media (max-width: 991.98px) {
+  body.has-user-drawer .user-header .user-drawer-toggle { display: inline-flex; }
+  body.has-user-drawer .breadcrumb-section { background: #ececec; }
+}
+
+@media (max-width: 767.98px) {
+  .user-header .user-info .user-name { max-width: 75px; overflow: hidden; text-overflow: ellipsis; word-break: break-all; height: 16px; line-height: 16px; }
+  .user-header .header-search .search-form { height: 32px; flex-direction: row-reverse; }
+  .user-header .search-input { padding: 4px 12px 4px 0; font-size: 13px; }
+  .layui-layer-page { width: 92% !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; }
+  .coupon-card { margin: 0 0 40px !important; }
+  .coupon-card .coupon-right { padding: 30px 10px; }
+  .coupon-card .coupon-left { padding: 10px; width: auto; }
+  .address-footer { opacity: 1 !important; }
+  .favorites-grid, .favorites-list { padding: 0 !important; }
+  .transaction-history { padding: 0 !important; }
+}
+
+@media (max-width: 380px) {
+  .user-header .top-nav .nav-item:not(.cart-link, .favo-link) { display: none; }
+  .coupon-card { flex-direction: column; }
+  .coupon-card .coupon-left { --grad-angle: 180deg; width: auto; border-inline-end: none; border-block-end: 4px dashed #fff; }
+}
+
+@media (max-width: 330px) {
+  .layui-layer-dialog { min-width: 240px !important; }
+  .user-header .top-nav .nav-item:not(.cart-link) { display: none; }
+  .order-header .order-status .status { font-size: 12px; }
+  .order-content .item-preview { flex-direction: column; align-items: flex-start; }
+  .coupon-section { flex-direction: column; }
+  .favorite-item { flex-direction: column; }
+  .review-form { padding: 16px 10px !important; border: none !important; margin: 12px -15px 0 !important; }
+  .wallet-card { flex-direction: column; }
+  .order-detail-page .info-item { flex-direction: column; align-items: start !important; }
+  .method-radio .method-icon { margin: 0 10px; margin-inline-end: 0; }
+}

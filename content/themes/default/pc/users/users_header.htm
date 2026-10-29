@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html {{todo:html_attributes}}>
+<head>
+    <meta charset="utf-8">
+    <title>{{todo:current_page_title}} - {{todo:site_name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{todo:site_description}}">
+    <meta name="site-url" content="{{todo:site_url}}">
+    <meta name="site-root" content="{{todo:site_url|default}}">
+    <script>
+        (function () {
+            function join(base, path) { return String(base || '').replace(/\/+$/, '') + '/' + String(path || '').replace(/^\/+/, ''); }
+            var siteUrl = '{{todo:site_url}}';
+            var siteRoot = '{{todo:site_url|default}}';
+            window.TODO = window.TODO || {};
+            window.TODO.SITE_URL = siteUrl;
+            window.TODO.SITE_ROOT = siteRoot;
+            window.TODO.join = window.TODO.join || join;
+            window.TODO.ADMIN_BASE = join(siteRoot, '/admin');
+            window.TODO.ADMIN_AJAX = join(window.TODO.ADMIN_BASE, 'admin-ajax.php');
+            window.TODO.INCLUDES_AJAX = join(siteRoot, '/includes/ajax');
+            window.TODO.API_BASE = join(siteRoot, '/api');
+            window.TODO.CONTENT_BASE = join(siteRoot, '/content');
+            window.TODO.PUBLIC_BASE = '{{todo:public_url}}';
+            window.TODO.CURRENCY_SYMBOL = '{{todo:currency_code}}';
+            window.TODO.CURRENCY_CODE = '{{todo:currency_iso}}';
+            window.TODO.CURRENCY_RATE = parseFloat('{{todo:currency_rate}}') || 1.0;
+        })();
+    </script>
+    <link rel="shortcut icon" href="{{todo:site_favicon}}" type="image/x-icon">
+    <link rel="stylesheet" href="{{todo:public_url}}/static/common/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{todo:public_url}}/static/common/css/iconfont.css">
+    <link rel="stylesheet" href="{{todo:public_url}}/plugins/layer-v3.5.1/theme/default/layer.css">
+    <link rel="stylesheet" href="{{todo:theme_url}}/users/skin/css/layout.css">
+    <link rel="stylesheet" href="{{todo:theme_url}}/users/skin/css/responsive.css">
+    {{todo:todo_head}}
+</head>
+<body>
+
+<header class="user-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="site-logo">
+                <a href="{{todo:home_url}}">
+                    {{todo:if site_logo}}
+                    <img src="{{todo:site_logo}}" alt="{{todo:site_name}}">
+                    {{todo:else}}
+                    <span class="logo-text">{{todo:site_name}}</span>
+                    {{/todo:if}}
+                </a>
+            </div>
+            <nav class="top-nav">
+                {{todo:if user_logged_in}}
+                <a href="{{todo:user_page_url page='orders'}}" class="nav-item">{{todo:t text="已买到的宝贝"}}</a>
+                {{/todo:if}}
+                <a href="{{todo:user_page_url page='cart'}}" class="nav-item cart-link">
+                    <i class="icon todofont todo-Shopping" style="opacity: 0.5;"></i> {{todo:t text="购物车"}}
+                    {{todo:if cart_count > 0}}
+                    <span class="cart-badge">{{todo:cart_count}}</span>
+                    {{/todo:if}}
+                </a>
+                <a href="{{todo:user_page_url page='favorites'}}" class="nav-item favo-link">
+                    {{todo:t text="收藏夹"}}
+                    {{todo:if favorites_count > 0}}
+                    <span class="cart-badge">{{todo:favorites_count}}</span>
+                    {{/todo:if}}
+                </a>
+            </nav>
+            <script>
+                window.TODO = window.TODO || {};
+                if (typeof window.TODO.doSafeSearch !== 'function') {
+                    window.TODO.doSafeSearch = function(val, inputEl) {
+                        var q = (val || '').trim();
+                        if (!q) {
+                            if (inputEl) inputEl.focus();
+                            return;
+                        }
+                        if (q.length > 60) q = q.substring(0, 60);
+                        var now = Date.now();
+                        if (window.TODO._lastSearchTime && (now - window.TODO._lastSearchTime < 2000)) {
+                            if (window.layer) layer.msg('{{todo:t text="搜索过于频繁，请稍后再试"}}', {icon: 2});
+                            return;
+                        }
+                        window.TODO._lastSearchTime = now;
+                        var baseSearchUrl = '{{todo:search_url}}';
+                        var targetUrl = baseSearchUrl + (baseSearchUrl.indexOf('?') !== -1 ? '&' : '?') + 'q=' + encodeURIComponent(q);
+                        window.location.href = targetUrl;
+                    };
+                }
+            </script>
+            <div class="header-search">
+                <form action="{{todo:search_url}}" method="get" class="search-form" onsubmit="event.preventDefault(); window.TODO.doSafeSearch(this.querySelector('input[name=keyword]').value, this.querySelector('input[name=keyword]'));">
+                    <input type="text" name="keyword" placeholder="{{todo:t text='搜索商品'}}" class="search-input" value="{{todo:get.keyword}}">
+                    <button type="submit" class="search-btn">
+                        <i class="icon todofont todo-Search" style="width: auto;"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="user-info">
+                {{todo:if user_logged_in}}
+                <div class="user-dropdown">
+                    <div class="user-trigger">
+                        <span class="user-name">{{todo:user.display_name}}</span>
+                        <i class="icon todofont todo-Right ro90"></i>
+                    </div>
+                    <div class="user-menu">
+                        <ul>
+                            <li><a href="{{todo:user_url}}">{{todo:t text="个人中心"}}</a></li>
+                            <li>
+                                <a href="{{todo:user_page_url page='favorites'}}">
+                                    {{todo:t text="收藏夹"}}
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li><a href="{{todo:logout_url}}">{{todo:t text="退出登录"}}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {{todo:else}}
+                <div class="auth-links">
+                    <a href="{{todo:login_url}}" class="login-link">{{todo:t text="登录"}}</a>
+                    {{todo:if_users_can_register}}
+                    <span class="separator">|</span>
+                    <a href="{{todo:register_url}}" class="register-link">{{todo:t text="注册"}}</a>
+                    {{/todo:if_users_can_register}}
+                </div>
+                {{/todo:if}}
+                <button type="button" class="user-drawer-toggle" id="userDrawerToggle" aria-controls="userSidebar" aria-expanded="false" aria-label="{{todo:t text='会员中心'}}">
+	                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+	            </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="breadcrumb-section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="{{todo:home_url}}">{{todo:t text="首页"}}</a>
+            <span class="separator">/</span>
+            {{todo:if current_page_title === '会员中心'}}
+            <span class="current">{{todo:current_page_title}}</span>
+            {{todo:else}}
+            <a href="{{todo:user_url}}">{{todo:t text="会员中心"}}</a>
+            {{/todo:if}}
+            {{todo:if current_page_title !== '会员中心'}}
+            <span class="separator">/</span>
+            <span class="current">{{todo:current_page_title}}</span>
+            {{/todo:if}}
+        </nav>
+    </div>
+</div>

@@ -1,0 +1,362 @@
+{{todo:include file="users/users_header.htm"}}
+    <link rel="stylesheet" href="{{todo:theme_url}}/users/skin/css/order-detail.css">
+    <style>
+    .review-item { margin-bottom: 24px; }
+    .rating-star-box { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 20px; color: #d9d9d9; }
+    .rating-star-box .star-icon.active { color: #ff6600; }
+    .rating-display { display: inline-flex; align-items: center; gap: 2px; }
+    .rating-display .star-icon { font-style: normal; color: #e0e0e0; font-size: 16px; }
+    .rating-display .star-icon.active { color: #ff6600; }
+    .comment-rating-stars { display: inline-block; position: relative; font-size: 14px; line-height: 1; margin-inline-start: 6px; vertical-align: middle; }
+    .stars-outer { color: #e0e0e0; letter-spacing: 2px; }
+    .stars-inner { color: #ff6600; position: absolute; left: 0; top: 0; overflow: hidden; white-space: nowrap; letter-spacing: 2px; }
+    .image-preview-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; position: relative; }
+    .image-preview-wrapper { position: relative; display: inline-block; margin-inline-end: 8px; margin-bottom: 8px; }
+    .image-preview-wrapper .remove-btn { position: absolute; top: -6px; right: -6px; background: #ff4d4f; color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    </style>
+
+    <div class="order-detail-page">
+        <div class="container">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <div class="header-left">
+                    <a href="{{todo:user_page_url page='order-detail'}}&id={{todo:order.id}}" class="back-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{todo:t text="返回订单详情"}}
+                    </a>
+                </div>
+                <div class="header-right">
+                    <span class="order-status status-completed">
+                        {{todo:t text="已完成"}}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- 订单信息卡片 -->
+            <div class="order-info-card">
+                <div class="card-header">
+                    <h3>{{todo:t text="订单信息"}}</h3>
+                </div>
+                <div class="card-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>{{todo:t text="订单号"}}:&nbsp;</label>
+                            <span>{{todo:order.order_no}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="下单时间"}}:&nbsp;</label>
+                            <span>{{todo:order.created_at_format}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="订单状态"}}:&nbsp;</label>
+                            <span class="order-status status-completed" style="padding:2px 8px;font-size:12px;">{{todo:t text="已完成"}}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>{{todo:t text="订单金额"}}:&nbsp;</label>
+                            <span style="color:#f5222d;font-weight:bold;">{{todo:currency_code}}{{todo:order.total_amount_format}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 商品评价卡片 -->
+            <div class="order-items-card">
+                <div class="card-header">
+                    <h3>{{todo:t text="商品评价"}}</h3>
+                </div>
+                <div class="card-content">
+                    {{todo:order.items}}
+                        <div class="review-item" data-product-id="{{todo:product_id}}">
+                            <div class="row">
+                                <div class="col-2 text-center">
+                                    {{todo:if condition="product_image"}}
+                                        <img src="{{todo:product_image}}" alt="{{todo:product_name}}" class="img-fluid rounded" style="max-height:80px;object-fit:cover;">
+                                    {{todo:else}}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height:80px;background:#f8fafc;">
+                                            📦
+                                        </div>
+                                    {{/todo:if}}
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="font-size:15px;font-weight:600;color:#1e293b;margin-bottom:4px;"><a href="{{todo:product_url}}" style="color:inherit;text-decoration:none;">{{todo:product_name}}</a></h4>
+                                    {{todo:if condition="spec_name"}}
+                                        <p class="text-muted" style="color:#64748b;font-size:13px;margin-bottom:4px;">{{todo:t text="规格"}}&nbsp;&nbsp;&nbsp;&nbsp;{{todo:spec_name}}</p>
+                                    {{/todo:if}}
+                                    <p class="text-muted" style="color:#64748b;font-size:13px;margin-bottom:12px;">
+                                        {{todo:currency_code}}{{todo:price_format}} × {{todo:quantity}}
+                                    </p>
+                                    
+                                    {{todo:if condition="is_reviewed"}}
+                                        <!-- 已评价 -->
+                                        <div class="reviewed-content" style="margin-top:12px;background:#f8fafc;padding:12px 16px;border-radius:6px;">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge badge-success mr-2" style="color: #009243;margin-inline-end:8px;font-size:12px;">{{todo:t text="已评价"}}</span>
+                                                <div class="rating-display" style="display:inline-flex;align-items:center;gap:2px;">
+                                                    {{todo:review_stars}}
+                                                        <i class="star-icon {{todo:if condition='active'}}active{{/todo:if}}" style="font-style:normal;font-size:16px;color:{{todo:if condition='active'}}#ff6600{{todo:else}}#e0e0e0{{/todo:if}};">★</i>
+                                                    {{/todo:review_stars}}
+                                                    <b style="font-size:13px;color:#f60;margin-inline-start:6px;">{{todo:review.rating}} {{todo:t text="分"}}</b>
+                                                </div>
+                                            </div>
+                                            <p class="mb-2" style="margin:8px 0;font-size:14px;color:#334155;line-height:1.6;">{{todo:review.content}}</p>
+                                            {{todo:if condition="review_images"}}
+                                                <div class="review-images-grid" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;margin-bottom:8px;">
+                                                    {{todo:review_images}}
+                                                        <img src="{{todo:image_url}}" class="review-image-thumb" style="width:68px;height:68px;object-fit:cover;border-radius:4px;border:1px solid #e2e8f0;cursor:pointer;" onclick="previewReviewImages(this, {{todo:index}})">
+                                                    {{/todo:review_images}}
+                                                </div>
+                                            {{/todo:if}}
+                                            <div class="text-muted" style="color:#94a3b8;font-size:12px;margin-top:6px;">
+                                                {{todo:t text="评价时间"}}:&nbsp;{{todo:review.created_at_format}}
+                                            </div>
+                                        </div>
+                                    {{todo:else}}
+                                        <!-- 评价表单 -->
+                                        <div class="review-form" style="margin-top:12px;background:#f8fafc;padding:16px;border-radius:6px;border:1px solid #e2e8f0;">
+                                            <form class="review-form-item" data-product-id="{{todo:product_id}}">
+                                                <!-- 评分 -->
+                                                <div class="form-group mb-3">
+                                                    <label class="font-weight-bold" style="display:block;margin-bottom:6px;font-size:14px;color:#334155;">{{todo:t text="评分"}}:&nbsp;</label>
+                                                    <div class="rating-star-box" id="star-box-{{todo:product_id}}">
+                                                        <input type="hidden" name="rating" value="5">
+                                                        <span class="star-icon active" data-val="1">★</span>
+                                                        <span class="star-icon active" data-val="2">★</span>
+                                                        <span class="star-icon active" data-val="3">★</span>
+                                                        <span class="star-icon active" data-val="4">★</span>
+                                                        <span class="star-icon active" data-val="5">★</span>
+                                                        <span class="rating-text" style="font-size:14px;color:#64748b;margin-inline-start:8px;">5 {{todo:t text="分"}}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- 评价内容 -->
+                                                <div class="form-group mb-3">
+                                                    <label for="content_{{todo:product_id}}" class="font-weight-bold" style="display:block;margin-bottom:6px;font-size:14px;color:#334155;">{{todo:t text="评价内容"}}:&nbsp; </label>
+                                                    <textarea class="form-control" id="content_{{todo:product_id}}" name="content" rows="3" placeholder="{{todo:t text='请分享您的使用体验，写下您的真实评价'}}" required style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;"></textarea>
+                                                </div>
+
+                                                <!-- 晒图上传 -->
+                                                <div class="form-group mb-3">
+                                                    <label class="font-weight-bold" style="display:block;margin-bottom:6px;font-size:14px;color:#334155;">{{todo:t text="上传图片 (选填)"}}:&nbsp;</label>
+                                                    <div class="image-upload-box" id="upload-box-{{todo:product_id}}">
+                                                        <div class="uploaded-image-preview-list" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                                                        <input type="file" class="review-image-input" accept="image/jpeg,image/png,image/gif,image/webp" multiple style="display:none;">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm btn-select-images" style="padding:6px 14px;border:1px dashed #cbd5e1;border-radius:4px;background:#ffffff;color:#475569;font-size:13px;cursor:pointer;">
+                                                            + {{todo:t text="添加晒图 (最多6张)"}}
+                                                        </button>
+                                                        <div class="small text-muted mt-1" style="font-size:12px;color:#94a3b8;">{{todo:t text="仅支持 JPG、PNG、GIF、WebP 图片，单张不超过 5MB"}}</div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- 提交按钮 -->
+                                                <button type="submit" class="btn btn-primary btn-submit-review">
+                                                    {{todo:t text="提交评价"}}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {{/todo:if}}
+                                </div>
+                            </div>
+                        </div>
+                    {{/todo:order.items}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{todo:include file="users/users_footer.htm"}}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化星级打分控件
+        document.querySelectorAll('.rating-star-box').forEach(function(box) {
+            var stars = box.querySelectorAll('.star-icon');
+            var input = box.querySelector('input[name="rating"]');
+            var text = box.querySelector('.rating-text');
+            
+            stars.forEach(function(star) {
+                star.addEventListener('click', function() {
+                    var val = parseInt(this.getAttribute('data-val')) || 5;
+                    if (input) input.value = val;
+                    if (text) text.textContent = val + ' {{todo:t text="分"}}';
+                    stars.forEach(function(s, idx) {
+                        if (idx < val) s.classList.add('active');
+                        else s.classList.remove('active');
+                    });
+                });
+            });
+        });
+
+        // 绑定晒图上传与预览
+        document.querySelectorAll('.image-upload-box').forEach(function(box) {
+            var btnSelect = box.querySelector('.btn-select-images');
+            var input = box.querySelector('.review-image-input');
+            var previewList = box.querySelector('.uploaded-image-preview-list');
+
+            if (btnSelect && input) {
+                btnSelect.addEventListener('click', function() {
+                    input.click();
+                });
+            }
+
+            if (input) {
+                input.addEventListener('change', function() {
+                    var files = Array.from(this.files);
+                    var currentCount = previewList.children.length;
+                    
+                    var allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    var maxSingleSize = 5 * 1024 * 1024; // 5MB
+
+                    files.forEach(function(file) {
+                        if (currentCount >= 6) {
+                            if (window.layer) layer.msg('{{todo:t text="最多只能上传6张晒图"}}', {icon: 2});
+                            return;
+                        }
+                        // 严格安全限定：校验 MIME 与扩展名
+                        if (!allowedMimes.includes(file.type.toLowerCase())) {
+                            if (window.layer) layer.msg('{{todo:t text="禁止上传非图片文件（仅支持 JPG/PNG/GIF/WebP）"}}', {icon: 2});
+                            return;
+                        }
+                        if (file.size > maxSingleSize) {
+                            if (window.layer) layer.msg('{{todo:t text="单张图片大小不能超过 5MB"}}', {icon: 2});
+                            return;
+                        }
+
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            var imgUrl = e.target.result;
+                            var wrapper = document.createElement('div');
+                            wrapper.className = 'image-preview-wrapper';
+                            wrapper.style.cssText = 'position:relative;display:inline-block;margin-inline-end:8px;margin-bottom:8px;';
+                            wrapper.setAttribute('data-file-url', imgUrl);
+
+                            wrapper.innerHTML = '<img src="' + imgUrl + '" style="width:64px;height:64px;object-fit:cover;border-radius:4px;border:1px solid #d9d9d9;">' +
+                                '<span class="remove-btn" style="position:absolute;top:-6px;right:-6px;background:#ff4d4f;color:#fff;border-radius:50%;width:18px;height:18px;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;">×</span>';
+
+                            wrapper.querySelector('.remove-btn').addEventListener('click', function() {
+                                wrapper.remove();
+                            });
+
+                            previewList.appendChild(wrapper);
+                            currentCount++;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    this.value = ''; // 清空 input 允许重复选择
+                });
+            }
+        });
+
+        // 绑定单表单/整体提交
+        document.querySelectorAll('.review-form-item').forEach(function(form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var productId = this.getAttribute('data-product-id');
+                var rating = this.querySelector('input[name="rating"]').value;
+                var content = this.querySelector('textarea[name="content"]').value;
+                var btn = this.querySelector('.btn-submit-review');
+                var uploadBox = this.querySelector('.image-upload-box');
+
+                var imageUrls = [];
+                if (uploadBox) {
+                    var wrappers = uploadBox.querySelectorAll('.image-preview-wrapper');
+                    wrappers.forEach(function(w) {
+                        var u = w.getAttribute('data-file-url');
+                        if (u) imageUrls.push(u);
+                    });
+                }
+
+                if (imageUrls.length > 6) {
+                    if (window.layer) layer.msg('{{todo:t text="最多只能上传6张晒图图片"}}', {icon: 2});
+                    else alert('{{todo:t text="最多只能上传6张晒图图片"}}');
+                    return;
+                }
+                
+                if (!content || content.trim().length < 2) {
+                    if (window.layer) layer.msg('{{todo:t text="评价内容不能少于2个字"}}', {icon: 2});
+                    else alert('{{todo:t text="评价内容不能少于2个字"}}');
+                    return;
+                }
+
+                var orderId = '{{todo:order.id}}';
+
+                try {
+                    btn.disabled = true;
+                    btn.textContent = '{{todo:t text="提交中"}}';
+
+                    var formData = new FormData();
+                    formData.append('action', 'submit_review');
+                    formData.append('order_id', orderId);
+                    formData.append('items[' + productId + '][rating]', rating);
+                    formData.append('items[' + productId + '][content]', content);
+
+                    imageUrls.forEach(function(imgUrl, idx) {
+                        formData.append('items[' + productId + '][images][' + idx + ']', imgUrl);
+                    });
+
+                    var token = await (window.todoCSRF && window.todoCSRF.getToken ? window.todoCSRF.getToken('submit_review') : '');
+                    formData.append('_todononce', token);
+
+                    var defaultAjaxUrl = '{{todo:site_url}}/includes/ajax/order-handler.php';
+                    var ajaxUrl = (window.TODO && window.TODO.INCLUDES_AJAX) ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'order-handler.php') : defaultAjaxUrl;
+
+                    var res = await fetch(ajaxUrl, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        body: formData
+                    }).then(r => r.json());
+
+                    if (res.success) {
+                        if (window.layer) layer.msg('{{todo:t text="评价成功"}}', {icon: 1, time: 1500}, function() { location.reload(); });
+                        else { alert('{{todo:t text="评价成功"}}'); location.reload(); }
+                    } else {
+                        if (window.layer) layer.msg(res.message || '{{todo:t text="评价提交失败"}}', {icon: 2});
+                        else alert(res.message || '{{todo:t text="评价提交失败"}}');
+                    }
+                } catch (err) {
+                    if (window.layer) layer.msg('{{todo:t text="网络错误"}}', {icon: 2});
+                    else alert('{{todo:t text="网络错误"}}');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '{{todo:t text="提交评价"}}';
+                }
+            });
+        });
+    });
+    function previewReviewImages(imgEl, startIdx) {
+        if (!imgEl) return;
+        var grid = imgEl.closest('.review-images-grid');
+        if (!grid) {
+            if (window.layer) {
+                layer.photos({ photos: { data: [{ src: imgEl.src }] } });
+            } else {
+                window.open(imgEl.src);
+            }
+            return;
+        }
+
+        var imgNodes = grid.querySelectorAll('img');
+        var photosData = [];
+        imgNodes.forEach(function(node) {
+            photosData.push({
+                src: node.getAttribute('src')
+            });
+        });
+
+        if (window.layer && photosData.length > 0) {
+            layer.photos({
+                photos: {
+                    title: '{{todo:t text="评价晒图预览"}}',
+                    start: startIdx >= 0 ? startIdx : 0,
+                    data: photosData
+                },
+                anim: 5
+            });
+        } else {
+            window.open(imgEl.src);
+        }
+    }
+    </script>
+</body>
+</html>

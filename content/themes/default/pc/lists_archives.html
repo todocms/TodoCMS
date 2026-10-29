@@ -1,0 +1,191 @@
+{{todo:include file="header.html"}}
+<div class="main-content">
+    <div class="container">
+        <!-- 面包屑导航 -->
+        {{todo:get_breadcrumb}}
+        <div class="row gap-5">
+            <main class="col">
+                <header class="tag-header">
+                    <div class="tag-info">
+                        <h1 class="tag-title">
+                            {{todo:t text="归档"}}:&nbsp;
+                            {{todo:archive_title}}
+                        </h1>
+                        <div class="tag-meta">
+                            <span class="post-count">
+                                <i class="fa fa-file-text"></i>
+                                {{todo:total_posts}} {{todo:t text="篇文章"}}
+                            </span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="m-t-20">
+                    {{todo:if condition="total_posts > 0"}}
+                        {{todo:loop posts}}
+                        <article class="article-item" data-id="{{todo:article_id}}">
+                            <div class="article-card">
+                                <!-- 文章缩略图 -->
+                                {{todo:if article_featured_image || view_mode != 'list'}}
+                                <div class="article-thumbnail">
+                                    <a href="{{todo:article_url}}" class="thumbnail-link">
+                                        {{todo:if article_featured_image}}
+                                        <img src="{{todo:article_featured_image}}" class="lazy-load" alt="{{todo:article_title}}" loading="lazy">
+                                        {{todo:else}}
+                                        <div class="thumbnail-placeholder">
+                                            <i class="icon-article"></i>
+                                        </div>
+                                        {{/todo:if}}
+
+                                        <div class="thumbnail-overlay">
+                                            <div class="overlay-content">
+                                                <span class="read-more">{{todo:t text="阅读全文"}}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="article-badges">
+                                            {{todo:if article_is_hot}}
+                                            <span class="badge badge-hot">{{todo:t text="热门"}}</span>
+                                            {{/todo:if}}
+                                            {{todo:if article_is_recommended}}
+                                            <span class="badge badge-recommend">{{todo:t text="推荐"}}</span>
+                                            {{/todo:if}}
+                                            {{todo:if article_is_top}}
+                                            <span class="badge badge-top">{{todo:t text="置顶"}}</span>
+                                            {{/todo:if}}
+                                            {{todo:if article_is_featured}}
+                                            <span class="badge badge-featured">{{todo:t text="头条"}}</span>
+                                            {{/todo:if}}
+                                            {{todo:if article_is_new}}
+                                            <span class="badge badge-new">{{todo:t text="最新"}}</span>
+                                            {{/todo:if}}
+                                        </div>
+                                    </a>
+                                </div>
+                                {{/todo:if}}
+
+                                <!-- 文章信息 -->
+                                <div class="article-info">
+                                    <h3 class="article-title">
+                                        <a href="{{todo:article_url}}" title="{{todo:article_title}}">{{todo:article_title}}</a>
+                                    </h3>
+
+                                    {{todo:if view_mode == 'list' || view_mode == 'card'}}
+                                    <div class="article-excerpt">
+                                        {{todo:article_excerpt length="200"}}
+                                    </div>
+                                    {{/todo:if}}
+
+                                    <div class="article-meta">
+                                        <div class="meta-left">
+                                            <time class="publish-date" datetime="{{todo:article_created_at}}">
+                                                <i class="icon-calendar"></i>
+                                                {{todo:article_created_at format="Y-m-d"}}
+                                            </time>
+                                            <span class="view-count">
+                                                <i class="icon-eye"></i>
+                                                {{todo:article_views format="number"}}
+                                            </span>
+                                            {{todo:if article_comments_count > 0}}
+                                            <span class="comment-count">
+                                                <i class="icon-comment"></i>
+                                                {{todo:article_comments_count}}
+                                            </span>
+                                            {{/todo:if}}
+                                            <span class="like-count">
+                                                <i class="icon-heart"></i>
+                                                {{todo:article_likes default="0"}}
+                                            </span>
+                                        </div>
+
+                                        {{todo:if article_author && (view_mode == 'list' || view_mode == 'card')}}
+                                        <div class="meta-right">
+                                            <span class="author">
+                                                <i class="icon-user"></i>
+                                                {{todo:article_author_name}}
+                                            </span>
+                                        </div>
+                                        {{/todo:if}}
+                                    </div>
+
+                                    <!-- 文章所属分类 -->
+                                    {{todo:if article_category_name && (view_mode == 'list' || view_mode == 'card')}}
+                                    <div class="article-category">
+                                        <a href="{{todo:article_category_url}}" class="category-link">
+                                            <i class="fa fa-folder"></i>
+                                            {{todo:article_category_name}}
+                                        </a>
+                                    </div>
+                                    {{/todo:if}}
+
+                                    <!-- 标签 -->
+                                    {{todo:if article_tags && (view_mode == 'list' || view_mode == 'card')}}
+                                    <div class="article-tags">
+                                        <i class="fa fa-tags"></i>
+                                        {{todo:loop article_tags}}
+                                        <a href="{{todo:tag_url}}" class="tag">{{todo:tag_name}}</a>
+                                        {{/todo:loop}}
+                                    </div>
+                                    {{/todo:if}}
+                                </div>
+                            </div>
+                        </article>
+                        {{/todo:loop}}
+                    {{todo:else}}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <h3>{{todo:t text="暂无文章"}}</h3>
+                        <p>{{todo:t text="该归档下还没有发布任何文章"}}</p>
+                        <a href="{{todo:site_url}}" class="btn btn-primary">
+                            <i class="fa fa-home"></i>
+                            {{todo:t text="返回首页"}}
+                        </a>
+                    </div>
+                    {{/todo:if}}
+                </div>
+
+                <!-- 分页导航 -->
+                {{todo:if pagination}}
+                <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                    <div class="pagination flex gap-2">
+                        {{todo:if pagination_prev_page > 0}}
+                        <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                            <i class="fa fa-chevron-left"></i>
+                            <span>{{todo:t text="上一页"}}</span>
+                        </a>
+                        {{/todo:if}}
+
+                        <div class="pagination-numbers flex gap-2 items-center flex-wrap">
+                            {{todo:loop pagination_pages}}
+                        {{todo:if page_is_dots}}
+                        <span class="pagination-dots">...</span>
+                        {{todo:elseif page_is_current}}
+                        <span class="pagination-number current">{{todo:page_number}}</span>
+                        {{todo:else}}
+                        <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                        {{/todo:if}}
+                        {{/todo:loop}}
+                        </div>
+
+                        {{todo:if pagination_next_page > 0}}
+                        <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                            <span>{{todo:t text="下一页"}}</span>
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                        {{/todo:if}}
+                    </div>
+                </div>
+                {{/todo:if}}
+            </main>
+
+            <!-- 右侧边栏 -->
+            <aside class="sidebar" style="width: 300px;">
+                {{todo:include file="sidebar.html"}}
+            </aside>
+        </div>
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}

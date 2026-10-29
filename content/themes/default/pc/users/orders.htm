@@ -1,0 +1,755 @@
+{{todo:include file="users/users_header.htm"}}
+<style>
+    .order-filters {
+        margin-bottom: 20px;
+    }
+
+    .filter-tabs {
+        display: flex;
+        border: 1px solid #eee;
+        border-radius: 50px;
+        overflow: hidden;
+    }
+
+    .filter-tab {
+        flex: auto;
+        padding: 15px 0;
+        line-height: normal;
+        text-align: center;
+        text-decoration: none;
+        color: #666;
+        border-inline-end: 1px solid #eee;
+        transition: all 0.3s;
+    }
+
+    .filter-tab:last-child {
+        border-inline-end: none;
+    }
+
+    .filter-tab:hover {
+        background-color: #f8f9fa;
+    }
+
+    .filter-tab.active {
+        color: #333;
+        font-weight: bold;
+    }
+
+    .orders-list {
+        display: block;
+    }
+
+    .order-card {
+        background: white;
+        margin-bottom: 20px;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        margin: -1px -1px 0;
+        --grad-angle: 45deg;
+        background: linear-gradient(var(--grad-angle), #f2f0ed, transparent);
+        position: relative;
+    }
+
+    [dir="rtl"] .order-header {
+        --grad-angle: -45deg;
+    }
+
+    .order-header::before {
+        content: "⁝";
+        display: block;
+        height: 100%;
+        position: absolute;
+        inset-inline-start: -4px;
+        top: 0;
+        color: #fff;
+        font-size: 30px;
+    }
+
+    .order-info {
+        display: flex;
+        gap: 0 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .order-no {
+        font-size: 14px;
+        font-weight: 500;
+        color: #ab7e52;
+        line-height: normal;
+        word-break: break-all;
+    }
+
+    .order-date {
+        color: #ada79d;
+        font-size: 14px;
+    }
+
+    .status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    .status-pending { background: #FEF3C7; color: #D97706; }
+    .status-processing { background: #DBEAFE; color: #2563EB; }
+    .status-shipped { background: #D1FAE5; color: #059669; }
+    .status-completed { background: #f1f1f1; color: #666; }
+    .status-cancelled { background: #FEE2E2; color: #DC2626; }
+
+    .order-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 20px 0;
+    }
+
+    .order-items {
+        flex: 1;
+    }
+
+    .item-preview {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .item-image img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+
+    .no-image {
+        width: 80px;
+        height: 80px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        color: #999;
+        font-size: 12px;
+    }
+
+    .specs {
+        font-size: 14px;
+        word-break: break-all;
+    }
+
+    .more-items {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .order-amount {
+        text-align: right;
+        margin-inline-start: 20px;
+    }
+
+    .amount-value {
+        font-size: 18px;
+        font-weight: 500;
+        color: #e74c3c;
+        line-height: normal;
+    }
+
+    .order-actions {
+        padding: 0 20px 20px;
+        display: flex;
+        gap: 10px;
+        justify-content: end;
+        flex-wrap: wrap;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .page-btn {
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #666;
+        transition: all 0.3s;
+    }
+
+    .page-btn:hover {
+        background-color: #f8f9fa;
+    }
+
+    .page-btn.active {
+        background-color: #FF6600;
+        color: white;
+        border-color: #FF6600;
+    }
+
+    @media (max-width: 768px) {
+        .order-stats {
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            flex: 1;
+            min-width: calc(50% - 7.5px);
+        }
+        
+        .filter-tabs {
+            flex-wrap: wrap;
+            border-radius: 20px;
+            margin: 0 -10px;
+        }
+        
+        .filter-tab {
+            font-size: 14px;
+            flex: 1;
+            min-width: calc(33.333% - 1px);
+            overflow: hidden;
+        }
+        
+        .order-header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+            --grad-angle: 180deg;
+        }
+
+        .order-header::before { display: none; }
+
+        .order-header .order-status { margin-inline-start: -10px; }
+        
+        .order-content {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+            padding: 20px 13px 0;
+        }
+        
+        .order-amount {
+            margin-inline-start: 0;
+            text-align: start;
+        }
+        
+        .order-actions {
+            text-align: start;
+            padding: 20px 0;
+        }
+    }
+</style>
+
+<div class="user-center-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                {{todo:include file="users/users_sidebar.htm"}}
+            </div>
+
+            <div style="flex: 1;">
+                <div class="user-main-content">
+                    <div class="page-header">
+                        <h2>{{todo:t text="我的订单"}}</h2>
+                    </div>
+
+                    <!-- 游客订单/订单搜索框 -->
+                    <div class="guest-order-search-section" style="margin-top: 15px; margin-bottom: 20px;">
+                        <form action="" method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <input type="hidden" name="user" value="orders">
+                            {{todo:if condition="status_param_val"}}
+                            <input type="hidden" name="status" value="{{todo:status_param_val}}">
+                            {{/todo:if}}
+                            <div style="flex: 1; position: relative;">
+                                <input type="text" id="search_order_input" name="search_order" class="form-control" placeholder="{{todo:t text='单号'}} / {{todo:t text='手机'}} / {{todo:t text='邮箱'}}" value="{{todo:search_order_val}}" style="width: 100%; border-radius: 50px; padding-inline-end: 36px;" oninput="toggleClearOrderSearch(this)">
+                                <span id="clear_order_search_btn" onclick="clearOrderSearch()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 30px;height: 30px;padding: 0 0 2px; display: {{todo:if condition='search_order_val'}}flex{{todo:else}}none{{/todo:if}}; align-items: center; justify-content: center; color: #333; border-radius: 50%; background: #f4f4f4; cursor: pointer; user-select: none; font-size: 18px; line-height: 1;" title="{{todo:t text='清空搜索'}}">&times;</span>
+                            </div>
+                            <button type="submit" class="btn btn-outline">{{todo:t text="查询订单"}}</button>
+                        </form>
+                        {{todo:if condition="is_guest_mode"}}
+                        <div class="guest-tip" style="margin: 10px 15px 0; font-size: 13px; color: #6b7280; display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <span>{{todo:t text="游客模式：系统自动加载本浏览器记录的下单列表"}}</span>
+                        </div>
+                        {{/todo:if}}
+                    </div>
+
+                    <div class="order-filters">
+                        <div class="filter-tabs">
+                            <a href="{{todo:user_page_url page='orders'}}"
+                                class="filter-tab{{todo:class_if var=status_is_all true=active}}">{{todo:t text="全部订单"}}</a>
+                            <a href="{{todo:user_page_url page='orders'}}&status=pending"
+                                class="filter-tab{{todo:class_if var=status_is_pending true=active}}">{{todo:t text="待付款"}}</a>
+                            <a href="{{todo:user_page_url page='orders'}}&status=processing"
+                                class="filter-tab{{todo:class_if var=status_is_processing true=active}}">{{todo:t text="待发货"}}</a>
+                            <a href="{{todo:user_page_url page='orders'}}&status=shipped"
+                                class="filter-tab{{todo:class_if var=status_is_shipped true=active}}">{{todo:t text="待收货"}}</a>
+                            <a href="{{todo:user_page_url page='orders'}}&status=completed"
+                                class="filter-tab{{todo:class_if var=status_is_completed true=active}}">{{todo:t text="已完成"}}</a>
+                            <a href="{{todo:user_page_url page='orders'}}&status=cancelled"
+                                class="filter-tab{{todo:class_if var=status_is_cancelled true=active}}">{{todo:t text="已取消"}}</a>
+                        </div>
+                    </div>
+
+                    {{todo:if condition="user_order_count > 0"}}
+                    <div class="orders-list">
+                        {{todo:user_orders}}
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-info">
+                                    <span class="order-no">{{todo:t text="订单号"}}:&nbsp;{{todo:order_no}}</span>
+                                    <span class="order-date">{{todo:created_at_format}}</span>
+                                </div>
+                                <div class="order-status">
+                                    {{todo:if condition="is_refunding"}}
+                                    <b class="status status-pending">{{todo:t text="退款处理中"}}</b>
+                                    {{todo:elseif condition="is_refunded"}}
+                                    <b class="status status-completed">{{todo:t text="已退款"}}</b>
+                                    {{todo:else}}
+                                    <b class="status status-{{todo:status}}">{{todo:status_text}}</b>
+                                    {{/todo:if}}
+                                </div>
+                            </div>
+
+                            <div class="order-content">
+                                <div class="order-items">
+                                    <div class="item-preview">
+                                        <div class="d-flex item-image" style="flex-shrink: 0;">
+                                            {{todo:if condition="first_item.product_image"}}
+                                            <img src="{{todo:first_item.product_image}}" alt="{{todo:first_item.product_title}}">
+                                            {{todo:else}}
+                                            <div class="no-image">{{todo:t text="无图片"}}</div>
+                                            {{/todo:if}}
+                                        </div>
+                                        <div class="item-info" style="line-height: normal;">
+                                            <h4><a href="{{todo:first_item.product_url}}" style="color: inherit; text-decoration: none; word-break: break-all;">{{todo:first_item.product_title}}</a></h4>
+                                            {{todo:if condition="first_item.specs_text"}}
+                                            <div class="specs lb-color">{{todo:first_item.specs_text}}</div>
+                                            {{/todo:if}}
+                                            <div class="item-price">{{todo:currency_code}}{{todo:first_item.unit_price_format}}</div>
+                                            <span class="lb-color" style="font-size: 12px;">×{{todo:first_item.quantity}} {{todo:first_item.unit_text}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{todo:if condition="items_count > 1"}}
+                                <div class="more-items">{{todo:items_count}}{{todo:t text="件商品"}}</div>
+                                {{/todo:if}}
+
+                                <div class="order-amount">
+                                    <div class="amount-value">{{todo:currency_code}}{{todo:pay_amount_format}}</div>
+                                </div>
+                            </div>
+
+                            <div class="order-actions">
+                                {{todo:if condition="status == 'cancelled' || status == 'completed' || status == 'delivered' || status == 'refunded'"}}
+                                <button class="btn btn-sm" onclick="deleteOrder('{{todo:order_id}}')" style="margin-inline-end: auto;opacity: 0.5;">{{todo:t text="删除"}}</button>
+                                {{/todo:if}}
+                                <a href="{{todo:user_page_url page='order-detail'}}&id={{todo:order_id}}" class="btn btn-secondary btn-sm">{{todo:t text="查看详情"}}</a>
+                                {{todo:if condition="status == 'pending'"}}
+                                <a href="{{todo:user_page_url page='payment'}}&order_id={{todo:order_id}}" class="btn btn-primary btn-sm">{{todo:t text="立即付款"}}</a>
+                                {{/todo:if}}
+                                {{todo:if condition="can_apply_refund"}}
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="applyRefund('{{todo:order_id}}', '{{todo:pay_amount_format}}')">{{todo:t text="申请售后"}}</button>
+                                {{/todo:if}}
+                                {{todo:if condition="is_refunding"}}
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="cancelRefund('{{todo:order_id}}')" style="color: #df7d13;">{{todo:t text="撤销售后"}}</button>
+                                {{/todo:if}}
+                                {{todo:if condition="status == 'completed'"}}
+                                    {{todo:if condition="is_reviewed || reviewed == 1"}}
+                                    <a href="{{todo:user_page_url page='order-review'}}&order_id={{todo:order_id}}" class="btn btn-secondary btn-sm disabled" style="opacity: 0.65; cursor: default;">{{todo:t text="已评价"}}</a>
+                                    {{todo:else}}
+                                    <a href="{{todo:user_page_url page='order-review'}}&order_id={{todo:order_id}}" class="btn btn-secondary btn-sm">{{todo:t text="评价"}}</a>
+                                    {{/todo:if}}
+                                {{/todo:if}}
+                            </div>
+                        </div>
+                        {{/todo:user_orders}}
+                    </div>
+                    {{todo:else}}
+                    <div class="empty-info">
+                        <h3>{{todo:t text="暂无订单"}}</h3>
+                        <p>{{todo:t text="您还没有任何订单，去看看有什么好商品吧"}}</p>
+                        <a href="{{todo:site_url}}" class="btn btn-primary">{{todo:t text="去购物"}}</a>
+                    </div>
+                    {{/todo:if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteOrder(orderId) {
+    const doDelete = function() {
+        // 获取 CSRF Token，如果有的话
+        let csrfToken = '';
+        const csrfInput = document.querySelector('input[name="_csrf_token"]');
+        if (csrfInput) {
+            csrfToken = csrfInput.value;
+        }
+        
+        let formData = new URLSearchParams();
+        formData.append('order_id', orderId);
+        if (csrfToken) formData.append('_csrf_token', csrfToken);
+        
+        let ajaxUrl = (window.TODO && window.TODO.INCLUDES_AJAX) ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'order-handler.php?action=delete_order') : '{{todo:site_url}}/includes/ajax/order-handler.php?action=delete_order';
+        
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (window.layer) { layer.msg('{{todo:t text="订单已删除"}}', {icon: 1}); }
+                location.reload();
+            } else {
+                if (window.layer) { layer.msg(data.message || '{{todo:t text="删除失败"}}', {icon: 2}); } else { alert(data.message || '{{todo:t text="删除失败"}}'); }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (window.layer) { layer.msg('{{todo:t text="删除失败"}}', {icon: 2}); } else { alert('{{todo:t text="删除失败"}}'); }
+        });
+    };
+
+    if (window.layer) {
+        layer.confirm('{{todo:t text="确定删除该订单"}}', {
+            icon: 3,
+            title: '{{todo:t text="确认删除"}}',
+            btn: [__t('确定'), __t('取消')]
+        }, function(index) {
+            layer.close(index);
+            doDelete();
+        });
+    }
+}
+
+function toggleClearOrderSearch(input) {
+    var btn = document.getElementById('clear_order_search_btn');
+    if (btn) {
+        btn.style.display = input.value.trim() ? 'flex' : 'none';
+    }
+}
+
+function clearOrderSearch() {
+    var input = document.getElementById('search_order_input');
+    if (input) {
+        var hadValue = input.value.trim() !== '';
+        input.value = '';
+        toggleClearOrderSearch(input);
+        if (hadValue) {
+            input.form.submit();
+        }
+    }
+}
+
+function applyRefund(orderId, maxAmount) {
+    if (!orderId) return;
+
+    var contentHtml = '<div style="padding: 0 20px;">' +
+        '<div class="form-group">' +
+            '<label>{{todo:t text="售后类型"}} <span style="color: #ff4d4f;">*</span></label>' +
+            '<div style="display: flex; gap: 12px;">' +
+                '<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 14px;line-height: normal;">' +
+                    '<input type="radio" name="swal_refund_type" value="refund_only" checked /> {{todo:t text="仅退款 (无需退货)"}}' +
+                '</label>' +
+                '<label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 14px;line-height: normal;">' +
+                    '<input type="radio" name="swal_refund_type" value="return_and_refund" /> {{todo:t text="退货退款 (需寄回商品)"}}' +
+                '</label>' +
+            '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+            '<label>{{todo:t text="退款金额"}}</label>' +
+            '<div style="position: relative; display: flex; align-items: center;">' +
+                '<span style="position: absolute; left: 10px; color: #888;">{{todo:currency_code}}</span>' +
+                '<input type="number" step="0.01" id="swal_refund_amount" value="' + (maxAmount || '') + '" class="form-control" style="padding-inline-start: 30px;" />' +
+            '</div>' +
+            '<div class="description">{{todo:t text="最高可退"}}：{{todo:currency_code}}' + (maxAmount || '0.00') + '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+            '<label>{{todo:t text="申请原因"}} <span style="color: #ff4d4f;">*</span></label>' +
+            '<select id="swal_refund_reason_select" class="form-control" style="width: 100%;">' +
+                '<option value="">-- {{todo:t text="选择"}} --</option>' +
+                '<option value="{{todo:t text="不想要了/拍错/多拍"}}">{{todo:t text="不想要了/拍错/多拍"}}</option>' +
+                '<option value="{{todo:t text="商品质量问题"}}">{{todo:t text="商品质量问题"}}</option>' +
+                '<option value="{{todo:t text="商品与描述不符"}}">{{todo:t text="商品与描述不符"}}</option>' +
+                '<option value="{{todo:t text="物流延误"}}">{{todo:t text="物流延误"}}</option>' +
+                '<option value="other">{{todo:t text="其他"}}</option>' +
+            '</select>' +
+            '<textarea id="swal_refund_reason_custom" rows="3" class="form-control" style="display: none; margin-top: 8px;"></textarea>' +
+        '</div>' +
+        '<div class="form-group">' +
+            '<label>{{todo:t text="上传凭证 (最多6张)"}}</label>' +
+            '<div id="refund_evidence_preview" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;"></div>' +
+            '<input type="file" id="refund_evidence_files" accept="image/jpeg,image/png,image/gif,image/webp" multiple style="display: none;" />' +
+            '<button type="button" class="btn btn-sm" onclick="document.getElementById(\'refund_evidence_files\').click()" style="background: #fafafa; border: 1px dashed #d9d9d9; color: #666; padding: 6px 12px; border-radius: 4px;">+ {{todo:t text="选择图片"}}</button>' +
+        '</div>' +
+    '</div>';
+
+    var selectedImages = [];
+
+    var submitRefund = function(type, amount, reason, images, layerIdx) {
+        var csrfInput = document.querySelector('input[name="_csrf_token"]');
+        var csrfToken = csrfInput ? csrfInput.value : '';
+
+        var formData = new URLSearchParams();
+        formData.append('action', 'apply_refund');
+        formData.append('order_id', orderId);
+        formData.append('refund_type', type);
+        formData.append('refund_amount', amount);
+        formData.append('reason', reason);
+        if (images && images.length > 0) {
+            images.forEach(function(img) {
+                formData.append('images[]', img);
+            });
+        }
+        if (csrfToken) formData.append('_csrf_token', csrfToken);
+
+        var ajaxUrl = (window.TODO && window.TODO.INCLUDES_AJAX) ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'order-handler.php') : '{{todo:site_url}}/includes/ajax/order-handler.php';
+
+        var loadIdx = window.layer ? layer.load(1) : null;
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData.toString()
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (loadIdx !== null) layer.close(loadIdx);
+            if (data.success) {
+                if (layerIdx && window.layer) layer.close(layerIdx);
+                if (window.layer) {
+                    layer.msg(data.message || '{{todo:t text="售后申请已提交"}}', {icon: 1, time: 1500}, function() {
+                        location.reload();
+                    });
+                } else {
+                    alert(data.message || '{{todo:t text="售后申请已提交"}}');
+                    location.reload();
+                }
+            } else {
+                var err = data.error || data.message || '{{todo:t text="提交失败"}}';
+                if (window.layer) { layer.msg(err, {icon: 2}); } else { alert(err); }
+            }
+        })
+        .catch(function(err) {
+            if (loadIdx !== null) layer.close(loadIdx);
+            console.error('Apply refund error:', err);
+            if (window.layer) { layer.msg('{{todo:t text="网络错误"}}', {icon: 2}); } else { alert('{{todo:t text="网络错误"}}'); }
+        });
+    };
+
+    if (window.layer) {
+        layer.open({
+            type: 1,
+            title: '{{todo:t text="申请售后/退款"}}',
+            area: ['480px', 'auto'],
+            content: contentHtml,
+            btn: [__t('提交申请'), __t('取消')],
+            success: function(layero, index) {
+                var selectEl = document.getElementById('swal_refund_reason_select');
+                var customTextEl = document.getElementById('swal_refund_reason_custom');
+                if (selectEl && customTextEl) {
+                    selectEl.addEventListener('change', function() {
+                        if (this.value === 'other') {
+                            customTextEl.style.display = 'block';
+                            customTextEl.focus();
+                        } else {
+                            customTextEl.style.display = 'none';
+                        }
+                    });
+                }
+
+                var fileInput = document.getElementById('refund_evidence_files');
+                if (fileInput) {
+                    fileInput.addEventListener('change', function(e) {
+                        var files = e.target.files;
+                        if (!files) return;
+                        for (var i = 0; i < files.length; i++) {
+                            if (selectedImages.length >= 6) {
+                                layer.msg('{{todo:t text="最多只能上传6张凭证图片"}}', {icon: 2});
+                                break;
+                            }
+                            var file = files[i];
+                            if (!file.type.match(/^image\/(jpeg|png|gif|webp)$/i)) {
+                                layer.msg('{{todo:t text="仅支持 JPG、PNG、GIF、WebP 格式图片"}}', {icon: 2});
+                                continue;
+                            }
+                            if (file.size > 10 * 1024 * 1024) {
+                                layer.msg('{{todo:t text="单张图片大小不能超过 10MB"}}', {icon: 2});
+                                continue;
+                            }
+                            (function(f) {
+                                var reader = new FileReader();
+                                reader.onload = function(evt) {
+                                    var base64 = evt.target.result;
+                                    selectedImages.push(base64);
+                                    renderEvidencePreview();
+                                };
+                                reader.readAsDataURL(f);
+                            })(file);
+                        }
+                        fileInput.value = '';
+                    });
+                }
+            },
+            yes: function(index) {
+                var amt = document.getElementById('swal_refund_amount').value.trim();
+                var selectEl = document.getElementById('swal_refund_reason_select');
+                var customTextEl = document.getElementById('swal_refund_reason_custom');
+                var selectedReason = selectEl ? selectEl.value.trim() : '';
+                var rsn = '';
+
+                if (!selectedReason) {
+                    layer.msg('{{todo:t text="请选择申请原因"}}', {icon: 2});
+                    return;
+                }
+
+                if (selectedReason === 'other') {
+                    rsn = customTextEl ? customTextEl.value.trim() : '';
+                    if (!rsn) {
+                        layer.msg('{{todo:t text="请填写具体售后原因"}}', {icon: 2});
+                        if (customTextEl) customTextEl.focus();
+                        return;
+                    }
+                } else {
+                    rsn = selectedReason;
+                }
+
+                var typeEl = document.querySelector('input[name="swal_refund_type"]:checked');
+                var type = typeEl ? typeEl.value : 'refund_only';
+                submitRefund(type, amt, rsn, selectedImages, index);
+            }
+        });
+
+        function renderEvidencePreview() {
+            var container = document.getElementById('refund_evidence_preview');
+            if (!container) return;
+            container.innerHTML = '';
+            selectedImages.forEach(function(imgData, idx) {
+                var wrap = document.createElement('div');
+                wrap.style.position = 'relative';
+                wrap.style.width = '54px';
+                wrap.style.height = '54px';
+                wrap.style.border = '1px solid #d9d9d9';
+                wrap.style.borderRadius = '4px';
+                wrap.style.overflow = 'hidden';
+
+                var img = document.createElement('img');
+                img.src = imgData;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+
+                var del = document.createElement('span');
+                del.innerHTML = '&times;';
+                del.style.position = 'absolute';
+                del.style.top = '0';
+                del.style.right = '0';
+                del.style.background = 'rgba(0,0,0,0.5)';
+                del.style.color = '#fff';
+                del.style.width = '16px';
+                del.style.height = '16px';
+                del.style.lineHeight = '14px';
+                del.style.textAlign = 'center';
+                del.style.cursor = 'pointer';
+                del.style.fontSize = '12px';
+                del.onclick = function() {
+                    selectedImages.splice(idx, 1);
+                    renderEvidencePreview();
+                };
+
+                wrap.appendChild(img);
+                wrap.appendChild(del);
+                container.appendChild(wrap);
+            });
+        }
+    } else {
+        var rsn = prompt('{{todo:t text="请输入申请售后原因："}}');
+        if (rsn) {
+            submitRefund('refund_only', maxAmount, rsn, [], null);
+        }
+    }
+}
+
+function cancelRefund(orderId) {
+    if (!orderId) return;
+
+    var doCancel = function() {
+        var csrfInput = document.querySelector('input[name="_csrf_token"]');
+        var csrfToken = csrfInput ? csrfInput.value : '';
+
+        var formData = new URLSearchParams();
+        formData.append('action', 'cancel_refund');
+        formData.append('order_id', orderId);
+        if (csrfToken) formData.append('_csrf_token', csrfToken);
+
+        var ajaxUrl = (window.TODO && window.TODO.INCLUDES_AJAX) ? window.TODO.join(window.TODO.INCLUDES_AJAX, 'order-handler.php') : '{{todo:site_url}}/includes/ajax/order-handler.php';
+
+        var loadIdx = window.layer ? layer.load(1) : null;
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData.toString()
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (loadIdx !== null) layer.close(loadIdx);
+            if (data.success) {
+                if (window.layer) {
+                    layer.msg(data.message || '{{todo:t text="已撤销售后申请"}}', {icon: 1, time: 1500}, function() {
+                        location.reload();
+                    });
+                } else {
+                    alert(data.message || '{{todo:t text="已撤销售后申请"}}');
+                    location.reload();
+                }
+            } else {
+                var err = data.error || data.message || '{{todo:t text="撤销失败"}}';
+                if (window.layer) { layer.msg(err, {icon: 2}); } else { alert(err); }
+            }
+        })
+        .catch(function(err) {
+            if (loadIdx !== null) layer.close(loadIdx);
+            console.error('Cancel refund error:', err);
+            if (window.layer) { layer.msg('{{todo:t text="网络错误"}}', {icon: 2}); } else { alert('{{todo:t text="网络错误"}}'); }
+        });
+    };
+
+    if (window.layer) {
+        layer.confirm('{{todo:t text="撤销后订单将恢复正常状态"}}', {
+            icon: 3,
+            title: '{{todo:t text="确认撤销"}}',
+            btn: [__t('确定'), __t('取消')]
+        }, function(index) {
+            layer.close(index);
+            doCancel();
+        });
+    } else {
+        if (confirm('{{todo:t text="撤销后订单将恢复正常状态"}}')) {
+            doCancel();
+        }
+    }
+}
+</script>
+
+{{todo:include file="users/users_footer.htm"}}
+</body>
+</html>

@@ -1,0 +1,15 @@
+{{todo:include file="header.html"}}
+
+<div class="banner-container">
+    <div class="banner-content">
+        <h1 class="banner-title">{{todo:banner_title}}</h1>
+        <p class="banner-description">{{todo:banner_description}}</p>
+        {{todo:if banner_image}}
+        <div class="banner-image">
+            <img src="{{todo:banner_image}}" alt="{{todo:banner_title}}" loading="eager" fetchpriority="high">
+        </div>
+        {{/todo:if}}
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}

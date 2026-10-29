@@ -1,0 +1,193 @@
+
+{{todo:include file="header.html"}}
+
+<div class="container">
+    <div class="content-wrapper">
+        <main class="main-content">
+            <div class="search-header flex flex-col items-center">
+                <h1 class="search-title">{{todo:t text="搜索"}} "{{todo:search_keyword}}"</h1>
+                <div class="search-info">
+                    <p>{{todo:t text="找到"}} <strong id="jsFoundPosts">0</strong> {{todo:t text="条相关结果"}}</p>
+                </div>
+                
+                <!-- 搜索框 -->
+                <div class="search-form">
+                    <div class="search-input-group">
+                        {{todo:if hot_searches}}
+                        <input type="text" id="search-input" value="{{todo:search_keyword}}" placeholder="{{todo:t text='请输入搜索关键词'}}" class="search-input" style="min-width: 300px; padding-inline-start: 20px; padding-inline-end: 0; border: none;" list="hotKeywords" onkeypress="if(event.key === 'Enter') document.getElementById('search-submit-btn').click();">
+                        <datalist id="hotKeywords">
+                            {{todo:loop hot_searches}}
+                            <option value="{{todo:keyword}}">
+                            {{/todo:loop}}
+                        </datalist>
+                        {{todo:else}}
+                        <input type="text" id="search-input" value="{{todo:search_keyword}}" placeholder="{{todo:t text='请输入搜索关键词'}}" class="search-input" onkeypress="if(event.key === 'Enter') document.getElementById('search-submit-btn').click();">
+                        {{/todo:if}}
+                        <button type="button" id="search-submit-btn" class="search-btn" style="background: none; color: #007cba; display: flex;" onclick="window.TODO.doSafeSearch(document.getElementById('search-input').value, document.getElementById('search-input'));"><i class="icon todofont todo-Search"></i></button>
+                    </div>
+                    {{todo:if hot_searches}}
+                    <div class="hot-searches-bar">
+                        <span class="hot-label">{{todo:t text="热搜"}}</span>
+                        <div>
+                        {{todo:loop hot_searches count="8"}}
+                        <a href="{{todo:search_url}}" class="hot-search-tag">{{todo:keyword}}</a>
+                        {{/todo:loop}}
+                        </div>
+                    </div>
+                    {{/todo:if}}
+                </div>
+            </div>
+            
+            {{todo:if search_results|noid='6,8'|limit=10}}
+            <div class="search-results">
+                {{todo:loop search_results|noid='6,8'|limit=10}}
+                <div class="search-item" data-type="{{todo:content_type}}" data-date="{{todo:content_date}}"{{todo:if pagination_total == 1}} style="grid-column: 1 / 3;"{{/todo:if}}>
+                    <div class="search-item-header">
+                        <div class="content-type-badge">
+                            {{todo:if content_type == 'article'}}
+                            <span class="type-badge type-article">{{todo:t text="文章"}}</span>
+                            {{todo:elseif content_type == 'product'}}
+                            <span class="type-badge type-product">{{todo:t text="产品"}}</span>
+                            {{todo:elseif content_type == 'download'}}
+                            <span class="type-badge type-download">{{todo:t text="下载"}}</span>
+                            {{todo:elseif content_type == 'images'}}
+                            <span class="type-badge type-images">{{todo:t text="图集"}}</span>
+                            {{todo:elseif content_type == 'media'}}
+                            <span class="type-badge type-media">{{todo:t text="媒体"}}</span>
+                            {{todo:elseif content_type == 'recruit'}}
+                            <span class="type-badge type-recruit">{{todo:t text="招聘"}}</span>
+                            {{todo:else}}
+                            <span class="type-badge type-other">{{todo:content_type}}</span>
+                            {{/todo:if}}
+                        </div>
+                        
+                        <div class="search-item-meta">
+                            <span class="item-date">{{todo:content_date}}</span>
+                            {{todo:post_categories}}
+                            <span class="item-category"><a href="{{todo:category_url}}">{{todo:category_name}}</a></span>
+                            {{/todo:post_categories}}
+                            {{todo:if content_views}}
+                            <span class="item-views"><i class="icon todofont todo-PreviewOpen"></i> {{todo:content_views}}</span>
+                            {{/todo:if}}
+                        </div>
+                    </div>
+                    
+                    <div class="search-item-content">
+                        {{todo:if content_thumbnail}}
+                        <div class="item-thumbnail">
+                            <a href="{{todo:content_url}}">
+                                {{todo:img_tag src="content_thumbnail" alt="content_title" class="lazy-load"}}
+                            </a>
+                        </div>
+                        {{/todo:if}}
+                        
+                        <div class="item-info">
+                            <h3 class="item-title">
+                                <a href="{{todo:content_url}}">{{todo:highlighted_title}}</a>
+                            </h3>
+                            
+                            <div class="item-url">
+                                <a href="{{todo:content_url}}" class="url-link">{{todo:content_url}}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/todo:loop}}
+            </div>
+            <!-- 分页导航 -->
+            {{todo:if pagination}}
+            <div class="pagination-nav" aria-label="{{todo:t text='分页导航'}}">
+                <div class="pagination flex gap-2">
+                    {{todo:if pagination_prev_page > 0}}
+                    <a href="{{todo:pagination_prev_url}}" class="pagination-btn prev-btn">
+                        <i class="fa fa-chevron-left"></i>
+                        <span>{{todo:t text="上一页"}}</span>
+                    </a>
+                    {{/todo:if}}
+
+                    <div class="pagination-numbers flex gap-2 items-center">
+                        {{todo:loop pagination_pages}}
+                        {{todo:if page_is_dots}}
+                        <span class="pagination-number dots">...</span>
+                        {{todo:elseif page_is_current}}
+                        <span class="pagination-number current">{{todo:page_number}}</span>
+                        {{todo:else}}
+                        <a href="{{todo:page_url}}" class="pagination-number">{{todo:page_number}}</a>
+                        {{/todo:if}}
+                        {{/todo:loop}}
+                    </div>
+
+                    {{todo:if pagination_next_page > 0}}
+                    <a href="{{todo:pagination_next_url}}" class="pagination-btn next-btn">
+                        <span>{{todo:t text="下一页"}}</span>
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                    {{/todo:if}}
+                </div>
+            </div>
+            {{/todo:if}}
+            <span id="jsFoundPostsValue" style="display:none;">{{todo:found_posts}}</span>
+            <script>
+                (function () {
+                    var target = document.getElementById('jsFoundPosts');
+                    var source = document.getElementById('jsFoundPostsValue');
+                    if (!target || !source) return;
+                    var value = (source.textContent || source.innerText || '').trim();
+                    if (value !== '') target.textContent = value;
+                })();
+            </script>
+            
+            {{todo:if pagination}}
+            <div class="pagination">
+                {{todo:if prev_page}}
+                <a href="{{todo:prev_page_url}}" class="page-prev">{{todo:t text="上一页"}}</a>
+                {{/todo:if}}
+                
+                {{todo:loop page_numbers}}
+                {{todo:if is_current}}
+                <span class="page-current">{{todo:page_number}}</span>
+                {{todo:else}}
+                <a href="{{todo:page_url}}" class="page-number">{{todo:page_number}}</a>
+                {{/todo:if}}
+                {{/todo:loop}}
+                
+                {{todo:if next_page}}
+                <a href="{{todo:next_page_url}}" class="page-next">{{todo:t text="下一页"}}</a>
+                {{/todo:if}}
+            </div>
+            {{/todo:if}}
+            
+            {{todo:else}}
+            {{todo:if search_locked}}
+            <div class="search-locked-notice no-results" style="padding: 40px 20px; text-align: center;">
+                <div style="width: 56px; height: 56px; line-height: 56px; border-radius: 50%; background: #fff1f0; color: #ff4d4f; font-size: 26px; margin: 0 auto 16px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="icon todofont todo-Lock" style="font-size: 28px;"></i>
+                </div>
+                <h3 style="color: #cf1322; font-size: 18px; margin-bottom: 8px;">{{todo:t text="搜索请求过于频繁"}}</h3>
+                <p style="color: #666; font-size: 14px;">{{todo:t text="超出系统频率限制，已临时拒绝搜索"}}</p>
+            </div>
+            {{todo:else}}
+            <div class="no-results">
+                <h3>{{todo:t text="没有找到相关结果"}}</h3>
+                <p>{{todo:t text="抱歉，没有找到与"}} "{{todo:search_keyword}}" {{todo:t text="相关的内容"}}</p>
+                
+                {{todo:if hot_searches}}
+                <div class="popular-searches m-t-10">
+                    <h4>{{todo:t text="热门搜索"}}</h4>
+                    <div class="popular-tags">
+                        {{todo:loop hot_searches}}
+                        <a href="{{todo:search_url}}" class="popular-tag">{{todo:keyword}}</a>
+                        {{/todo:loop}}
+                    </div>
+                </div>
+                {{/todo:if}}
+            </div>
+            {{/todo:if}}
+            {{/todo:if}}
+        </main>
+        
+        
+    </div>
+</div>
+
+{{todo:include file="footer.html"}}
