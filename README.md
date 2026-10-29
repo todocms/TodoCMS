@@ -1,4 +1,4 @@
-# TodoCMS
+# TodoCMS 简单好用的PHP内容管理系统
 
 > 面向独立开发者与出海团队的 AI 原生 PHP 建站系统
 
