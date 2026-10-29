@@ -15,7 +15,7 @@ TodoCMS 是一套轻量、模块化、面向 AI 工作流的 PHP 建站系统：
 - 交流 QQ 群：**527961813**
 
 
-![logo](./index01.png)
+![TodoCMS-img01](index01.png)
 
 
 ## 目录
@@ -296,5 +296,5 @@ define('TODO_DEBUG', true);   // 生产环境务必为 false
 如果 TodoCMS 对你有帮助，欢迎点一个 Star ⭐
 
 
-![logo](./index02.png)
-![logo](./index03.png)
+![TodoCMS-img02](index02.png)
+![TodoCMS-img03](index03.png)
